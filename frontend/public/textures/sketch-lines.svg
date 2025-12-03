@@ -1,0 +1,25 @@
+<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg">
+  <!-- Карандашные линии в стиле Леонардо да Винчи -->
+  <g opacity="0.15">
+    <!-- Горизонтальные линии -->
+    <line x1="0" y1="10" x2="100" y2="12" stroke="#3d3d3d" stroke-width="0.5" stroke-linecap="round"/>
+    <line x1="0" y1="25" x2="100" y2="27" stroke="#3d3d3d" stroke-width="0.5" stroke-linecap="round"/>
+    <line x1="0" y1="40" x2="100" y2="42" stroke="#3d3d3d" stroke-width="0.5" stroke-linecap="round"/>
+    <line x1="0" y1="55" x2="100" y2="57" stroke="#3d3d3d" stroke-width="0.5" stroke-linecap="round"/>
+    <line x1="0" y1="70" x2="100" y2="72" stroke="#3d3d3d" stroke-width="0.5" stroke-linecap="round"/>
+    <line x1="0" y1="85" x2="100" y2="87" stroke="#3d3d3d" stroke-width="0.5" stroke-linecap="round"/>
+    
+    <!-- Вертикальные линии -->
+    <line x1="15" y1="0" x2="17" y2="100" stroke="#3d3d3d" stroke-width="0.5" stroke-linecap="round"/>
+    <line x1="30" y1="0" x2="32" y2="100" stroke="#3d3d3d" stroke-width="0.5" stroke-linecap="round"/>
+    <line x1="45" y1="0" x2="47" y2="100" stroke="#3d3d3d" stroke-width="0.5" stroke-linecap="round"/>
+    <line x1="60" y1="0" x2="62" y2="100" stroke="#3d3d3d" stroke-width="0.5" stroke-linecap="round"/>
+    <line x1="75" y1="0" x2="77" y2="100" stroke="#3d3d3d" stroke-width="0.5" stroke-linecap="round"/>
+    <line x1="90" y1="0" x2="92" y2="100" stroke="#3d3d3d" stroke-width="0.5" stroke-linecap="round"/>
+    
+    <!-- Диагональные линии (схемы) -->
+    <line x1="0" y1="0" x2="50" y2="50" stroke="#3d3d3d" stroke-width="0.3" stroke-linecap="round" opacity="0.1"/>
+    <line x1="50" y1="0" x2="100" y2="50" stroke="#3d3d3d" stroke-width="0.3" stroke-linecap="round" opacity="0.1"/>
+  </g>
+</svg>
+

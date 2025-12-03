@@ -1,0 +1,1052 @@
+// Prisma Schema для Nexus Vita
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ========== ПОЛЬЗОВАТЕЛИ И РОЛИ ==========
+
+enum UserRole {
+  GUEST
+  USER
+  TRAINER
+  LOCATION_MANAGER
+  ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+}
+
+model User {
+  id            String      @id @default(cuid())
+  email         String      @unique
+  phone         String?
+  passwordHash  String
+  firstName     String
+  lastName      String?
+  avatar        String?
+  role          UserRole    @default(USER)
+  status        UserStatus  @default(ACTIVE)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  // Профиль пользователя
+  profile       UserProfile?
+  
+  // Аватар тела
+  bodyAvatar    BodyAvatar?
+  
+  // Тренерский профиль
+  trainerProfile TrainerProfile?
+  
+  // Подписки и отслеживание
+  following     Follow[]    @relation("Following")
+  followers     Follow[]    @relation("Followers")
+  subscriptions Subscription[]
+  
+  // Контент
+  posts         Post[]
+  comments      Comment[]
+  likes         Like[]
+  
+  // Тренировки
+  workoutRecords WorkoutRecord[]
+  workoutPlans  WorkoutPlan[]
+  
+  // Питание
+  nutritionPlans NutritionPlan[]
+  
+  // Медицина
+  medicalRecords MedicalRecord[]
+  
+  // Заказы и покупки
+  orders        Order[]
+  
+  // Токены
+  tokens        TokenTransaction[]
+  
+  // Чат
+  sentMessages  Message[]   @relation("Sender")
+  receivedMessages Message[] @relation("Receiver")
+  chatMemberships ChatMember[]
+  
+  // События
+  eventRegistrations EventRegistration[]
+  
+  // Достижения
+  achievements  UserAchievement[]
+  
+  // Локации (для менеджеров)
+  managedLocations Location[] @relation("LocationManager")
+  
+  @@index([email])
+  @@index([role])
+}
+
+model UserProfile {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  bio         String?
+  dateOfBirth DateTime?
+  gender      String?
+  height      Float?   // см
+  weight      Float?   // кг
+  goals       Json?    // JSON с целями пользователя
+  
+  // Настройки приватности
+  isPublic    Boolean  @default(true)
+  showProgress Boolean @default(true)
+  showMedicalData Boolean @default(false)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// ========== АВАТАР ТЕЛА ==========
+
+model BodyAvatar {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Проблемные зоны и цели
+  targetZones Json     // { bodyPart: "back", goal: "strength", priority: "high" }
+  painPoints  Json     // { bodyPart: "knee", severity: "moderate", notes: "..." }
+  injuryHistory Json?  // История травм
+  
+  // Визуальные настройки
+  avatarConfig Json?   // Настройки отображения аватара
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// ========== ТРЕНЕРЫ ==========
+
+model TrainerProfile {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  specialties String[] // ["strength", "yoga", "nutrition"]
+  certifications String[]
+  experience  Int?     // лет опыта
+  bio         String?
+  
+  // Страница тренера (мини-сайт)
+  trainerPage TrainerPage?
+  
+  // Локации
+  locations   TrainerLocation[]
+  
+  // Программы
+  programs    Program[]
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model TrainerPage {
+  id          String   @id @default(cuid())
+  trainerId   String   @unique
+  trainer     TrainerProfile @relation(fields: [trainerId], references: [id], onDelete: Cascade)
+  
+  slug        String   @unique // URL slug для мини-сайта
+  title       String
+  description String?
+  
+  // Тема оформления
+  themeId     String?
+  theme       Theme?   @relation(fields: [themeId], references: [id])
+  
+  // Модули страницы
+  modules     TrainerPageModule[]
+  
+  // Статистика
+  followersCount Int    @default(0)
+  subscribersCount Int  @default(0)
+  
+  isPublished Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([slug])
+}
+
+model TrainerPageModule {
+  id          String   @id @default(cuid())
+  pageId      String
+  page        TrainerPage @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  
+  moduleType  String   // "feed", "calendar", "shop", "achievements", etc.
+  config      Json     // Конфигурация модуля
+  order       Int      // Порядок отображения
+  
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([pageId, order])
+}
+
+// ========== ТЕМЫ ==========
+
+model Theme {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String?
+  
+  // Владелец темы
+  authorId    String?
+  author      User?    @relation(fields: [authorId], references: [id])
+  
+  // Конфигурация темы
+  config      Json     // { colors: {...}, fonts: {...}, textures: {...} }
+  
+  // Метаданные
+  isPublic    Boolean  @default(false)
+  isDefault   Boolean  @default(false)
+  downloads   Int      @default(0)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Использование
+  trainerPages TrainerPage[]
+  
+  @@index([slug])
+  @@index([isPublic])
+}
+
+// ========== ПОДПИСКИ ==========
+
+model Follow {
+  id          String   @id @default(cuid())
+  followerId String
+  follower    User     @relation("Following", fields: [followerId], references: [id], onDelete: Cascade)
+  followingId String
+  following   User     @relation("Followers", fields: [followingId], references: [id], onDelete: Cascade)
+  
+  createdAt   DateTime @default(now())
+  
+  @@unique([followerId, followingId])
+  @@index([followerId])
+  @@index([followingId])
+}
+
+model Subscription {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  trainerId   String
+  trainer     TrainerProfile @relation(fields: [trainerId], references: [id], onDelete: Cascade)
+  
+  planId      String?
+  plan        SubscriptionPlan? @relation(fields: [planId], references: [id])
+  
+  status      String   @default("active") // active, cancelled, expired
+  startDate   DateTime @default(now())
+  endDate     DateTime?
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([userId])
+  @@index([trainerId])
+}
+
+model SubscriptionPlan {
+  id          String   @id @default(cuid())
+  trainerId   String
+  trainer     TrainerProfile @relation(fields: [trainerId], references: [id], onDelete: Cascade)
+  
+  name        String
+  description String?
+  price       Float
+  currency    String   @default("RUB")
+  duration    Int      // дней
+  features    Json     // Список возможностей
+  
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// ========== КОНТЕНТ ==========
+
+enum PostType {
+  PHOTO
+  VIDEO
+  TEXT
+  ARTICLE
+  STORY
+}
+
+model Post {
+  id          String   @id @default(cuid())
+  authorId    String
+  author      User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  
+  type        PostType
+  content     String   // Текст поста
+  media       String[] // URLs медиафайлов
+  
+  // Категории
+  category    String?  // "education", "inspiration", "personal"
+  tags        String[]
+  
+  // Взаимодействие
+  likesCount  Int      @default(0)
+  commentsCount Int    @default(0)
+  sharesCount Int      @default(0)
+  
+  // Метаданные
+  isPublic    Boolean  @default(true)
+  publishedAt DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Связи
+  comments    Comment[]
+  likes       Like[]
+  
+  @@index([authorId])
+  @@index([publishedAt])
+  @@index([category])
+}
+
+model Comment {
+  id          String   @id @default(cuid())
+  postId      String
+  post        Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  authorId    String
+  author      User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  
+  content     String
+  parentId    String?  // Для вложенных комментариев
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([postId])
+  @@index([authorId])
+}
+
+model Like {
+  id          String   @id @default(cuid())
+  postId      String
+  post        Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  createdAt   DateTime @default(now())
+  
+  @@unique([postId, userId])
+  @@index([postId])
+  @@index([userId])
+}
+
+// ========== ТРЕНИРОВКИ ==========
+
+model Exercise {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  instructions String? // Инструкции по выполнению
+  
+  // Категории
+  category    String   // "strength", "cardio", "flexibility"
+  muscleGroups String[] // ["chest", "triceps"]
+  equipment   String[] // ["dumbbells", "barbell"]
+  
+  // Медиа
+  imageUrl    String?
+  videoUrl    String?
+  
+  // Метаданные
+  difficulty  String?  // "beginner", "intermediate", "advanced"
+  duration    Int?     // секунды
+  calories    Int?     // калории за выполнение
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Связи
+  workoutPlanExercises WorkoutPlanExercise[]
+  
+  @@index([category])
+}
+
+model WorkoutPlan {
+  id          String   @id @default(cuid())
+  trainerId   String?
+  trainer     TrainerProfile? @relation(fields: [trainerId], references: [id], onDelete: SetNull)
+  
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  name        String
+  description String?
+  
+  // Настройки
+  duration    Int      // дней
+  frequency   Int      // тренировок в неделю
+  
+  // Упражнения
+  exercises   WorkoutPlanExercise[]
+  
+  // Прогресс
+  isActive    Boolean  @default(true)
+  startDate   DateTime?
+  endDate     DateTime?
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([trainerId])
+  @@index([userId])
+}
+
+model WorkoutPlanExercise {
+  id          String   @id @default(cuid())
+  planId      String
+  plan        WorkoutPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
+  exerciseId  String
+  exercise    Exercise @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
+  
+  day         Int      // День плана
+  sets        Int?
+  reps        Int?
+  weight      Float?
+  duration    Int?     // секунды
+  rest        Int?     // секунды отдыха
+  order       Int      // Порядок в тренировке
+  
+  @@index([planId, day])
+}
+
+model WorkoutRecord {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  planId      String?
+  plan        WorkoutPlan? @relation(fields: [planId], references: [id], onDelete: SetNull)
+  
+  exerciseId  String?
+  exercise    Exercise? @relation(fields: [exerciseId], references: [id], onDelete: SetNull)
+  
+  // Результаты
+  sets        Int?
+  reps        Int?
+  weight      Float?
+  duration    Int?     // секунды
+  calories    Int?
+  
+  notes       String?
+  date        DateTime @default(now())
+  
+  createdAt   DateTime @default(now())
+  
+  @@index([userId, date])
+  @@index([planId])
+}
+
+// ========== ПИТАНИЕ ==========
+
+model NutritionPlan {
+  id          String   @id @default(cuid())
+  trainerId   String?
+  trainer     TrainerProfile? @relation(fields: [trainerId], references: [id], onDelete: SetNull)
+  
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  name        String
+  description String?
+  
+  // Калории и БЖУ
+  calories    Int?
+  protein     Float?
+  carbs       Float?
+  fats        Float?
+  
+  // План питания
+  meals       NutritionMeal[]
+  
+  duration    Int      // дней
+  startDate   DateTime?
+  endDate     DateTime?
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([trainerId])
+  @@index([userId])
+}
+
+model NutritionMeal {
+  id          String   @id @default(cuid())
+  planId      String
+  plan        NutritionPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
+  
+  day         Int      // День плана
+  mealType    String   // "breakfast", "lunch", "dinner", "snack"
+  name        String
+  description String?
+  
+  calories    Int?
+  protein     Float?
+  carbs       Float?
+  fats        Float?
+  
+  ingredients Json?    // Список ингредиентов
+  recipe      String?  // Рецепт
+  
+  order       Int
+  
+  @@index([planId, day])
+}
+
+// ========== МЕДИЦИНА ==========
+
+model MedicalRecord {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Тип записи
+  recordType  String   // "analysis", "recommendation", "diagnosis"
+  
+  // Данные
+  title       String
+  description String?
+  data        Json     // Структурированные данные (анализы, показатели)
+  
+  // Врач/тренер
+  doctorId    String?  // ID врача или тренера с мед. образованием
+  
+  // Метаданные
+  date        DateTime @default(now())
+  isPrivate   Boolean  @default(true)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([userId, date])
+  @@index([recordType])
+}
+
+// ========== ЛОКАЦИИ ==========
+
+model Location {
+  id          String   @id @default(cuid())
+  managerId   String
+  manager     User     @relation("LocationManager", fields: [managerId], references: [id], onDelete: Cascade)
+  
+  name        String
+  description String?
+  address     String
+  city        String
+  country     String   @default("RU")
+  
+  // Тип локации
+  type        String   // "gym", "spa", "pool", "medical_center"
+  
+  // Контакты
+  phone       String?
+  email       String?
+  website     String?
+  
+  // Медиа
+  images      String[]
+  
+  // Настройки
+  isActive    Boolean  @default(true)
+  
+  // Абонементы
+  passes      LocationPass[]
+  
+  // Тренеры
+  trainers    TrainerLocation[]
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([type])
+  @@index([city])
+}
+
+model TrainerLocation {
+  id          String   @id @default(cuid())
+  trainerId   String
+  trainer     TrainerProfile @relation(fields: [trainerId], references: [id], onDelete: Cascade)
+  locationId  String
+  location    Location @relation(fields: [locationId], references: [id], onDelete: Cascade)
+  
+  // Партнёрские условия
+  discount    Float?   // Процент скидки для клиентов тренера
+  schedule    Json?    // Расписание работы тренера в этой локации
+  
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  
+  @@unique([trainerId, locationId])
+  @@index([trainerId])
+  @@index([locationId])
+}
+
+model LocationPass {
+  id          String   @id @default(cuid())
+  locationId  String
+  location    Location @relation(fields: [locationId], references: [id], onDelete: Cascade)
+  
+  name        String
+  description String?
+  
+  // Тип абонемента
+  type        String   // "unlimited", "visits", "time"
+  
+  // Параметры
+  visits      Int?     // Количество посещений
+  duration    Int?     // Дней действия
+  price       Float
+  currency    String   @default("RUB")
+  
+  // Скидки
+  discount    Float?
+  
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Заказы
+  orders      Order[]
+  
+  @@index([locationId])
+}
+
+// ========== МАГАЗИН ==========
+
+enum ProductType {
+  SERVICE
+  PHYSICAL
+  DIGITAL
+}
+
+model Product {
+  id          String   @id @default(cuid())
+  
+  // Владелец (тренер или система)
+  sellerId    String?  // ID тренера или null для системных товаров
+  
+  name        String
+  description String?
+  
+  type        ProductType
+  category    String
+  
+  // Цена
+  price       Float
+  currency    String   @default("RUB")
+  tokenPrice  Int?     // Цена в токенах
+  
+  // Медиа
+  images      String[]
+  videoUrl    String?
+  
+  // Для услуг
+  duration    Int?     // минут
+  isOnline    Boolean? // Онлайн или офлайн
+  
+  // Для физических товаров
+  stock       Int?
+  sku         String?
+  
+  // Для цифровых товаров
+  downloadUrl String?
+  accessType  String?  // "lifetime", "subscription"
+  
+  // Метаданные
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Заказы
+  orderItems  OrderItem[]
+  
+  @@index([sellerId])
+  @@index([category])
+}
+
+model Program {
+  id          String   @id @default(cuid())
+  trainerId   String
+  trainer     TrainerProfile @relation(fields: [trainerId], references: [id], onDelete: Cascade)
+  
+  name        String
+  description String?
+  
+  // Тип программы
+  type        String   // "workout", "nutrition", "wellness", "challenge"
+  
+  // Контент
+  content     Json     // Структурированный контент программы
+  
+  // Цена
+  price       Float?
+  currency    String   @default("RUB")
+  tokenPrice  Int?
+  
+  // Доступ
+  isPublic    Boolean  @default(false)
+  accessLevel String?  // "free", "premium", "subscription"
+  
+  // Метаданные
+  duration    Int?     // дней
+  difficulty  String?
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([trainerId])
+  @@index([type])
+}
+
+// ========== ЗАКАЗЫ ==========
+
+enum OrderStatus {
+  PENDING
+  PAID
+  PROCESSING
+  COMPLETED
+  CANCELLED
+  REFUNDED
+}
+
+model Order {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Тип заказа
+  orderType   String   // "product", "pass", "subscription", "program"
+  
+  // Элементы заказа
+  items       OrderItem[]
+  
+  // Абонемент (если заказ абонемента)
+  passId      String?
+  pass        LocationPass? @relation(fields: [passId], references: [id])
+  
+  // Цена
+  total       Float
+  currency    String   @default("RUB")
+  tokenAmount Int?     // Потрачено токенов
+  
+  // Оплата
+  paymentMethod String?
+  paymentId   String?
+  status      OrderStatus @default(PENDING)
+  
+  // Доставка (для физических товаров)
+  shippingAddress Json?
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([userId])
+  @@index([status])
+}
+
+model OrderItem {
+  id          String   @id @default(cuid())
+  orderId     String
+  order       Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  
+  productId   String?
+  product     Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+  
+  name        String
+  quantity    Int      @default(1)
+  price       Float
+  tokenPrice  Int?
+  
+  @@index([orderId])
+}
+
+// ========== ТОКЕНЫ ==========
+
+enum TokenTransactionType {
+  EARNED
+  SPENT
+  TRANSFERRED
+  REFUNDED
+}
+
+model TokenTransaction {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  type        TokenTransactionType
+  amount      Int      // Может быть отрицательным для трат
+  
+  // Причина
+  reason      String   // "workout_completed", "challenge_participation", "purchase", etc.
+  description String?
+  
+  // Связь с другими сущностями
+  relatedId   String?  // ID связанной сущности (заказ, челлендж и т.д.)
+  relatedType String?  // Тип связанной сущности
+  
+  balance     Int      // Баланс после транзакции
+  
+  createdAt   DateTime @default(now())
+  
+  @@index([userId, createdAt])
+  @@index([type])
+}
+
+// ========== ЧАТ ==========
+
+model Chat {
+  id          String   @id @default(cuid())
+  
+  // Тип чата
+  type        String   @default("direct") // "direct", "group", "event"
+  
+  // Участники
+  members     ChatMember[]
+  
+  // Сообщения
+  messages    Message[]
+  
+  // Для групповых чатов
+  name        String?
+  description String?
+  
+  // Telegram интеграция
+  telegramChatId String?
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model ChatMember {
+  id          String   @id @default(cuid())
+  chatId      String
+  chat        Chat     @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  role        String   @default("member") // "member", "admin"
+  joinedAt    DateTime @default(now())
+  
+  @@unique([chatId, userId])
+  @@index([chatId])
+  @@index([userId])
+}
+
+model Message {
+  id          String   @id @default(cuid())
+  chatId      String
+  chat        Chat     @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  
+  senderId    String
+  sender      User     @relation("Sender", fields: [senderId], references: [id], onDelete: Cascade)
+  
+  receiverId  String?
+  receiver    User?    @relation("Receiver", fields: [receiverId], references: [id], onDelete: SetNull)
+  
+  content     String
+  type        String   @default("text") // "text", "image", "video", "file"
+  mediaUrl    String?
+  
+  // Telegram
+  telegramMessageId String?
+  
+  isRead      Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  
+  @@index([chatId, createdAt])
+  @@index([senderId])
+  @@index([receiverId])
+}
+
+// ========== СОБЫТИЯ ==========
+
+enum EventType {
+  ONLINE_TRAINING
+  OFFLINE_TRAINING
+  WEBINAR
+  CONSULTATION
+  GROUP_SESSION
+}
+
+model Event {
+  id          String   @id @default(cuid())
+  
+  // Организатор
+  organizerId String   // ID тренера или локации
+  
+  title       String
+  description String?
+  
+  type        EventType
+  
+  // Время
+  startDate   DateTime
+  endDate     DateTime
+  timezone    String   @default("Europe/Moscow")
+  
+  // Локация
+  locationId  String?
+  location    Location? @relation(fields: [locationId], references: [id])
+  isOnline    Boolean   @default(false)
+  meetingUrl  String?   // Для онлайн событий
+  
+  // Участники
+  maxParticipants Int?
+  registrations EventRegistration[]
+  
+  // Цена
+  price       Float?
+  currency    String   @default("RUB")
+  tokenPrice  Int?
+  
+  // Метаданные
+  isPublic    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([organizerId])
+  @@index([startDate])
+  @@index([type])
+}
+
+model EventRegistration {
+  id          String   @id @default(cuid())
+  eventId     String
+  event       Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  status      String   @default("registered") // "registered", "attended", "cancelled"
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@unique([eventId, userId])
+  @@index([eventId])
+  @@index([userId])
+}
+
+// ========== ДОСТИЖЕНИЯ ==========
+
+model Achievement {
+  id          String   @id @default(cuid())
+  
+  name        String
+  description String?
+  icon        String?  // URL иконки
+  badge       String?  // URL бейджа
+  
+  // Условия получения
+  condition   Json     // Условия для получения достижения
+  
+  // Категория
+  category    String   // "workout", "social", "challenge", "streak"
+  
+  // Награда
+  tokenReward Int?     // Токены за получение
+  
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  
+  @@index([category])
+}
+
+model UserAchievement {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievementId String
+  achievement   Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+  
+  unlockedAt    DateTime @default(now())
+  
+  @@unique([userId, achievementId])
+  @@index([userId])
+  @@index([achievementId])
+}
+
+// ========== ЧЕЛЛЕНДИ ==========
+
+model Challenge {
+  id          String   @id @default(cuid())
+  
+  // Организатор
+  organizerId String?  // ID тренера или системы
+  
+  name        String
+  description String?
+  
+  // Тип
+  type        String   // "workout", "steps", "nutrition", "streak"
+  
+  // Параметры
+  goal        Json     // Цель челленджа
+  duration    Int      // дней
+  
+  // Время
+  startDate   DateTime
+  endDate     DateTime
+  
+  // Награды
+  tokenReward Int?
+  achievementId String?
+  achievement Achievement? @relation(fields: [achievementId], references: [id])
+  
+  // Участники
+  participants ChallengeParticipant[]
+  
+  // Метаданные
+  isPublic    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([startDate])
+  @@index([type])
+}
+
+model ChallengeParticipant {
+  id          String   @id @default(cuid())
+  challengeId String
+  challenge   Challenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  progress    Json     // Прогресс участника
+  completed   Boolean  @default(false)
+  
+  joinedAt    DateTime @default(now())
+  completedAt DateTime?
+  
+  @@unique([challengeId, userId])
+  @@index([challengeId])
+  @@index([userId])
+}
+

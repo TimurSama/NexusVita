@@ -1,0 +1,454 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Базовые CSS переменные для темы по умолчанию */
+  --theme-bg-primary: #fefbf7;
+  --theme-bg-secondary: #fdf6ef;
+  --theme-text-primary: #3d3d3d;
+  --theme-text-secondary: #6d6d6d;
+  --theme-accent: #4fd1c7;
+  --theme-accent-hover: #38b2aa;
+  --theme-border: #e7e7e7;
+  --theme-card-bg: #ffffff;
+  --theme-shadow: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="dmitry"] {
+  /* Тема "Лес, грибы, Dune" */
+  --theme-bg-primary: #f5f0e8;
+  --theme-bg-secondary: #e8e0d4;
+  --theme-text-primary: #2d2a24;
+  --theme-text-secondary: #5a564d;
+  --theme-accent: #6b8e5a;
+  --theme-accent-hover: #5a7a4a;
+  --theme-border: #d4c9b8;
+  --theme-card-bg: #faf7f2;
+}
+
+[data-theme="oleg"] {
+  /* Тема "Киберпанк-неон" */
+  --theme-bg-primary: #0a0e1a;
+  --theme-bg-secondary: #141b2d;
+  --theme-text-primary: #e0e0e0;
+  --theme-text-secondary: #a0a0a0;
+  --theme-accent: #00d9ff;
+  --theme-accent-hover: #00b8d9;
+  --theme-border: #1a2332;
+  --theme-card-bg: #1a2332;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+  background-color: var(--theme-bg-primary);
+  color: var(--theme-text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+body {
+  background-image: 
+    url('/textures/parchment.jpg'),
+    url('/textures/sketch-lines.svg');
+  background-size: 
+    100% 100%,
+    150px 150px;
+  background-position: 
+    center,
+    0 0;
+  background-blend-mode: 
+    normal,
+    multiply;
+  background-attachment: fixed;
+  opacity: 0.95;
+  position: relative;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    radial-gradient(circle at 20% 30%, rgba(61, 61, 61, 0.03) 0%, transparent 50%),
+    radial-gradient(circle at 80% 70%, rgba(61, 61, 61, 0.03) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Эффект карандашных набросков (стиль Леонардо да Винчи) */
+@keyframes sketchLine {
+  0%, 100% {
+    opacity: 0.3;
+    transform: translateX(-2px) translateY(-1px);
+  }
+  50% {
+    opacity: 0.5;
+    transform: translateX(2px) translateY(1px);
+  }
+}
+
+.sketch-border {
+  position: relative;
+  background: var(--theme-card-bg);
+  border: 2px solid transparent;
+}
+
+.sketch-border::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: 
+    linear-gradient(90deg, transparent 0%, rgba(61, 61, 61, 0.1) 50%, transparent 100%),
+    linear-gradient(0deg, transparent 0%, rgba(61, 61, 61, 0.1) 50%, transparent 100%);
+  border-radius: 12px;
+  z-index: -1;
+  animation: sketchLine 3s ease-in-out infinite;
+  opacity: 0.4;
+}
+
+.sketch-border::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(61, 61, 61, 0.03) 2px,
+      rgba(61, 61, 61, 0.03) 4px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 2px,
+      rgba(61, 61, 61, 0.03) 2px,
+      rgba(61, 61, 61, 0.03) 4px
+    );
+  border-radius: 12px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Material Expressive 3 - плавные переходы и анимации */
+@keyframes materialRipple {
+  0% {
+    transform: scale(0);
+    opacity: 0.6;
+  }
+  100% {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+.ripple-effect {
+  position: relative;
+  overflow: hidden;
+}
+
+.ripple-effect::before {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.6);
+  width: 100px;
+  height: 100px;
+  margin-top: -50px;
+  margin-left: -50px;
+  top: 50%;
+  left: 50%;
+  animation: materialRipple 0.6s;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.ripple-effect:active::before {
+  animation: materialRipple 0.6s;
+  opacity: 1;
+}
+
+/* Компоненты */
+.card {
+  background: var(--theme-card-bg);
+  border: 2px solid var(--theme-border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 
+    0 1px 3px rgba(0, 0, 0, 0.05),
+    0 4px 6px rgba(0, 0, 0, 0.05),
+    0 8px 12px rgba(0, 0, 0, 0.08);
+  transition: 
+    transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.1),
+    transparent
+  );
+  transition: left 0.5s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px) scale(1.01);
+  box-shadow: 
+    0 4px 6px rgba(0, 0, 0, 0.07),
+    0 10px 15px rgba(0, 0, 0, 0.1),
+    0 20px 25px rgba(0, 0, 0, 0.12);
+  border-color: var(--theme-accent);
+}
+
+.card:hover::before {
+  left: 100%;
+}
+
+/* Карандашные линии на карточках */
+.card-sketch {
+  position: relative;
+}
+
+.card-sketch::after {
+  content: '';
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 40px;
+  height: 40px;
+  background-image: 
+    url('/textures/sketch-lines.svg');
+  background-size: 40px 40px;
+  opacity: 0.2;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Дополнительные эффекты карандашных набросков */
+.sketch-underline {
+  position: relative;
+  display: inline-block;
+}
+
+.sketch-underline::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(
+    to right,
+    transparent 0%,
+    rgba(61, 61, 61, 0.3) 20%,
+    rgba(61, 61, 61, 0.3) 80%,
+    transparent 100%
+  );
+  transform: skewX(-5deg);
+  opacity: 0.6;
+}
+
+/* Эффект "наброска" для текста */
+.sketch-text {
+  position: relative;
+  display: inline-block;
+}
+
+.sketch-text::before {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  color: rgba(61, 61, 61, 0.1);
+  transform: translate(1px, 1px);
+  z-index: -1;
+}
+
+.button-primary {
+  background: var(--theme-accent);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: 
+    background 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.1),
+    0 4px 8px rgba(0, 0, 0, 0.08);
+}
+
+.button-primary::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.button-primary:hover {
+  background: var(--theme-accent-hover);
+  transform: translateY(-2px);
+  box-shadow: 
+    0 4px 8px rgba(0, 0, 0, 0.12),
+    0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.button-primary:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+.button-primary:active {
+  transform: translateY(0);
+}
+
+.button-secondary {
+  background: transparent;
+  color: var(--theme-text-primary);
+  border: 2px solid var(--theme-border);
+  padding: 0.75rem 1.5rem;
+  border-radius: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: 
+    background 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 0.3s ease,
+    transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.button-secondary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: var(--theme-bg-secondary);
+  transition: left 0.3s ease;
+  z-index: -1;
+}
+
+.button-secondary:hover {
+  background: var(--theme-bg-secondary);
+  border-color: var(--theme-accent);
+  transform: translateY(-2px);
+}
+
+.button-secondary:hover::before {
+  left: 0;
+}
+
+.button-secondary:active {
+  transform: translateY(0);
+}
+
+/* Анимации */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.shimmer {
+  animation: shimmer 2s infinite;
+  background: linear-gradient(
+    to right,
+    var(--theme-bg-secondary) 0%,
+    var(--theme-bg-primary) 50%,
+    var(--theme-bg-secondary) 100%
+  );
+  background-size: 1000px 100%;
+}
+
+/* Material Expressive 3 - дополнительные эффекты */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.float-animation {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Эффект "дыхания" для карточек */
+@keyframes breathe {
+  0%, 100% {
+    box-shadow: 
+      0 1px 3px rgba(0, 0, 0, 0.05),
+      0 4px 6px rgba(0, 0, 0, 0.05),
+      0 8px 12px rgba(0, 0, 0, 0.08);
+  }
+  50% {
+    box-shadow: 
+      0 2px 4px rgba(0, 0, 0, 0.06),
+      0 6px 8px rgba(0, 0, 0, 0.06),
+      0 12px 16px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.card-breathe {
+  animation: breathe 4s ease-in-out infinite;
+}
