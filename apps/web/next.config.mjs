@@ -20,6 +20,9 @@ const nextConfig = {
     NEXT_PUBLIC_WS_URL: process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:5000',
   },
 
+  // Output configuration for Docker
+  output: 'standalone',
+
   // Experimental features
   experimental: {
     // Enable server actions
@@ -79,4 +82,5 @@ const nextConfig = {
 };
 
 export default nextConfig;
+
 

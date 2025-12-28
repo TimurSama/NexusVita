@@ -372,3 +372,4 @@ router.get('/specializations/all', async (req, res, next) => {
 
 export default router;
 
+

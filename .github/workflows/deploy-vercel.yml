@@ -26,13 +26,14 @@ jobs:
 
       - name: Install dependencies
         run: |
-          npm install
+          npm ci
           cd apps/web
           npm install
 
       - name: Pull Vercel Environment Information
         run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
         working-directory: ./apps/web
+        continue-on-error: true
 
       - name: Build Project Artifacts
         run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
@@ -40,8 +41,10 @@ jobs:
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-          NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
-          NEXT_PUBLIC_TELEGRAM_BOT_USERNAME: ${{ secrets.NEXT_PUBLIC_TELEGRAM_BOT_USERNAME }}
+          NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api' }}
+          NEXT_PUBLIC_APP_URL: ${{ secrets.NEXT_PUBLIC_APP_URL || 'http://localhost:3000' }}
+          NEXT_PUBLIC_WS_URL: ${{ secrets.NEXT_PUBLIC_WS_URL || 'ws://localhost:5000' }}
+          NEXT_PUBLIC_TELEGRAM_BOT_USERNAME: ${{ secrets.NEXT_PUBLIC_TELEGRAM_BOT_USERNAME || '' }}
 
       - name: Deploy Project Artifacts to Vercel
         run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}

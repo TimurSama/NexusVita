@@ -210,3 +210,4 @@ import { InviteCard } from '@/components/invite/InviteCard';
 3. Убедитесь, что все переменные окружения установлены
 4. Проверьте доступность webhook URL
 
+

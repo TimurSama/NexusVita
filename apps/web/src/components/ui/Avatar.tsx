@@ -164,3 +164,4 @@ const AvatarGroup = ({ children, max = 4, size = 'md', className }: AvatarGroupP
 
 export { Avatar, AvatarGroup };
 
+
