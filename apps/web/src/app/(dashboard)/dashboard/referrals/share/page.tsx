@@ -49,14 +49,19 @@ export default function ShareReferralPage() {
     try {
       const tg = window.Telegram?.WebApp;
       if (tg) {
-        tg.requestContact((granted, contact) => {
+        tg.requestContact(async (granted, contact) => {
           if (granted && contact) {
-            // Send invite to contact
-            const { telegramApi } = await import('@/lib/api');
-            await telegramApi.sendInvite({
-              telegramId: contact.contact.user_id?.toString(),
-            });
-            tg.showAlert('Приглашение отправлено!');
+            try {
+              // Send invite to contact
+              const { telegramApi } = await import('@/lib/api');
+              await telegramApi.sendInvite({
+                telegramId: contact.contact.user_id?.toString(),
+              });
+              tg.showAlert('Приглашение отправлено!');
+            } catch (error) {
+              console.error('Error sending invite:', error);
+              tg.showAlert('Ошибка при отправке приглашения');
+            }
           }
         });
       }
