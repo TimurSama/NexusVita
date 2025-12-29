@@ -10,6 +10,10 @@ jobs:
     name: Deploy Frontend to Vercel
     runs-on: ubuntu-latest
     
+    # Этот workflow опционален - Vercel может деплоить автоматически
+    # Если вы настроили Vercel через Dashboard, этот workflow можно отключить
+    if: ${{ secrets.VERCEL_TOKEN }}
+    
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -35,13 +39,11 @@ jobs:
           npm install
 
       - name: Pull Vercel Environment Information
-        if: ${{ secrets.VERCEL_TOKEN }}
         run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
         working-directory: ./apps/web
         continue-on-error: true
 
       - name: Build Project Artifacts
-        if: ${{ secrets.VERCEL_TOKEN }}
         run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
         working-directory: ./apps/web
         env:
@@ -53,7 +55,6 @@ jobs:
           NEXT_PUBLIC_TELEGRAM_BOT_USERNAME: ${{ secrets.NEXT_PUBLIC_TELEGRAM_BOT_USERNAME || '' }}
 
       - name: Deploy Project Artifacts to Vercel
-        if: ${{ secrets.VERCEL_TOKEN }}
         run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
         working-directory: ./apps/web
         env:
