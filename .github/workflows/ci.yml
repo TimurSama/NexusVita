@@ -24,7 +24,11 @@ jobs:
 
       - name: Install dependencies
         run: |
-          npm ci
+          if [ -f package-lock.json ]; then
+            npm ci
+          else
+            npm install
+          fi
           cd apps/api && npm install || true
           cd ../web && npm install || true
 
@@ -70,7 +74,11 @@ jobs:
 
       - name: Install dependencies
         run: |
-          npm ci
+          if [ -f package-lock.json ]; then
+            npm ci
+          else
+            npm install
+          fi
           cd apps/api && npm install || true
           cd ../web && npm install || true
 
