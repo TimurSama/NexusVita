@@ -320,3 +320,4 @@ router.get('/amenities/all', async (req, res, next) => {
 export default router;
 
 
+

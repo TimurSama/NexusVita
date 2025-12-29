@@ -4,3 +4,4 @@ export class SexologyService {
   // Placeholder methods - to be implemented
 }
 
+

@@ -788,6 +788,59 @@ body {
   animation: slide-up 0.4s ease-out;
 }
 
+@keyframes shimmer-slow {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+@keyframes gradient-shift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes scale-pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+@keyframes rotate-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-shimmer-slow {
+  animation: shimmer-slow 3s infinite;
+}
+
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradient-shift 3s ease infinite;
+}
+
+.animate-scale-pulse {
+  animation: scale-pulse 2s ease-in-out infinite;
+}
+
+.animate-rotate-slow {
+  animation: rotate-slow 20s linear infinite;
+}
+
 /* Smooth transitions for interactive elements */
 button, a, [role="button"] {
   transition: all var(--transition-fast);
@@ -799,6 +852,46 @@ button:hover, a:hover, [role="button"]:hover {
 
 button:active, a:active, [role="button"]:active {
   transform: translateY(0);
+}
+
+/* Enhanced card hover effects */
+.card-interactive {
+  transition: all var(--transition-base);
+  cursor: pointer;
+}
+
+.card-interactive:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: var(--shadow-xl), var(--shadow-glow-primary);
+  border-color: var(--primary-500);
+}
+
+/* Loading spinner */
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spinner {
+  border: 3px solid var(--bg-tertiary);
+  border-top-color: var(--primary-500);
+  border-radius: 50%;
+  animation: spin-slow 1s linear infinite;
+}
+
+/* Progress bar animation */
+@keyframes progress {
+  from {
+    width: 0%;
+  }
+}
+
+.progress-animated {
+  animation: progress 1s ease-out;
 }
 
 /* Card hover effects */

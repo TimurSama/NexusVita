@@ -4,3 +4,4 @@ export class LifestyleService {
   // Placeholder methods - to be implemented
 }
 
+

@@ -227,3 +227,4 @@ router.get('/referral/earnings', async (req: AuthRequest, res, next) => {
 export default router;
 
 
+

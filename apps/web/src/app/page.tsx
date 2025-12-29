@@ -72,10 +72,10 @@ const features = [
 ];
 
 const stats = [
-  { value: '50K+', label: 'Активных пользователей' },
-  { value: '1200+', label: 'Специалистов' },
-  { value: '500K+', label: 'NVT токенов в обороте' },
-  { value: '95%', label: 'Удовлетворённость' },
+  { value: '50K+', label: 'Активных пользователей', icon: '👥', trend: '+12%' },
+  { value: '1200+', label: 'Специалистов', icon: '👨‍🏫', trend: '+8%' },
+  { value: '500K+', label: 'NVT токенов в обороте', icon: '🪙', trend: '+25%' },
+  { value: '95%', label: 'Удовлетворённость', icon: '⭐', trend: '+2%' },
 ];
 
 export default function HomePage() {
@@ -185,11 +185,18 @@ export default function HomePage() {
             {stats.map((stat, index) => (
               <div 
                 key={stat.label}
-                className="text-center p-6 rounded-2xl glass"
+                className="group text-center p-6 rounded-2xl glass hover:glass-strong cursor-pointer transition-all duration-300 hover:scale-105 hover:-translate-y-1"
                 style={{ animationDelay: `${index * 100}ms` }}
               >
-                <div className="text-3xl md:text-4xl font-bold text-gradient mb-2">{stat.value}</div>
-                <div className="text-sm text-[var(--text-secondary)]">{stat.label}</div>
+                <div className="text-4xl mb-3 group-hover:scale-110 transition-transform duration-300">{stat.icon}</div>
+                <div className="text-3xl md:text-4xl font-bold text-gradient mb-2 group-hover:scale-110 transition-transform duration-300">{stat.value}</div>
+                <div className="text-sm text-[var(--text-secondary)] mb-1">{stat.label}</div>
+                <div className="text-xs text-green-400 font-medium flex items-center justify-center gap-1">
+                  <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                  </svg>
+                  {stat.trend} за месяц
+                </div>
               </div>
             ))}
           </div>
@@ -212,23 +219,29 @@ export default function HomePage() {
               <Link
                 key={feature.id}
                 href={feature.href}
-                className={`card group cursor-pointer opacity-0 animate-fade-in-up`}
+                className={`card group cursor-pointer opacity-0 animate-fade-in-up relative overflow-hidden hover:border-[var(--primary-500)] transition-all duration-300`}
                 style={{ animationDelay: `${index * 100}ms`, animationFillMode: 'forwards' }}
               >
-                <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${feature.color} flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform shadow-lg`}>
-                  {feature.icon}
-                </div>
-                <h3 className="heading-4 mb-2 group-hover:text-[var(--primary-400)] transition-colors">
-                  {feature.title}
-                </h3>
-                <p className="text-[var(--text-secondary)] body-small">
-                  {feature.description}
-                </p>
-                <div className="mt-4 flex items-center gap-2 text-sm text-[var(--primary-400)] opacity-0 group-hover:opacity-100 transition-opacity">
-                  <span>Подробнее</span>
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
+                {/* Gradient overlay on hover */}
+                <div className={`absolute inset-0 bg-gradient-to-br ${feature.color} opacity-0 group-hover:opacity-10 transition-opacity duration-300`} />
+                
+                {/* Icon with glow effect */}
+                <div className="relative z-10">
+                  <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${feature.color} flex items-center justify-center text-2xl mb-4 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shadow-lg group-hover:shadow-xl group-hover:shadow-[var(--primary-500)]/30`}>
+                    {feature.icon}
+                  </div>
+                  <h3 className="heading-4 mb-2 group-hover:text-[var(--primary-400)] transition-colors">
+                    {feature.title}
+                  </h3>
+                  <p className="text-[var(--text-secondary)] body-small group-hover:text-[var(--text-primary)] transition-colors">
+                    {feature.description}
+                  </p>
+                  <div className="mt-4 flex items-center gap-2 text-sm text-[var(--primary-400)] opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:translate-x-1">
+                    <span>Подробнее</span>
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </div>
                 </div>
               </Link>
             ))}
@@ -273,23 +286,45 @@ export default function HomePage() {
             </div>
 
             <div className="relative">
-              <div className="aspect-square rounded-3xl bg-gradient-to-br from-violet-500/20 to-cyan-500/20 p-8 border border-[var(--border-default)]">
+              <div className="aspect-square rounded-3xl bg-gradient-to-br from-violet-500/20 to-cyan-500/20 p-8 border border-[var(--border-default)] hover:border-[var(--primary-500)] transition-all duration-300 group">
                 <div className="w-full h-full rounded-2xl bg-[var(--bg-tertiary)] flex items-center justify-center relative overflow-hidden">
+                  {/* Animated background particles */}
+                  <div className="absolute inset-0">
+                    {[...Array(20)].map((_, i) => (
+                      <div
+                        key={i}
+                        className="absolute w-1 h-1 rounded-full bg-violet-400/30 animate-pulse"
+                        style={{
+                          left: `${Math.random() * 100}%`,
+                          top: `${Math.random() * 100}%`,
+                          animationDelay: `${Math.random() * 2}s`,
+                          animationDuration: `${2 + Math.random() * 2}s`,
+                        }}
+                      />
+                    ))}
+                  </div>
+                  
                   {/* Token visualization */}
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-48 h-48 rounded-full bg-gradient-to-br from-violet-500 to-cyan-500 animate-glow flex items-center justify-center">
-                      <span className="text-6xl font-bold text-white">NVT</span>
+                    <div className="w-48 h-48 rounded-full bg-gradient-to-br from-violet-500 to-cyan-500 animate-glow flex items-center justify-center group-hover:scale-110 transition-transform duration-500 shadow-2xl">
+                      <span className="text-6xl font-bold text-white drop-shadow-lg">NVT</span>
                     </div>
                   </div>
+                  
                   {/* Orbiting elements */}
                   <div className="absolute w-full h-full animate-spin" style={{ animationDuration: '20s' }}>
-                    <div className="absolute top-4 left-1/2 -translate-x-1/2 w-12 h-12 rounded-full bg-violet-500 flex items-center justify-center text-xl">
+                    <div className="absolute top-4 left-1/2 -translate-x-1/2 w-12 h-12 rounded-full bg-violet-500 flex items-center justify-center text-xl shadow-lg group-hover:scale-125 transition-transform">
                       🏆
                     </div>
                   </div>
                   <div className="absolute w-full h-full animate-spin" style={{ animationDuration: '25s', animationDirection: 'reverse' }}>
-                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 w-12 h-12 rounded-full bg-cyan-500 flex items-center justify-center text-xl">
+                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 w-12 h-12 rounded-full bg-cyan-500 flex items-center justify-center text-xl shadow-lg group-hover:scale-125 transition-transform">
                       💎
+                    </div>
+                  </div>
+                  <div className="absolute w-full h-full animate-spin" style={{ animationDuration: '15s' }}>
+                    <div className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-purple-500 flex items-center justify-center text-lg shadow-lg group-hover:scale-125 transition-transform">
+                      🪙
                     </div>
                   </div>
                 </div>

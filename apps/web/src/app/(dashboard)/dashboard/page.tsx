@@ -29,6 +29,28 @@ const activeChallenges = [
   { id: 2, title: '10K шагов ежедневно', progress: 80, participants: 567, reward: 200 },
 ];
 
+// Weekly progress data for charts
+const weeklySteps = [8500, 9200, 7800, 10500, 9800, 11200, 8432];
+const weeklyCalories = [2100, 1950, 2200, 2050, 2300, 2150, 1850];
+const weeklySleep = [7.5, 8.0, 7.2, 8.5, 7.8, 8.2, 7.5];
+
+// Health score data
+const healthScore = {
+  overall: 87,
+  fitness: 92,
+  nutrition: 85,
+  sleep: 88,
+  mental: 90,
+};
+
+// Recent activity feed
+const recentActivity = [
+  { id: 1, type: 'workout', title: 'Завершена тренировка "Силовая"', time: '2 часа назад', icon: '💪', points: 150 },
+  { id: 2, type: 'meal', title: 'Добавлен прием пищи', time: '4 часа назад', icon: '🍎', points: 50 },
+  { id: 3, type: 'achievement', title: 'Получено достижение "Неделя активности"', time: 'Вчера', icon: '🏆', points: 200 },
+  { id: 4, type: 'challenge', title: 'Присоединились к челленджу "30 дней фитнеса"', time: '2 дня назад', icon: '🎯', points: 100 },
+];
+
 export default function DashboardPage() {
   const [greeting, setGreeting] = useState('');
   const [currentDate, setCurrentDate] = useState('');
@@ -207,6 +229,182 @@ export default function DashboardPage() {
         </CardContent>
       </Card>
 
+      {/* Weekly Progress Charts */}
+      <div className="grid lg:grid-cols-2 gap-6">
+        {/* Steps Chart */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Шаги за неделю</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="h-48 flex items-end justify-between gap-2">
+              {weeklySteps.map((value, index) => {
+                const max = Math.max(...weeklySteps);
+                const height = (value / max) * 100;
+                const isToday = index === weeklySteps.length - 1;
+                return (
+                  <div key={index} className="flex-1 flex flex-col items-center gap-2">
+                    <div className="relative w-full flex items-end justify-center" style={{ height: '160px' }}>
+                      <div
+                        className={`w-full rounded-t-lg transition-all duration-500 hover:opacity-80 ${
+                          isToday 
+                            ? 'bg-gradient-to-t from-violet-600 to-violet-400' 
+                            : 'bg-gradient-to-t from-violet-500/60 to-violet-400/40'
+                        }`}
+                        style={{ height: `${height}%` }}
+                      />
+                    </div>
+                    <span className="text-xs text-[var(--text-tertiary)]">
+                      {['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'][index]}
+                    </span>
+                    <span className="text-xs font-medium text-[var(--text-secondary)]">
+                      {(value / 1000).toFixed(1)}K
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Calories Chart */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Калории за неделю</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="h-48 flex items-end justify-between gap-2">
+              {weeklyCalories.map((value, index) => {
+                const max = Math.max(...weeklyCalories);
+                const height = (value / max) * 100;
+                const isToday = index === weeklyCalories.length - 1;
+                return (
+                  <div key={index} className="flex-1 flex flex-col items-center gap-2">
+                    <div className="relative w-full flex items-end justify-center" style={{ height: '160px' }}>
+                      <div
+                        className={`w-full rounded-t-lg transition-all duration-500 hover:opacity-80 ${
+                          isToday 
+                            ? 'bg-gradient-to-t from-orange-600 to-orange-400' 
+                            : 'bg-gradient-to-t from-orange-500/60 to-orange-400/40'
+                        }`}
+                        style={{ height: `${height}%` }}
+                      />
+                    </div>
+                    <span className="text-xs text-[var(--text-tertiary)]">
+                      {['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'][index]}
+                    </span>
+                    <span className="text-xs font-medium text-[var(--text-secondary)]">
+                      {value}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Health Score */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Общий индекс здоровья</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-6">
+            {/* Overall Score */}
+            <div className="text-center">
+              <div className="relative inline-block">
+                <svg className="w-32 h-32 transform -rotate-90">
+                  <circle
+                    cx="64"
+                    cy="64"
+                    r="56"
+                    stroke="var(--bg-tertiary)"
+                    strokeWidth="12"
+                    fill="none"
+                  />
+                  <circle
+                    cx="64"
+                    cy="64"
+                    r="56"
+                    stroke="url(#healthGradient)"
+                    strokeWidth="12"
+                    fill="none"
+                    strokeDasharray={`${(healthScore.overall / 100) * 352} 352`}
+                    className="transition-all duration-1000"
+                  />
+                  <defs>
+                    <linearGradient id="healthGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stopColor="#8b5cf6" />
+                      <stop offset="100%" stopColor="#06b6d4" />
+                    </linearGradient>
+                  </defs>
+                </svg>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="text-center">
+                    <div className="text-3xl font-bold text-gradient">{healthScore.overall}</div>
+                    <div className="text-xs text-[var(--text-tertiary)]">из 100</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Category Scores */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {[
+                { label: 'Фитнес', value: healthScore.fitness, icon: '💪', color: 'from-violet-500 to-purple-600' },
+                { label: 'Питание', value: healthScore.nutrition, icon: '🥗', color: 'from-emerald-500 to-teal-600' },
+                { label: 'Сон', value: healthScore.sleep, icon: '😴', color: 'from-indigo-500 to-purple-600' },
+                { label: 'Ментал', value: healthScore.mental, icon: '🧠', color: 'from-pink-500 to-rose-600' },
+              ].map((category) => (
+                <div key={category.label} className="text-center p-4 rounded-xl bg-[var(--bg-tertiary)]">
+                  <div className="text-2xl mb-2">{category.icon}</div>
+                  <div className="text-lg font-bold mb-1">{category.value}</div>
+                  <div className="text-xs text-[var(--text-secondary)] mb-2">{category.label}</div>
+                  <div className="h-1.5 bg-[var(--bg-primary)] rounded-full overflow-hidden">
+                    <div
+                      className={`h-full bg-gradient-to-r ${category.color} rounded-full transition-all duration-500`}
+                      style={{ width: `${category.value}%` }}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Recent Activity Feed */}
+      <Card>
+        <CardHeader className="flex items-center justify-between">
+          <CardTitle>Последняя активность</CardTitle>
+          <Link href="/dashboard/activity" className="text-sm text-violet-400 hover:underline">
+            Вся активность
+          </Link>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-3">
+            {recentActivity.map((activity) => (
+              <div
+                key={activity.id}
+                className="flex items-center gap-4 p-3 rounded-xl bg-[var(--bg-tertiary)] hover:bg-[var(--bg-elevated)] transition-colors"
+              >
+                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-violet-500/20 to-cyan-500/20 flex items-center justify-center text-xl">
+                  {activity.icon}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="font-medium text-sm">{activity.title}</div>
+                  <div className="text-xs text-[var(--text-tertiary)]">{activity.time}</div>
+                </div>
+                <Badge variant="primary" size="sm">
+                  +{activity.points} NVT
+                </Badge>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Quick Actions */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {[
@@ -218,15 +416,16 @@ export default function DashboardPage() {
           <Link
             key={action.label}
             href={action.href}
-            className="flex flex-col items-center gap-3 p-4 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-subtle)] hover:border-[var(--border-default)] hover:bg-[var(--bg-tertiary)] transition-all text-center"
+            className="flex flex-col items-center gap-3 p-4 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-subtle)] hover:border-[var(--border-default)] hover:bg-[var(--bg-tertiary)] hover:scale-105 transition-all text-center group"
           >
-            <span className="text-3xl">{action.icon}</span>
-            <span className="text-sm text-[var(--text-secondary)]">{action.label}</span>
+            <span className="text-3xl group-hover:scale-110 transition-transform">{action.icon}</span>
+            <span className="text-sm text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors">{action.label}</span>
           </Link>
         ))}
       </div>
     </div>
   );
 }
+
 
 

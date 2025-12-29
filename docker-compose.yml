@@ -1,7 +1,14 @@
+# Docker Compose для Nexus Vita
+# ВАЖНО: Для локальной разработки и демо-презентации Docker НЕ требуется!
+# Используйте: npm run dev (в корне проекта)
+#
+# Docker нужен только для production-развертывания или тестирования полной инфраструктуры
+# Для демо-презентации инвесторам используйте локальную разработку
+
 version: '3.8'
 
 services:
-  # PostgreSQL Database
+  # PostgreSQL Database (опционально, можно использовать локальный PostgreSQL)
   postgres:
     image: postgres:15-alpine
     container_name: nexusvita-postgres
@@ -20,8 +27,10 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    profiles:
+      - production
 
-  # Redis Cache
+  # Redis Cache (опционально, можно использовать локальный Redis)
   redis:
     image: redis:7-alpine
     container_name: nexusvita-redis
@@ -36,8 +45,10 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    profiles:
+      - production
 
-  # API Backend
+  # API Backend (опционально, для локальной разработки используйте npm run dev)
   api:
     build:
       context: ./apps/api
@@ -62,8 +73,10 @@ services:
     volumes:
       - ./apps/api:/app
       - /app/node_modules
+    profiles:
+      - production
 
-  # Web Frontend
+  # Web Frontend (опционально, для локальной разработки используйте npm run dev)
   web:
     build:
       context: ./apps/web
@@ -83,41 +96,13 @@ services:
       - ./apps/web:/app
       - /app/node_modules
       - /app/.next
-
-  # MinIO S3-Compatible Storage (optional)
-  minio:
-    image: minio/minio:latest
-    container_name: nexusvita-minio
-    environment:
-      MINIO_ROOT_USER: minioadmin
-      MINIO_ROOT_PASSWORD: minioadmin
-    command: server /data --console-address ":9001"
-    ports:
-      - "9000:9000"
-      - "9001:9001"
-    volumes:
-      - minio_data:/data
-    networks:
-      - nexusvita-network
-
-  # Adminer - Database Management (optional)
-  adminer:
-    image: adminer:latest
-    container_name: nexusvita-adminer
-    ports:
-      - "8080:8080"
-    depends_on:
-      - postgres
-    networks:
-      - nexusvita-network
+    profiles:
+      - production
 
 volumes:
   postgres_data:
   redis_data:
-  minio_data:
 
 networks:
   nexusvita-network:
     driver: bridge
-
-
