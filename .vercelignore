@@ -11,5 +11,5 @@ dist
 coverage
 .vscode
 .idea
-
-
+apps/api
+packages
