@@ -315,7 +315,7 @@ export default function ChallengesPage() {
                 </div>
                 <p className="text-sm text-[var(--text-secondary)] mb-4 line-clamp-2">
                   {challenge.description}
-                </div>
+                </p>
                 <div className="space-y-2 mb-4 text-sm">
                   <div className="flex items-center justify-between">
                     <span className="text-[var(--text-secondary)]">Награда получена</span>
