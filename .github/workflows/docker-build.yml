@@ -28,7 +28,7 @@ jobs:
         continue-on-error: true
 
       - name: Extract metadata for API
-        if: secrets.DOCKER_HUB_USERNAME != ''
+        if: github.event_name != 'pull_request' && secrets.DOCKER_HUB_USERNAME != ''
         id: meta-api
         uses: docker/metadata-action@v5
         with:
@@ -41,7 +41,7 @@ jobs:
             type=sha
 
       - name: Build and push API image
-        if: secrets.DOCKER_HUB_USERNAME != ''
+        if: github.event_name != 'pull_request' && secrets.DOCKER_HUB_USERNAME != ''
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -54,7 +54,7 @@ jobs:
         continue-on-error: true
 
       - name: Extract metadata for Web
-        if: secrets.DOCKER_HUB_USERNAME != ''
+        if: github.event_name != 'pull_request' && secrets.DOCKER_HUB_USERNAME != ''
         id: meta-web
         uses: docker/metadata-action@v5
         with:
@@ -67,7 +67,7 @@ jobs:
             type=sha
 
       - name: Build and push Web image
-        if: secrets.DOCKER_HUB_USERNAME != ''
+        if: github.event_name != 'pull_request' && secrets.DOCKER_HUB_USERNAME != ''
         uses: docker/build-push-action@v5
         with:
           context: .
