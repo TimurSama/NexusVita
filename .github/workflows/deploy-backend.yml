@@ -52,7 +52,7 @@ jobs:
 
       # Деплой на Railway (пример)
       - name: Deploy to Railway
-        if: ${{ secrets.RAILWAY_TOKEN != '' }}
+        if: ${{ secrets.RAILWAY_TOKEN }}
         uses: bervProject/railway-deploy@v1.0.0
         with:
           railway_token: ${{ secrets.RAILWAY_TOKEN }}
@@ -62,7 +62,7 @@ jobs:
 
       # Альтернатива: Деплой на Render
       - name: Deploy to Render
-        if: ${{ secrets.RENDER_SERVICE_ID != '' }}
+        if: ${{ secrets.RENDER_SERVICE_ID }}
         uses: johnbeynon/render-deploy-action@v0.0.8
         with:
           service-id: ${{ secrets.RENDER_SERVICE_ID }}
@@ -71,7 +71,7 @@ jobs:
 
       # Альтернатива: Деплой через Docker
       - name: Build Docker image
-        if: ${{ secrets.DOCKER_HUB_USERNAME != '' }}
+        if: ${{ secrets.DOCKER_HUB_USERNAME }}
         run: |
           docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/nexusvita-api:latest -f apps/api/Dockerfile .
           docker login -u ${{ secrets.DOCKER_HUB_USERNAME }} -p ${{ secrets.DOCKER_HUB_PASSWORD }}
