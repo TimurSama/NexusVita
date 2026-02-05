@@ -1,0 +1,910 @@
+// Prisma Schema для Nexus Vita
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Пользователь
+model User {
+  id            String   @id @default(uuid())
+  email         String   @unique
+  username      String   @unique
+  passwordHash  String
+  firstName     String?
+  lastName      String?
+  avatar        String?
+  role          UserRole @default(USER)
+  aiTrialEndsAt DateTime? // Пробный период AI (7 дней)
+  onboardingCompleted Boolean @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Связи
+  personalMetrics     PersonalMetrics?
+  medicalProfile      MedicalProfile?
+  goals               Goal[]
+  medicalAnalyses     MedicalAnalysisRecord[]
+  trainingPrograms    TrainingProgram[] @relation("ProgramCreator")
+  subscriptions       Subscription[] @relation("Subscriber")
+  subscriptionsAsProvider Subscription[] @relation("Provider")
+  transactions        Transaction[] @relation("Sender")
+  receivedTransactions Transaction[] @relation("Recipient")
+  researchFunds       ResearchFund[] @relation("Researcher")
+  donations           Transaction[] @relation("Donor")
+  posts               Post[]
+  achievements        UserAchievement[]
+  rewardRedemptions   RewardRedemption[]
+  calendarEvents      CalendarEvent[]
+  referralsSent       Referral[] @relation("Referrer")
+  referralsReceived   Referral[] @relation("Referred")
+  cashbackOffers      CashbackOffer[] @relation("Merchant")
+  recommendations     PartnerRecommendation[] @relation("Specialist")
+  friends             Friendship[] @relation("User")
+  friendOf            Friendship[] @relation("Friend")
+  chats               ChatParticipant[]
+  messages            Message[]
+  accessPasses        AccessPass[]
+  integrations        UserIntegration[]
+  integrationTokens   IntegrationToken[]
+  ingestions          HealthIngestion[]
+  auditLogs           AuditLog[]
+  onboardingProgress  OnboardingProgress?
+
+  @@map("users")
+}
+
+enum UserRole {
+  USER
+  TRAINER
+  DOCTOR
+  PSYCHOLOGIST
+  MERCHANT
+  ADMIN
+}
+
+// Персональные метрики
+model PersonalMetrics {
+  id              String   @id @default(uuid())
+  userId          String   @unique
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  height          Float?   // Рост в см
+  currentWeight   Float?   // Текущий вес в кг
+  bodyFatPercent  Float?   // Процент жира
+  muscleMass      Float?   // Мышечная масса в кг
+  boneMass        Float?   // Костная масса в кг
+  waterPercent    Float?   // Процент воды
+  
+  // Замеры тела
+  chestCircumference  Float?
+  waistCircumference  Float?
+  hipCircumference    Float?
+  bicepCircumference  Float?
+  thighCircumference  Float?
+  
+  updatedAt       DateTime @updatedAt
+
+  @@map("personal_metrics")
+}
+
+// Цели
+model Goal {
+  id          String      @id @default(uuid())
+  userId      String
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  title       String
+  description String?
+  type        GoalType
+  targetValue Float?
+  currentValue Float?    @default(0)
+  deadline    DateTime?
+  status      GoalStatus @default(ACTIVE)
+  rewardNXT   Int?       // Награда в токенах
+  
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  completedAt DateTime?
+  logs        GoalLog[]
+
+  @@map("goals")
+}
+
+enum GoalType {
+  WEIGHT_LOSS
+  WEIGHT_GAIN
+  MUSCLE_GAIN
+  FAT_LOSS
+  STRENGTH
+  ENDURANCE
+  CONSISTENCY
+  OTHER
+}
+
+enum GoalStatus {
+  ACTIVE
+  COMPLETED
+  CANCELLED
+  PAUSED
+}
+
+// Медицинские анализы
+model MedicalAnalysisRecord {
+  id              String   @id @default(uuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  dateOfAnalysis  DateTime
+  analysisType    AnalysisType
+  sourceLab       String?
+  documentUpload  String?  // Ссылка на файл
+  trainerAccess   Boolean  @default(false)
+  notes           String?
+  
+  indicators      AnalysisIndicator[]
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("medical_analysis_records")
+}
+
+enum AnalysisType {
+  GENERAL_BIOCHEMICAL
+  HORMONES
+  VITAMINS
+  OTHER
+}
+
+model AnalysisIndicator {
+  id                String   @id @default(uuid())
+  recordId          String
+  record            MedicalAnalysisRecord @relation(fields: [recordId], references: [id], onDelete: Cascade)
+  
+  name              String
+  value             Float
+  unit              String
+  referenceRange    String
+  status            IndicatorStatus
+  
+  @@map("analysis_indicators")
+}
+
+enum IndicatorStatus {
+  NORMAL
+  LOW
+  HIGH
+  CRITICAL
+}
+
+// Медицинский профиль (медкарта)
+model MedicalProfile {
+  id                     String   @id @default(uuid())
+  userId                 String   @unique
+  user                   User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  bloodType              String?
+  allergies              String[]
+  chronicConditions      String[]
+  emergencyContactName   String?
+  emergencyContactPhone  String?
+  medications            Json?
+  vaccinations           Json?
+
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+
+  @@map("medical_profiles")
+}
+
+// Программы тренировок
+model TrainingProgram {
+  id            String   @id @default(uuid())
+  programName  String
+  createdById  String
+  creator      User     @relation("ProgramCreator", fields: [createdById], references: [id])
+  
+  durationWeeks Int
+  goal          TrainingGoal
+  costTokens   Int       @default(0)
+  description  String?
+  
+  schedule     TrainingDay[]
+  
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@map("training_programs")
+}
+
+enum TrainingGoal {
+  MASS
+  CUTTING
+  STRENGTH
+  ENDURANCE
+}
+
+model TrainingDay {
+  id              String   @id @default(uuid())
+  programId       String
+  program         TrainingProgram @relation(fields: [programId], references: [id], onDelete: Cascade)
+  
+  dayNumber       Int
+  trainingFocus   String
+  exercises       Exercise[]
+  
+  @@map("training_days")
+}
+
+model Exercise {
+  id                  String   @id @default(uuid())
+  dayId               String
+  day                 TrainingDay @relation(fields: [dayId], references: [id], onDelete: Cascade)
+  
+  exerciseName        String
+  sets                Int
+  repsRange           String
+  restTimeSec         Int
+  muscleGroupsPrimary String[] // Массив групп мышц
+  safetyNotes         String?
+  visualizationTag    String?  // Ключ для отображения позы Да Винчи
+  
+  @@map("exercises")
+}
+
+// Токеномика и транзакции
+model Transaction {
+  id              String   @id @default(uuid())
+  timestamp       DateTime @default(now())
+  senderId        String?
+  sender          User?    @relation("Sender", fields: [senderId], references: [id])
+  recipientId     String?
+  recipient       User?    @relation("Recipient", fields: [recipientId], references: [id])
+  donorId         String?
+  donor           User?    @relation("Donor", fields: [donorId], references: [id])
+  
+  amountNXT       Float
+  transactionType TransactionType
+  relatedEntity   String?  // ID связанной сущности (подписка, покупка и т.д.)
+  fiatEquivalent  Float?
+  
+  @@map("transactions")
+}
+
+enum TransactionType {
+  SUBSCRIPTION_IN
+  PURCHASE
+  REWARD
+  DONATION
+  TRANSFER
+}
+
+// Подписки
+model Subscription {
+  id              String   @id @default(uuid())
+  providerId      String
+  provider        User     @relation("Provider", fields: [providerId], references: [id])
+  subscriberId    String
+  subscriber      User     @relation("Subscriber", fields: [subscriberId], references: [id])
+  
+  priceNXTMonthly Int
+  status          SubscriptionStatus @default(ACTIVE)
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  expiresAt       DateTime?
+
+  @@unique([providerId, subscriberId])
+  @@map("subscriptions")
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELED
+  EXPIRED
+}
+
+// Абонементы и пропуска
+model AccessPass {
+  id           String           @id @default(uuid())
+  userId       String
+  user         User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  providerName String
+  status       AccessPassStatus @default(ACTIVE)
+  expiresAt    DateTime?
+  externalId   String?
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("access_passes")
+}
+
+enum AccessPassStatus {
+  ACTIVE
+  PAUSED
+  EXPIRED
+}
+
+// Фонды исследований
+model ResearchFund {
+  id          String   @id @default(uuid())
+  researcherId String
+  researcher  User     @relation("Researcher", fields: [researcherId], references: [id])
+  
+  title       String
+  description String?
+  goalNXT     Int
+  collectedNXT Int     @default(0)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("research_funds")
+}
+
+// Социальная сеть
+model Post {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  content   String
+  images    String[] // Массив ссылок на изображения
+  likes     Int      @default(0)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("posts")
+}
+
+model Achievement {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  rewardNXT   Int      @default(0)
+  category    String?
+  createdAt   DateTime @default(now())
+
+  users       UserAchievement[]
+
+  @@map("achievements")
+}
+
+model UserAchievement {
+  id             String   @id @default(uuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievementId  String
+  achievement    Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+  earnedAt       DateTime @default(now())
+
+  @@unique([userId, achievementId])
+  @@map("user_achievements")
+}
+
+model Reward {
+  id          String   @id @default(uuid())
+  title       String
+  costNXT     Int
+  description String?
+  createdAt   DateTime @default(now())
+
+  redemptions RewardRedemption[]
+
+  @@map("rewards")
+}
+
+model RewardRedemption {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  rewardId  String
+  reward    Reward   @relation(fields: [rewardId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@map("reward_redemptions")
+}
+
+model CalendarEvent {
+  id            String   @id @default(uuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title         String
+  description   String?
+  type          String
+  startsAt      DateTime
+  endsAt        DateTime?
+  specialistId  String?
+  specialist    User?    @relation(fields: [specialistId], references: [id], onDelete: SetNull)
+  serviceId     String?
+  service       SpecialistService? @relation(fields: [serviceId], references: [id], onDelete: SetNull)
+  location      String?
+  status        String   @default("PLANNED")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  logs          CalendarEventLog[]
+
+  @@map("calendar_events")
+}
+
+model SpecialistService {
+  id            String   @id @default(uuid())
+  specialistId  String
+  specialist    User     @relation(fields: [specialistId], references: [id], onDelete: Cascade)
+  title         String
+  type          String
+  description   String?
+  priceNXT      Int      @default(0)
+  durationMin   Int      @default(60)
+  active        Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  calendarEvents CalendarEvent[]
+
+  @@map("specialist_services")
+}
+
+model SpecialistSlot {
+  id          String   @id @default(uuid())
+  specialistId String
+  specialist  User     @relation(fields: [specialistId], references: [id], onDelete: Cascade)
+  startsAt    DateTime
+  endsAt      DateTime
+  status      String   @default("OPEN")
+  createdAt   DateTime @default(now())
+
+  @@map("specialist_slots")
+}
+
+model CalendarEventLog {
+  id        String   @id @default(uuid())
+  eventId   String
+  event     CalendarEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  actorId   String
+  actor     User     @relation(fields: [actorId], references: [id], onDelete: Cascade)
+  action    String
+  createdAt DateTime @default(now())
+
+  @@map("calendar_event_logs")
+}
+
+model Referral {
+  id            String   @id @default(uuid())
+  referrerId    String
+  referrer      User     @relation("Referrer", fields: [referrerId], references: [id], onDelete: Cascade)
+  referredId    String
+  referred      User     @relation("Referred", fields: [referredId], references: [id], onDelete: Cascade)
+  type          String
+  status        String   @default("PENDING")
+  rewardNXT     Int      @default(0)
+  referralCodeId String?
+  referralCode  ReferralCode? @relation(fields: [referralCodeId], references: [id], onDelete: SetNull)
+  completedAt   DateTime?
+  createdAt     DateTime @default(now())
+
+  @@unique([referrerId, referredId, type])
+  @@map("referrals")
+}
+
+model ReferralCode {
+  id          String   @id @default(uuid())
+  code        String   @unique
+  referrerId  String
+  referrer    User     @relation(fields: [referrerId], references: [id], onDelete: Cascade)
+  type        String
+  rewardNXT   Int      @default(0)
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  referrals   Referral[]
+
+  @@map("referral_codes")
+}
+
+model CashbackOffer {
+  id            String   @id @default(uuid())
+  merchantId    String
+  merchant      User     @relation("Merchant", fields: [merchantId], references: [id], onDelete: Cascade)
+  title         String
+  description   String?
+  percent       Float
+  active        Boolean  @default(true)
+  referralCode  String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  redemptions   CashbackRedemption[]
+
+  @@map("cashback_offers")
+}
+
+model CashbackRedemption {
+  id          String   @id @default(uuid())
+  offerId     String
+  offer       CashbackOffer @relation(fields: [offerId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  amountNXT   Int
+  createdAt   DateTime @default(now())
+
+  @@map("cashback_redemptions")
+}
+
+model Purchase {
+  id            String   @id @default(uuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  merchantId    String
+  merchant      User     @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+  offerId       String?
+  offer         CashbackOffer? @relation(fields: [offerId], references: [id], onDelete: SetNull)
+  amountNXT     Int
+  createdAt     DateTime @default(now())
+
+  @@map("purchases")
+}
+
+model KnowledgeItem {
+  id          String   @id @default(uuid())
+  authorId    String
+  author      User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  title       String
+  type        String
+  url         String?
+  description String?
+  tags        String[]
+  priceNXT    Int      @default(0)
+  status      String   @default("PENDING")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  verifications KnowledgeVerification[]
+  purchases     KnowledgePurchase[]
+
+  @@map("knowledge_items")
+}
+
+model KnowledgeVerification {
+  id          String   @id @default(uuid())
+  itemId      String
+  item        KnowledgeItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  verifierId  String
+  verifier    User     @relation(fields: [verifierId], references: [id], onDelete: Cascade)
+  status      String
+  note        String?
+  createdAt   DateTime @default(now())
+
+  @@map("knowledge_verifications")
+}
+
+model KnowledgePurchase {
+  id        String   @id @default(uuid())
+  itemId    String
+  item      KnowledgeItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  buyerId   String
+  buyer     User     @relation(fields: [buyerId], references: [id], onDelete: Cascade)
+  priceNXT  Int
+  createdAt DateTime @default(now())
+
+  @@map("knowledge_purchases")
+}
+
+model PartnerRecommendation {
+  id            String   @id @default(uuid())
+  specialistId  String
+  specialist    User     @relation("Specialist", fields: [specialistId], references: [id], onDelete: Cascade)
+  name          String
+  category      String
+  description   String?
+  cashbackOfferId String?
+  cashbackOffer CashbackOffer? @relation(fields: [cashbackOfferId], references: [id], onDelete: SetNull)
+  createdAt     DateTime @default(now())
+
+  @@map("partner_recommendations")
+}
+
+model GoalLog {
+  id        String   @id @default(uuid())
+  goalId    String
+  goal      Goal     @relation(fields: [goalId], references: [id], onDelete: Cascade)
+  value     Float?
+  note      String?
+  createdAt DateTime @default(now())
+
+  @@map("goal_logs")
+}
+
+model AiDailyPlan {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date      DateTime
+  summary   String?
+  items     Json?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, date])
+  @@map("ai_daily_plans")
+}
+
+model Friendship {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation("User", fields: [userId], references: [id], onDelete: Cascade)
+  friendId  String
+  friend    User     @relation("Friend", fields: [friendId], references: [id], onDelete: Cascade)
+  
+  status    FriendshipStatus @default(PENDING)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, friendId])
+  @@map("friendships")
+}
+
+enum FriendshipStatus {
+  PENDING
+  ACCEPTED
+  BLOCKED
+}
+
+model Chat {
+  id        String   @id @default(uuid())
+  type      ChatType @default(PRIVATE)
+  name      String?
+  
+  participants ChatParticipant[]
+  messages     Message[]
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("chats")
+}
+
+enum ChatType {
+  PRIVATE
+  GROUP
+}
+
+model ChatParticipant {
+  id        String   @id @default(uuid())
+  chatId    String
+  chat      Chat     @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  joinedAt  DateTime @default(now())
+
+  @@unique([chatId, userId])
+  @@map("chat_participants")
+}
+
+model Message {
+  id        String   @id @default(uuid())
+  chatId    String
+  chat      Chat     @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  content   String
+  createdAt DateTime @default(now())
+
+  @@map("messages")
+}
+
+// DAO предложения и голосования
+model DaoProposal {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  status      DaoProposalStatus @default(OPEN)
+  createdById String
+  creator     User     @relation(fields: [createdById], references: [id], onDelete: Cascade)
+  startsAt    DateTime @default(now())
+  endsAt      DateTime?
+
+  votes       DaoVote[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("dao_proposals")
+}
+
+model DaoVote {
+  id          String   @id @default(uuid())
+  proposalId  String
+  proposal    DaoProposal @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  support     Boolean
+  weight      Int      @default(1)
+
+  createdAt   DateTime @default(now())
+
+  @@unique([proposalId, userId])
+  @@map("dao_votes")
+}
+
+enum DaoProposalStatus {
+  OPEN
+  CLOSED
+  CANCELLED
+}
+
+// Интеграции устройств
+model UserIntegration {
+  id         String   @id @default(uuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  provider   String
+  status     IntegrationStatus @default(PENDING)
+  externalId String?
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([userId, provider])
+  @@map("user_integrations")
+}
+
+enum IntegrationStatus {
+  PENDING
+  CONNECTED
+  DISCONNECTED
+}
+
+// OAuth токены интеграций
+model IntegrationToken {
+  id           String   @id @default(uuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  provider     String
+  accessToken  String
+  refreshToken String?
+  expiresAt    DateTime?
+  scope        String?
+  metadata     Json?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([userId, provider])
+  @@map("integration_tokens")
+}
+
+// Импорт из клиник (FHIR/HL7)
+model HealthIngestion {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  source      String
+  status      String   @default("RECEIVED")
+  payloadJson Json?
+  payloadText String?
+  createdAt   DateTime @default(now())
+
+  @@map("health_ingestions")
+}
+
+model FhirPatient {
+  id         String   @id @default(uuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  patientId  String
+  data       Json?
+  updatedAt  DateTime @updatedAt
+
+  @@unique([userId, patientId])
+  @@map("fhir_patients")
+}
+
+model FhirObservation {
+  id               String   @id @default(uuid())
+  userId           String
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  observationId    String
+  code             String?
+  value            Float?
+  unit             String?
+  effectiveDate    DateTime?
+  raw              Json?
+  updatedAt        DateTime @updatedAt
+
+  @@unique([userId, observationId])
+  @@map("fhir_observations")
+}
+
+model HealthMetric {
+  id         String   @id @default(uuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  source     String
+  type       MetricType
+  value      Float
+  unit       String?
+  measuredAt DateTime
+  raw        Json?
+  createdAt  DateTime @default(now())
+
+  @@unique([userId, source, type, measuredAt])
+  @@map("health_metrics")
+}
+
+enum MetricType {
+  SLEEP
+  STEPS
+  HEART_RATE
+}
+
+model AiChatSession {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String?
+  messages  AiChatMessage[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("ai_chat_sessions")
+}
+
+model AiChatMessage {
+  id         String   @id @default(uuid())
+  sessionId  String
+  session    AiChatSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  role       String
+  content    String
+  createdAt  DateTime @default(now())
+
+  @@map("ai_chat_messages")
+}
+
+// Аудит действий
+model AuditLog {
+  id         String   @id @default(uuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  action     String
+  targetType String?
+  targetId   String?
+  metadata   String?  // JSON строка для гибкости
+  ipAddress String?
+  userAgent String?
+  createdAt  DateTime @default(now())
+
+  @@map("audit_logs")
+}
+
+// Прогресс онбординга
+model OnboardingProgress {
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  step      Int      @default(1) // Текущий шаг (1-5)
+  completedSteps String[] @default([]) // Завершенные шаги
+  
+  // Данные шагов
+  step1Completed Boolean @default(false) // Профиль
+  step2Completed Boolean @default(false) // Цели
+  step3Completed Boolean @default(false) // Интеграции
+  step4Completed Boolean @default(false) // AI знакомство
+  step5Completed Boolean @default(false) // Завершение
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@map("onboarding_progress")
+}
+
+
