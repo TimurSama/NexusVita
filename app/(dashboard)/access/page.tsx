@@ -1,3 +1,7 @@
+'use client'
+
+import { useEffect, useState } from 'react'
+
 const accessCards = [
   {
     title: 'Единая медкарта',
@@ -24,10 +28,6 @@ const accessCards = [
     actions: ['Привязать кошелек', 'Получить пропуск', 'Войти в DAO'],
   },
 ]
-
-'use client'
-
-import { useEffect, useState } from 'react'
 
 type Pass = {
   id: string

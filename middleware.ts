@@ -11,8 +11,8 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith('/login') ||
     pathname.startsWith('/register') ||
     pathname.startsWith('/r/') ||
-    pathname === '/' ||
-    pathname.startsWith('/pricing')
+    pathname.startsWith('/pricing') ||
+    pathname.startsWith('/landing')
   ) {
     return NextResponse.next()
   }
@@ -23,6 +23,11 @@ export async function middleware(request: NextRequest) {
   if (!session && pathname.startsWith('/onboarding')) {
     // Онбординг доступен только авторизованным
     return NextResponse.redirect(new URL('/login', request.url))
+  }
+
+  // Редирект неавторизованных с корня на лендинг
+  if (!session && pathname === '/') {
+    return NextResponse.redirect(new URL('/landing', request.url))
   }
 
   if (!session && pathname.startsWith('/')) {

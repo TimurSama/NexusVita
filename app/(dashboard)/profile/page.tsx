@@ -191,49 +191,50 @@ export default function ProfilePage() {
                 )
                 const status = integration?.status || 'DISCONNECTED'
                 return (
-                <div
-                  key={item.provider}
-                  className="flex items-center justify-between p-3 rounded-lg border border-ink-200 bg-parchment-100"
-                >
-                  <span>{item.provider}</span>
-                  <div className="flex items-center gap-2">
-                    <span
-                      className={`text-xs px-3 py-1 rounded-full ${
-                        status === 'CONNECTED'
-                          ? 'bg-green-100 text-green-800'
+                  <div
+                    key={item.provider}
+                    className="flex items-center justify-between p-3 rounded-lg border border-ink-200 bg-parchment-100"
+                  >
+                    <span>{item.provider}</span>
+                    <div className="flex items-center gap-2">
+                      <span
+                        className={`text-xs px-3 py-1 rounded-full ${
+                          status === 'CONNECTED'
+                            ? 'bg-green-100 text-green-800'
+                            : status === 'PENDING'
+                            ? 'bg-yellow-100 text-yellow-800'
+                            : 'bg-ink-200 text-ink-700'
+                        }`}
+                      >
+                        {status === 'CONNECTED'
+                          ? 'Подключено'
                           : status === 'PENDING'
-                          ? 'bg-yellow-100 text-yellow-800'
-                          : 'bg-ink-200 text-ink-700'
-                      }`}
-                    >
-                      {status === 'CONNECTED'
-                        ? 'Подключено'
-                        : status === 'PENDING'
-                        ? 'Ожидает'
-                        : 'Не подключено'}
-                    </span>
-                    <button
-                      className="px-3 py-1 rounded-md border border-ink-300 text-xs text-ink-700 hover:bg-parchment-200"
-                      onClick={() =>
-                        handleIntegration(
-                          item.provider,
-                          status === 'CONNECTED' ? 'DISCONNECTED' : 'PENDING'
-                        )
-                      }
-                    >
-                      {status === 'CONNECTED' ? 'Отключить' : 'Подключить'}
-                    </button>
-                    {status === 'CONNECTED' &&
-                      (item.provider === 'Oura' || item.provider === 'Garmin') && (
-                        <button
-                          className="px-3 py-1 rounded-md border border-ink-300 text-xs text-ink-700 hover:bg-parchment-200"
-                          onClick={() => handleSync(item.provider)}
-                        >
-                          Синхронизировать
-                        </button>
-                      )}
+                          ? 'Ожидает'
+                          : 'Не подключено'}
+                      </span>
+                      <button
+                        className="px-3 py-1 rounded-md border border-ink-300 text-xs text-ink-700 hover:bg-parchment-200"
+                        onClick={() =>
+                          handleIntegration(
+                            item.provider,
+                            status === 'CONNECTED' ? 'DISCONNECTED' : 'PENDING'
+                          )
+                        }
+                      >
+                        {status === 'CONNECTED' ? 'Отключить' : 'Подключить'}
+                      </button>
+                      {status === 'CONNECTED' &&
+                        (item.provider === 'Oura' || item.provider === 'Garmin') && (
+                          <button
+                            className="px-3 py-1 rounded-md border border-ink-300 text-xs text-ink-700 hover:bg-parchment-200"
+                            onClick={() => handleSync(item.provider)}
+                          >
+                            Синхронизировать
+                          </button>
+                        )}
+                    </div>
                   </div>
-                </div>
+                )
               })}
             </div>
           </div>

@@ -38,7 +38,8 @@ model User {
   posts               Post[]
   achievements        UserAchievement[]
   rewardRedemptions   RewardRedemption[]
-  calendarEvents      CalendarEvent[]
+  calendarEvents      CalendarEvent[] @relation("EventUser")
+  calendarEventsAsSpecialist CalendarEvent[] @relation("EventSpecialist")
   referralsSent       Referral[] @relation("Referrer")
   referralsReceived   Referral[] @relation("Referred")
   cashbackOffers      CashbackOffer[] @relation("Merchant")
@@ -53,6 +54,23 @@ model User {
   ingestions          HealthIngestion[]
   auditLogs           AuditLog[]
   onboardingProgress  OnboardingProgress?
+  purchasesAsBuyer    Purchase[] @relation("PurchaseBuyer")
+  purchasesAsMerchant Purchase[] @relation("PurchaseMerchant")
+  specialistServices  SpecialistService[]
+  specialistSlots     SpecialistSlot[]
+  calendarEventLogs   CalendarEventLog[]
+  referralCodes       ReferralCode[]
+  cashbackRedemptions CashbackRedemption[]
+  knowledgeItems      KnowledgeItem[]
+  knowledgeVerifications KnowledgeVerification[]
+  knowledgePurchases  KnowledgePurchase[]
+  aiDailyPlans        AiDailyPlan[]
+  daoProposals        DaoProposal[]
+  daoVotes            DaoVote[]
+  fhirPatients        FhirPatient[]
+  fhirObservations    FhirObservation[]
+  healthMetrics       HealthMetric[]
+  aiChatSessions      AiChatSession[]
 
   @@map("users")
 }
@@ -415,14 +433,14 @@ model RewardRedemption {
 model CalendarEvent {
   id            String   @id @default(uuid())
   userId        String
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user          User     @relation("EventUser", fields: [userId], references: [id], onDelete: Cascade)
   title         String
   description   String?
   type          String
   startsAt      DateTime
   endsAt        DateTime?
   specialistId  String?
-  specialist    User?    @relation(fields: [specialistId], references: [id], onDelete: SetNull)
+  specialist    User?    @relation("EventSpecialist", fields: [specialistId], references: [id], onDelete: SetNull)
   serviceId     String?
   service       SpecialistService? @relation(fields: [serviceId], references: [id], onDelete: SetNull)
   location      String?
@@ -522,6 +540,8 @@ model CashbackOffer {
   updatedAt     DateTime @updatedAt
 
   redemptions   CashbackRedemption[]
+  purchases     Purchase[]
+  partnerRecommendations PartnerRecommendation[]
 
   @@map("cashback_offers")
 }
@@ -541,9 +561,9 @@ model CashbackRedemption {
 model Purchase {
   id            String   @id @default(uuid())
   userId        String
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user          User     @relation("PurchaseBuyer", fields: [userId], references: [id], onDelete: Cascade)
   merchantId    String
-  merchant      User     @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+  merchant      User     @relation("PurchaseMerchant", fields: [merchantId], references: [id], onDelete: Cascade)
   offerId       String?
   offer         CashbackOffer? @relation(fields: [offerId], references: [id], onDelete: SetNull)
   amountNXT     Int

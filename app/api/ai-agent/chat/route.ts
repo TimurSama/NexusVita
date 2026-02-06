@@ -105,7 +105,7 @@ export async function POST(request: NextRequest) {
     ]
 
     const provider = (process.env.AI_PROVIDER || 'fallback').toLowerCase()
-    let reply: string | undefined
+    let reply: string | null | undefined
     if (provider === 'anthropic') {
       reply = await callAnthropic(
         history.map((m) => ({ role: m.role, content: m.content }))

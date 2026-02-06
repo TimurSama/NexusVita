@@ -10,7 +10,8 @@ type EventItem = {
   startsAt: string
   endsAt?: string | null
   location?: string | null
-  specialist?: { username?: string | null; role?: string | null } | null
+  status?: string | null
+  specialist?: { username?: string | null; role?: string | null; id?: string | null } | null
 }
 
 export default function CalendarPage() {

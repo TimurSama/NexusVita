@@ -16,9 +16,8 @@ import {
   Wallet,
   Menu,
   X,
-  IdCard,
-  ClipboardList,
   CreditCard,
+  ClipboardList,
   User,
   Sparkles,
   Award,
@@ -27,7 +26,7 @@ import {
   Building2,
   Briefcase,
   BookOpen,
-  NotebookPen,
+  PenTool,
 } from 'lucide-react'
 import { cn } from '@/lib/utils/cn'
 
@@ -36,7 +35,7 @@ const navigationItems = [
   { href: '/social', label: 'Лента', icon: Users },
   { href: '/specialists', label: 'Специалисты', icon: HeartPulse },
   { href: '/marketplace', label: 'Маркетплейс', icon: Store },
-  { href: '/access', label: 'Карты и пропуска', icon: IdCard },
+  { href: '/access', label: 'Карты и пропуска', icon: CreditCard },
   { href: '/ai-agent', label: 'AI агент', icon: Sparkles },
   { href: '/ecosystem', label: 'Экосистема', icon: Book },
   { href: '/dao', label: 'DAO / Токены', icon: Wallet },
@@ -56,7 +55,7 @@ const utilityItems = [
   { href: '/partner', label: 'Кабинет партнера', icon: Building2 },
   { href: '/specialist-dashboard', label: 'Панель специалиста', icon: Briefcase },
   { href: '/knowledge', label: 'Библиотека знаний', icon: BookOpen },
-  { href: '/journal', label: 'Личный дневник', icon: NotebookPen },
+  { href: '/journal', label: 'Личный дневник', icon: PenTool },
 ]
 
 export default function Navigation() {
