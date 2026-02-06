@@ -36,7 +36,7 @@ const mockMetrics: DashboardMetric[] = [
     label: 'Психика',
     value: 'Стресс',
     unit: 'умеренный',
-    link: '/ai-agent',
+    link: '/journal',
     position: { x: 50, y: 80 }, // Низ
   },
   {
@@ -72,7 +72,7 @@ const dailyModules = [
     title: 'Психика',
     metric: 'Стресс умеренный',
     plan: 'Дыхательная практика 10 мин',
-    link: '/ai-agent',
+    link: '/journal',
   },
   {
     title: 'Социальное',

@@ -36,7 +36,7 @@ const navigationItems = [
   { href: '/specialists', label: 'Специалисты', icon: HeartPulse },
   { href: '/marketplace', label: 'Маркетплейс', icon: Store },
   { href: '/access', label: 'Карты и пропуска', icon: CreditCard },
-  { href: '/ai-agent', label: 'AI агент', icon: Sparkles },
+  { href: '/journal', label: 'Личный дневник', icon: PenTool },
   { href: '/ecosystem', label: 'Экосистема', icon: Book },
   { href: '/dao', label: 'DAO / Токены', icon: Wallet },
 ]

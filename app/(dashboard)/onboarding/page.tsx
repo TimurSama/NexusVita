@@ -144,7 +144,7 @@ export default function OnboardingPage() {
           </div>
           <button
             className="sketch-button"
-            onClick={() => router.push('/ai-agent')}
+            onClick={() => router.push('/journal')}
           >
             Попробовать AI Health+
           </button>
