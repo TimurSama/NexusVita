@@ -1,0 +1,67 @@
+@echo off
+REM Скрипт для отправки проекта в GitHub репозиторий (Windows)
+REM Использование: deploy-to-github.bat
+
+echo 🚀 Начинаем деплой в GitHub...
+
+REM Проверка, что мы в правильной директории
+if not exist "package.json" (
+    echo ❌ Ошибка: package.json не найден. Убедитесь, что вы в директории 'Nexus Vita/Vita Nexus'
+    pause
+    exit /b 1
+)
+
+REM Инициализация Git (если еще не сделано)
+if not exist ".git" (
+    echo 📦 Инициализация Git репозитория...
+    git init
+)
+
+REM Добавление remote
+git remote remove origin 2>nul
+echo 🔗 Настройка remote репозитория...
+git remote add origin https://github.com/TimurSama/NexusVita.git
+
+REM Добавление всех файлов
+echo 📝 Добавление файлов...
+git add .
+
+REM Коммит
+echo 💾 Создание коммита...
+git commit -m "Initial commit: Full Nexus Vita platform ready for deployment
+
+- Complete Next.js application with all features
+- Authentication and authorization
+- AI Health+ agent
+- Social network features
+- Calendar and booking system
+- Achievements and rewards
+- Referral and cashback system
+- Knowledge library
+- Specialist management
+- Ready for Vercel deployment"
+
+REM Переключение на main ветку
+git branch -M main
+
+REM Подтверждение перед force push
+echo.
+echo ⚠️  ВНИМАНИЕ: Это перезапишет все файлы в репозитории!
+set /p confirm="Продолжить? (y/n): "
+
+if /i "%confirm%"=="y" (
+    echo 📤 Отправка в GitHub...
+    git push -u origin main --force
+    echo.
+    echo ✅ Готово! Репозиторий обновлен: https://github.com/TimurSama/NexusVita
+    echo.
+    echo 📋 Следующие шаги:
+    echo 1. Проверьте репозиторий на GitHub
+    echo 2. В Vercel укажите репозиторий: TimurSama/NexusVita
+    echo 3. Root Directory оставьте пустым (или укажите .)
+    echo 4. Добавьте переменные окружения и задеплойте
+) else (
+    echo ❌ Отменено
+)
+
+pause
