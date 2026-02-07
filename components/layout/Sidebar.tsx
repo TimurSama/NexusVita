@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { X, Home, Users, HeartPulse, Store, CreditCard, Book, Wallet, Dumbbell, Apple, FileText, Target, Calendar, ClipboardList, User, Award, Gift, Building2, Briefcase, BookOpen, PenTool, Sparkles, LogIn, UserPlus } from 'lucide-react'
+import { X, Home, Users, HeartPulse, Store, CreditCard, Book, Wallet, Dumbbell, Apple, FileText, Target, Calendar, ClipboardList, User, Award, Gift, Building2, Briefcase, BookOpen, PenTool, LogIn } from 'lucide-react'
 import { cn } from '@/lib/utils/cn'
 import { useEffect, useState } from 'react'
 

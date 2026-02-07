@@ -19,7 +19,6 @@ import {
   CreditCard,
   ClipboardList,
   User,
-  Sparkles,
   Award,
   Calendar,
   Gift,

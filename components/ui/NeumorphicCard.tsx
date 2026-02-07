@@ -1,7 +1,6 @@
 'use client'
 
 import { cn } from '@/lib/utils/cn'
-import { neumorphicCard } from '@/lib/utils/neumorphic'
 import { ReactNode } from 'react'
 
 interface NeumorphicCardProps {
