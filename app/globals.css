@@ -19,15 +19,17 @@ body {
 
 /* Светлая тема (по умолчанию) */
 :root {
-  --bg-primary: #f9f7f4;
-  --bg-secondary: #f2ede8;
+  --bg-primary: #f5f1eb;
+  --bg-secondary: #f0ebe3;
   --bg-tertiary: #e8e0d8;
   --text-primary: #3d3631;
   --text-secondary: #6f645b;
   --text-tertiary: #8a7d72;
   --border-color: #d9cec4;
   --shadow-light: rgba(255, 255, 255, 0.9);
-  --shadow-dark: rgba(0, 0, 0, 0.1);
+  --shadow-dark: rgba(0, 0, 0, 0.08);
+  --button-primary: linear-gradient(135deg, #a8d5e2 0%, #8bc4d3 100%);
+  --button-primary-hover: linear-gradient(135deg, #b8e0ed 0%, #9bd4e3 100%);
 }
 
 /* Темная тема */
@@ -44,13 +46,22 @@ body {
 }
 
 body {
-  background-color: var(--bg-primary);
+  background: 
+    radial-gradient(circle at 20% 30%, rgba(168, 213, 226, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 80% 70%, rgba(236, 72, 153, 0.12) 0%, transparent 50%),
+    radial-gradient(circle at 50% 50%, rgba(34, 197, 94, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 10% 80%, rgba(239, 68, 68, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 90% 20%, rgba(168, 213, 226, 0.12) 0%, transparent 50%),
+    linear-gradient(135deg, #f5f1eb 0%, #f0ebe3 50%, #f5f1eb 100%);
+  background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%;
+  background-attachment: fixed;
   color: var(--text-primary);
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   transition: background-color 0.3s ease, color 0.3s ease;
+  position: relative;
 }
 
 /* Smooth scrolling */
@@ -60,9 +71,9 @@ html {
 
 /* Focus styles */
 *:focus-visible {
-  outline: 2px solid #64a0cc;
+  outline: 2px solid #a8d5e2;
   outline-offset: 2px;
-  border-radius: 0.5rem;
+  border-radius: 1rem;
 }
 
 /* Custom scrollbar */
@@ -116,7 +127,7 @@ html {
   /* Неоморфная кнопка */
   .neumorphic-button {
     background: var(--bg-secondary);
-    border-radius: 1rem;
+    border-radius: 1.5rem;
     box-shadow: 
       6px 6px 12px var(--shadow-dark),
       -6px -6px 12px var(--shadow-light);
@@ -142,7 +153,7 @@ html {
 
   /* Неоморфная кнопка с акцентом */
   .neumorphic-button-primary {
-    background: linear-gradient(135deg, #64a0cc 0%, #4d8bb8 100%);
+    background: var(--button-primary);
     color: white;
     box-shadow: 
       6px 6px 12px rgba(0, 0, 0, 0.15),
@@ -159,7 +170,7 @@ html {
   .neumorphic-input {
     background: var(--bg-secondary);
     border: none;
-    border-radius: 1rem;
+    border-radius: 1.5rem;
     box-shadow: 
       inset 4px 4px 8px var(--shadow-dark),
       inset -4px -4px 8px var(--shadow-light);
@@ -295,5 +306,8 @@ html {
 .animate-bounce {
   animation: bounce 1s infinite;
 }
+
+
+
 
 
