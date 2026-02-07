@@ -1,3 +1,11 @@
+'use client'
+
+import { Sparkles, Users, TrendingUp, Calendar, CheckCircle } from 'lucide-react'
+import NeumorphicCard from '@/components/ui/NeumorphicCard'
+import NeumorphicButton from '@/components/ui/NeumorphicButton'
+import NeumorphicBadge from '@/components/ui/NeumorphicBadge'
+import { cn } from '@/lib/utils/cn'
+
 const healthContours = [
   'Кардиометаболическое здоровье и профилактика',
   'Гормональный баланс и эндокринология',
@@ -74,172 +82,202 @@ const saleStages = [
 
 export default function EcosystemPage() {
   return (
-    <div className="min-h-screen px-6 py-12">
-      <div className="max-w-7xl mx-auto space-y-12">
-        <header className="grid grid-cols-1 lg:grid-cols-[1.4fr,1fr] gap-8 items-center">
+    <div className="min-h-screen bg-warmGray-50 p-4 sm:p-6 lg:p-8">
+      <div className="max-w-7xl mx-auto space-y-8 sm:space-y-12">
+        <header className="grid grid-cols-1 lg:grid-cols-[1.4fr,1fr] gap-6 sm:gap-8 items-center animate-fadeIn">
           <div className="space-y-4">
-            <h1 className="text-5xl font-bold text-ink-800">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-warmGraphite-800">
               Nexus Vita — DAO экосистема здоровья человека
             </h1>
-            <p className="text-ink-600 text-lg">
+            <p className="text-base sm:text-lg text-warmGraphite-600">
               Единое пространство для метрик, специалистов, сообществ, подписок и
               токенизированных сервисов вокруг здоровья.
             </p>
             <div className="flex flex-wrap gap-3">
-              <button className="sketch-button">Запросить доступ</button>
-              <button className="px-5 py-2.5 rounded-lg border-2 border-ink-300 text-ink-700 hover:bg-parchment-200">
-                Презентация для инвесторов
-              </button>
+              <NeumorphicButton primary>Запросить доступ</NeumorphicButton>
+              <NeumorphicButton>Презентация для инвесторов</NeumorphicButton>
             </div>
           </div>
-          <div className="sketch-card p-6 space-y-4">
-            <div className="text-sm uppercase tracking-widest text-ink-500">
+          <NeumorphicCard className="p-4 sm:p-6 space-y-4 animate-fadeIn" style={{ animationDelay: '0.1s' }}>
+            <div className="text-xs sm:text-sm uppercase tracking-widest text-warmGray-600">
               Витрувианская модель
             </div>
-            <h2 className="text-2xl font-semibold text-ink-800">
+            <h2 className="text-xl sm:text-2xl font-semibold text-warmGraphite-800">
               Человек как центральный интерфейс данных
             </h2>
-            <p className="text-ink-600">
-              Мы объединяем медицинские данные, образ жизни и сообщество в одной
-              визуальной и понятной среде, похожей на чертежи Леонардо.
+            <p className="text-sm sm:text-base text-warmGraphite-600">
+              Мы объединяем медицинские данные, образ жизни и сообщество в одной визуальной и
+              понятной среде, похожей на чертежи Леонардо.
             </p>
-          </div>
+          </NeumorphicCard>
         </header>
 
-        <section className="sketch-card p-6">
-          <h2 className="text-2xl font-semibold text-ink-800 mb-4">
+        <NeumorphicCard className="p-4 sm:p-6 animate-fadeIn" style={{ animationDelay: '0.2s' }}>
+          <h2 className="text-xl sm:text-2xl font-semibold text-warmGraphite-800 mb-4">
             Контуры здоровья, которые покрывает экосистема
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 text-sm text-ink-700">
-            {healthContours.map((item) => (
-              <div
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+            {healthContours.map((item, index) => (
+              <NeumorphicCard
                 key={item}
-                className="flex items-center gap-2 p-3 rounded-lg border border-ink-200 bg-parchment-100"
+                soft
+                className="p-3 flex items-center gap-2 hover:scale-[1.02] transition-transform animate-fadeIn"
+                style={{ animationDelay: `${0.3 + index * 0.05}s` }}
               >
-                <span className="text-lg">✦</span>
-                <span>{item}</span>
-              </div>
+                <span className="text-lg text-warmBlue-600">✦</span>
+                <span className="text-xs sm:text-sm text-warmGraphite-700">{item}</span>
+              </NeumorphicCard>
             ))}
           </div>
-        </section>
+        </NeumorphicCard>
 
-        <section className="grid grid-cols-1 lg:grid-cols-[1.2fr,1fr] gap-6">
-          <div className="sketch-card p-6">
-            <h2 className="text-2xl font-semibold text-ink-800 mb-4">
+        <section className="grid grid-cols-1 lg:grid-cols-[1.2fr,1fr] gap-4 sm:gap-6">
+          <NeumorphicCard className="p-4 sm:p-6 animate-fadeIn" style={{ animationDelay: '0.4s' }}>
+            <h2 className="text-xl sm:text-2xl font-semibold text-warmGraphite-800 mb-4">
               Подписка AI Health+
             </h2>
-            <p className="text-ink-600 mb-4">
-              Платный пакет, который включает персонального ИИ-ассистента,
-              аналитическую панель и готовые протоколы улучшения здоровья.
+            <p className="text-sm sm:text-base text-warmGraphite-600 mb-4">
+              Платный пакет, который включает персонального ИИ-ассистента, аналитическую панель и
+              готовые протоколы улучшения здоровья.
             </p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {aiFeatures.map((feature) => (
-                <div
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+              {aiFeatures.map((feature, index) => (
+                <NeumorphicCard
                   key={feature.title}
-                  className="p-4 rounded-lg border border-ink-200 bg-parchment-100"
+                  soft
+                  className="p-4 hover:scale-[1.02] transition-transform animate-fadeIn"
+                  style={{ animationDelay: `${0.5 + index * 0.1}s` }}
                 >
-                  <div className="font-semibold text-ink-800">{feature.title}</div>
-                  <div className="text-sm text-ink-600">{feature.description}</div>
-                </div>
+                  <div className="font-semibold text-warmGraphite-800 text-sm sm:text-base mb-1">
+                    {feature.title}
+                  </div>
+                  <div className="text-xs sm:text-sm text-warmGraphite-600">
+                    {feature.description}
+                  </div>
+                </NeumorphicCard>
               ))}
             </div>
-            <div className="mt-6 flex flex-wrap gap-3">
-              <button className="sketch-button">Оформить подписку</button>
-              <button className="px-5 py-2.5 rounded-lg border-2 border-ink-300 text-ink-700 hover:bg-parchment-200">
-                Сравнить тарифы
-              </button>
+            <div className="flex flex-wrap gap-3">
+              <NeumorphicButton primary>Оформить подписку</NeumorphicButton>
+              <NeumorphicButton>Сравнить тарифы</NeumorphicButton>
             </div>
-          </div>
+          </NeumorphicCard>
 
-          <div className="sketch-card p-6 space-y-4">
-            <h2 className="text-2xl font-semibold text-ink-800">
+          <NeumorphicCard className="p-4 sm:p-6 space-y-4 animate-fadeIn" style={{ animationDelay: '0.6s' }}>
+            <h2 className="text-xl sm:text-2xl font-semibold text-warmGraphite-800">
               Сообщество и DAO
             </h2>
-            <p className="text-ink-600">
-              Управление экосистемой, гранты на исследования, голосования и
-              распределение доходов через DAO.
+            <p className="text-sm sm:text-base text-warmGraphite-600">
+              Управление экосистемой, гранты на исследования, голосования и распределение доходов
+              через DAO.
             </p>
-            <div className="space-y-3 text-sm text-ink-700">
-              <div className="p-3 rounded-lg border border-ink-200 bg-parchment-100">
-                Голосование по протоколам лечения и сервисам
-              </div>
-              <div className="p-3 rounded-lg border border-ink-200 bg-parchment-100">
-                Вознаграждения за участие и данные
-              </div>
-              <div className="p-3 rounded-lg border border-ink-200 bg-parchment-100">
-                Казначейство на исследования здоровья
-              </div>
+            <div className="space-y-3">
+              {[
+                'Голосование по протоколам лечения и сервисам',
+                'Вознаграждения за участие и данные',
+                'Казначейство на исследования здоровья',
+              ].map((item, index) => (
+                <NeumorphicCard
+                  key={item}
+                  soft
+                  className="p-3 text-xs sm:text-sm text-warmGraphite-700 hover:scale-[1.01] transition-transform animate-fadeIn"
+                  style={{ animationDelay: `${0.7 + index * 0.1}s` }}
+                >
+                  {item}
+                </NeumorphicCard>
+              ))}
             </div>
-            <button className="sketch-button w-full">Подключиться к DAO</button>
-          </div>
+            <NeumorphicButton primary className="w-full">
+              Подключиться к DAO
+            </NeumorphicButton>
+          </NeumorphicCard>
         </section>
 
-        <section className="sketch-card p-6">
-          <h2 className="text-2xl font-semibold text-ink-800 mb-4">Токеномика NVT</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-ink-700">
-            {tokenomics.map((item) => (
-              <div
+        <NeumorphicCard className="p-4 sm:p-6 animate-fadeIn" style={{ animationDelay: '0.8s' }}>
+          <h2 className="text-xl sm:text-2xl font-semibold text-warmGraphite-800 mb-4">
+            Токеномика NVT
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
+            {tokenomics.map((item, index) => (
+              <NeumorphicCard
                 key={item.label}
-                className="flex items-center justify-between p-3 rounded-lg border border-ink-200 bg-parchment-100"
+                soft
+                className="p-3 flex items-center justify-between hover:scale-[1.01] transition-transform animate-fadeIn"
+                style={{ animationDelay: `${0.9 + index * 0.05}s` }}
               >
-                <span>{item.label}</span>
-                <span className="font-semibold text-ink-800">{item.value}</span>
-              </div>
+                <span className="text-xs sm:text-sm text-warmGraphite-700">{item.label}</span>
+                <span className="font-semibold text-warmGraphite-800 text-xs sm:text-sm">
+                  {item.value}
+                </span>
+              </NeumorphicCard>
             ))}
           </div>
-          <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-ink-700">
-            <div className="p-4 rounded-lg border border-ink-200 bg-parchment-100">
-              Использование токена: оплата услуг специалистов, абонементов,
-              подписок, голосования и доступ к премиальным исследованиям.
-            </div>
-            <div className="p-4 rounded-lg border border-ink-200 bg-parchment-100">
-              Механики: кэшбек за здоровье, стейкинг для доступа к клубам,
-              делегирование голоса и начисление за качественные данные.
-            </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <NeumorphicCard soft className="p-4 text-xs sm:text-sm text-warmGraphite-700">
+              Использование токена: оплата услуг специалистов, абонементов, подписок, голосования
+              и доступ к премиальным исследованиям.
+            </NeumorphicCard>
+            <NeumorphicCard soft className="p-4 text-xs sm:text-sm text-warmGraphite-700">
+              Механики: кэшбек за здоровье, стейкинг для доступа к клубам, делегирование голоса и
+              начисление за качественные данные.
+            </NeumorphicCard>
           </div>
-        </section>
+        </NeumorphicCard>
 
-        <section className="grid grid-cols-1 lg:grid-cols-[1fr,1.2fr] gap-6">
-          <div className="sketch-card p-6">
-            <h2 className="text-2xl font-semibold text-ink-800 mb-4">
+        <section className="grid grid-cols-1 lg:grid-cols-[1fr,1.2fr] gap-4 sm:gap-6">
+          <NeumorphicCard className="p-4 sm:p-6 animate-fadeIn" style={{ animationDelay: '1s' }}>
+            <h2 className="text-xl sm:text-2xl font-semibold text-warmGraphite-800 mb-4">
               Воронка продажи токенов
             </h2>
             <div className="space-y-3">
-              {saleStages.map((stage) => (
-                <div
+              {saleStages.map((stage, index) => (
+                <NeumorphicCard
                   key={stage.title}
-                  className="p-4 rounded-lg border border-ink-200 bg-parchment-100"
+                  soft
+                  className="p-4 hover:scale-[1.01] transition-transform animate-fadeIn"
+                  style={{ animationDelay: `${1.1 + index * 0.1}s` }}
                 >
-                  <div className="flex items-center justify-between">
-                    <div className="font-semibold text-ink-800">{stage.title}</div>
-                    <span className="text-xs px-2 py-1 rounded-full bg-ink-700 text-white">
+                  <div className="flex items-center justify-between mb-1">
+                    <div className="font-semibold text-warmGraphite-800 text-sm sm:text-base">
+                      {stage.title}
+                    </div>
+                    <NeumorphicBadge variant="warning" size="sm">
                       Скидка {stage.discount}
-                    </span>
+                    </NeumorphicBadge>
                   </div>
-                  <div className="text-sm text-ink-600">{stage.focus}</div>
-                </div>
+                  <div className="text-xs sm:text-sm text-warmGraphite-600">{stage.focus}</div>
+                </NeumorphicCard>
               ))}
             </div>
-          </div>
+          </NeumorphicCard>
 
-          <div className="sketch-card p-6">
-            <h2 className="text-2xl font-semibold text-ink-800 mb-4">Дорожная карта</h2>
+          <NeumorphicCard className="p-4 sm:p-6 animate-fadeIn" style={{ animationDelay: '1.2s' }}>
+            <h2 className="text-xl sm:text-2xl font-semibold text-warmGraphite-800 mb-4">
+              Дорожная карта
+            </h2>
             <div className="space-y-3">
-              {roadmap.map((phase) => (
-                <div
+              {roadmap.map((phase, index) => (
+                <NeumorphicCard
                   key={phase.phase}
-                  className="p-4 rounded-lg border border-ink-200 bg-parchment-100"
+                  soft
+                  className="p-4 hover:scale-[1.01] transition-transform animate-fadeIn"
+                  style={{ animationDelay: `${1.3 + index * 0.1}s` }}
                 >
-                  <div className="font-semibold text-ink-800">{phase.phase}</div>
-                  <ul className="text-sm text-ink-600 mt-2 space-y-1">
+                  <div className="font-semibold text-warmGraphite-800 text-sm sm:text-base mb-2">
+                    {phase.phase}
+                  </div>
+                  <ul className="text-xs sm:text-sm text-warmGraphite-600 space-y-1">
                     {phase.items.map((item) => (
-                      <li key={item}>• {item}</li>
+                      <li key={item} className="flex items-center gap-2">
+                        <CheckCircle className="w-3 h-3 text-warmGreen-600 flex-shrink-0" />
+                        {item}
+                      </li>
                     ))}
                   </ul>
-                </div>
+                </NeumorphicCard>
               ))}
             </div>
-          </div>
+          </NeumorphicCard>
         </section>
       </div>
     </div>
