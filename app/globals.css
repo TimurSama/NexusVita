@@ -140,14 +140,18 @@ html {
   /* Неоморфная кнопка */
   .neumorphic-button {
     background: var(--bg-secondary);
-    border-radius: 1.5rem;
+    border-radius: 1.5rem !important;
     box-shadow: 
       6px 6px 12px var(--shadow-dark),
       -6px -6px 12px var(--shadow-light);
-    transition: all 0.2s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     border: none;
     color: var(--text-primary);
     font-weight: 500;
+    padding: 0.875rem 1.75rem;
+    position: relative;
+    z-index: 1;
+    cursor: pointer;
   }
 
   .neumorphic-button:hover {
@@ -166,11 +170,39 @@ html {
 
   /* Неоморфная кнопка с акцентом */
   .neumorphic-button-primary {
-    background: var(--button-primary);
-    color: white;
+    background: var(--button-primary) !important;
+    color: white !important;
+    border-radius: 1.5rem !important;
     box-shadow: 
-      6px 6px 12px rgba(0, 0, 0, 0.15),
-      -6px -6px 12px rgba(255, 255, 255, 0.1);
+      6px 6px 16px rgba(0, 0, 0, 0.12),
+      -6px -6px 16px rgba(255, 255, 255, 0.8);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    font-weight: 600;
+    padding: 0.875rem 1.75rem;
+    position: relative;
+    z-index: 1;
+    cursor: pointer;
+  }
+
+  .neumorphic-button-primary:hover {
+    background: var(--button-primary-hover) !important;
+    box-shadow: 
+      8px 8px 20px rgba(0, 0, 0, 0.15),
+      -8px -8px 20px rgba(255, 255, 255, 0.9);
+    transform: translateY(-2px);
+  }
+
+  .neumorphic-button-primary:active {
+    box-shadow: 
+      inset 3px 3px 6px rgba(0, 0, 0, 0.15),
+      inset -3px -3px 6px rgba(255, 255, 255, 0.5);
+    transform: translateY(1px);
+  }
+
+  .neumorphic-button-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
   }
 
   .neumorphic-button-primary:hover {
