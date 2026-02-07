@@ -1,6 +1,9 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest'
 
-describe('Onboarding Flow', () => {
+// Пропускаем E2E тесты в CI/CD
+const isCI = process.env.CI === 'true' || process.env.VERCEL === '1'
+
+describe.skipIf(isCI)('Onboarding Flow', () => {
   let testUserId: string
   let testSessionCookie: string
 

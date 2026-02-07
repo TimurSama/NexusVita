@@ -46,7 +46,15 @@ export function verifySessionToken(token: string): SessionPayload | null {
   const [encoded, signature] = token.split('.')
   if (!encoded || !signature) return null
   const expected = sign(encoded)
-  if (!crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expected))) {
+  
+  // Проверяем длину буферов перед сравнением
+  const signatureBuf = Buffer.from(signature)
+  const expectedBuf = Buffer.from(expected)
+  if (signatureBuf.length !== expectedBuf.length) {
+    return null
+  }
+  
+  if (!crypto.timingSafeEqual(signatureBuf, expectedBuf)) {
     return null
   }
   try {

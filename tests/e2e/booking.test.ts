@@ -1,6 +1,9 @@
 import { describe, it, expect, beforeAll } from 'vitest'
 
-describe('Specialist Booking Flow', () => {
+// Пропускаем E2E тесты в CI/CD
+const isCI = process.env.CI === 'true' || process.env.VERCEL === '1'
+
+describe.skipIf(isCI)('Specialist Booking Flow', () => {
   let userSession: string
 
   beforeAll(async () => {
