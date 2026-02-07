@@ -5,37 +5,30 @@ import { getSessionFromRequest } from '@/lib/auth/session'
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
-  // Публичные маршруты
+  // Публичные маршруты - все страницы доступны без регистрации
   if (
     pathname.startsWith('/api') ||
     pathname.startsWith('/login') ||
     pathname.startsWith('/register') ||
     pathname.startsWith('/r/') ||
     pathname.startsWith('/pricing') ||
-    pathname.startsWith('/landing')
+    pathname.startsWith('/landing') ||
+    pathname.startsWith('/_next') ||
+    pathname.startsWith('/favicon.ico')
   ) {
     return NextResponse.next()
   }
 
-  // Проверка авторизации для защищенных маршрутов
+  // Все остальные страницы доступны без авторизации для просмотра
+  // Авторизация требуется только для действий (создание, редактирование, удаление)
   const session = getSessionFromRequest(request)
-  
-  if (!session && pathname.startsWith('/onboarding')) {
-    // Онбординг доступен только авторизованным
-    return NextResponse.redirect(new URL('/login', request.url))
-  }
 
-  // Редирект неавторизованных с корня на лендинг
+  // Редирект с корня на лендинг для неавторизованных
   if (!session && pathname === '/') {
     return NextResponse.redirect(new URL('/landing', request.url))
   }
 
-  if (!session && pathname.startsWith('/')) {
-    // Дашборд требует авторизации
-    return NextResponse.redirect(new URL('/login', request.url))
-  }
-
-  // Проверка онбординга для новых пользователей
+  // Проверка онбординга только для авторизованных пользователей
   if (session && !pathname.startsWith('/onboarding') && !pathname.startsWith('/api')) {
     try {
       const { prisma } = await import('@/lib/db/prisma')
@@ -44,7 +37,7 @@ export async function middleware(request: NextRequest) {
         select: { onboardingCompleted: true },
       })
 
-      if (user && !user.onboardingCompleted) {
+      if (user && !user.onboardingCompleted && pathname !== '/onboarding') {
         // Перенаправляем на онбординг, если не завершен
         return NextResponse.redirect(new URL('/onboarding', request.url))
       }

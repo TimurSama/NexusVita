@@ -2,6 +2,10 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
+import NeumorphicCard from '@/components/ui/NeumorphicCard'
+import NeumorphicButton from '@/components/ui/NeumorphicButton'
+import NeumorphicInput from '@/components/ui/NeumorphicInput'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -30,44 +34,57 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen px-6 py-12">
-      <div className="max-w-md mx-auto sketch-card p-6">
-        <h1 className="text-3xl font-bold text-ink-800 mb-2">Вход</h1>
-        <p className="text-ink-600 mb-6">
+    <div className="min-h-screen flex items-center justify-center px-4 py-12">
+      <NeumorphicCard className="w-full max-w-md p-8 sm:p-10 animate-fadeIn">
+        <h1 className="text-3xl sm:text-4xl font-bold text-warmGraphite-800 mb-3">
+          Вход
+        </h1>
+        <p className="text-base sm:text-lg text-warmGraphite-600 mb-8">
           Войдите, чтобы управлять медкартой и подписками.
         </p>
-        <form className="space-y-4" onSubmit={handleSubmit}>
-          <input
-            className="sketch-input"
+        <form className="space-y-5" onSubmit={handleSubmit}>
+          <NeumorphicInput
             placeholder="Email или username"
             value={identifier}
             onChange={(e) => setIdentifier(e.target.value)}
             required
+            className="w-full"
           />
-          <input
-            className="sketch-input"
+          <NeumorphicInput
             placeholder="Пароль"
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
+            className="w-full"
           />
           {error && (
-            <div className="text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg p-3">
-              {error}
-            </div>
+            <NeumorphicCard
+              soft
+              className="p-4 bg-warmRed-50 border-2 border-warmRed-200 animate-shake"
+            >
+              <p className="text-sm text-warmRed-700">{error}</p>
+            </NeumorphicCard>
           )}
-          <button className="sketch-button w-full" type="submit" disabled={loading}>
+          <NeumorphicButton
+            primary
+            type="submit"
+            disabled={loading}
+            className="w-full text-base sm:text-lg py-4"
+          >
             {loading ? 'Вход...' : 'Войти'}
-          </button>
+          </NeumorphicButton>
         </form>
-        <div className="text-sm text-ink-600 mt-4">
+        <div className="text-sm sm:text-base text-warmGraphite-600 mt-6 text-center">
           Нет аккаунта?{' '}
-          <a className="ink-link" href="/register">
+          <Link
+            href="/register"
+            className="text-warmBlue-600 hover:text-warmBlue-700 font-medium transition-colors"
+          >
             Зарегистрироваться
-          </a>
+          </Link>
         </div>
-      </div>
+      </NeumorphicCard>
     </div>
   )
 }
