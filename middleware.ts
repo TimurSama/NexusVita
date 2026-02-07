@@ -12,7 +12,7 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith('/register') ||
     pathname.startsWith('/r/') ||
     pathname.startsWith('/pricing') ||
-    pathname.startsWith('/landing') ||
+    pathname.startsWith('/about') ||
     pathname.startsWith('/_next') ||
     pathname.startsWith('/favicon.ico')
   ) {
@@ -23,9 +23,10 @@ export async function middleware(request: NextRequest) {
   // Авторизация требуется только для действий (создание, редактирование, удаление)
   const session = getSessionFromRequest(request)
 
-  // Редирект с корня на лендинг для неавторизованных
-  if (!session && pathname === '/') {
-    return NextResponse.redirect(new URL('/landing', request.url))
+  // Главная страница - всегда дашборд (для всех)
+  // Редирект /landing на /about (лендинг-презентация)
+  if (pathname === '/landing') {
+    return NextResponse.redirect(new URL('/about', request.url))
   }
 
   // Проверка онбординга только для авторизованных пользователей
