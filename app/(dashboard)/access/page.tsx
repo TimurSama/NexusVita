@@ -1,6 +1,11 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { CreditCard, FileText, Shield, Wallet, Plus, Download, Upload } from 'lucide-react'
+import NeumorphicCard from '@/components/ui/NeumorphicCard'
+import NeumorphicButton from '@/components/ui/NeumorphicButton'
+import NeumorphicBadge from '@/components/ui/NeumorphicBadge'
+import { cn } from '@/lib/utils/cn'
 
 const accessCards = [
   {
@@ -8,24 +13,32 @@ const accessCards = [
     description:
       'История анализов, диагнозов, назначений и телемедицинских консультаций.',
     actions: ['Открыть карту', 'Импорт из клиник', 'Экспорт PDF'],
+    icon: FileText,
+    color: 'warmBlue',
   },
   {
     title: 'Абонементы и пропуска',
     description:
       'QR-пропуск в клубы, бассейны, бани, студии и групповые классы.',
     actions: ['Добавить абонемент', 'Поделиться доступом', 'Проверить срок'],
+    icon: CreditCard,
+    color: 'warmGreen',
   },
   {
     title: 'Страхование и чек-апы',
     description:
       'Управление страховыми планами, годовые осмотры и напоминания.',
     actions: ['Подключить страхование', 'Запланировать чек-ап', 'История'],
+    icon: Shield,
+    color: 'warmPink',
   },
   {
     title: 'Доступ DAO',
     description:
       'NFT-пропуск, голосования и участники, подтвержденные токеном.',
     actions: ['Привязать кошелек', 'Получить пропуск', 'Войти в DAO'],
+    icon: Wallet,
+    color: 'warmRed',
   },
 ]
 
@@ -51,8 +64,8 @@ export default function AccessPage() {
         return
       }
       setIsAuthed(true)
-      const data = await fetch(`/api/access-passes?userId=${me.user.id}`).then(
-        (res) => res.json()
+      const data = await fetch(`/api/access-passes?userId=${me.user.id}`).then((res) =>
+        res.json()
       )
       setPasses(Array.isArray(data) ? data : [])
       setLoading(false)
@@ -61,98 +74,124 @@ export default function AccessPage() {
   }, [])
 
   return (
-    <div className="min-h-screen px-6 py-10">
-      <div className="max-w-6xl mx-auto space-y-10">
-        <header className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+    <div className="min-h-screen bg-warmGray-50 p-4 sm:p-6 lg:p-8">
+      <div className="max-w-6xl mx-auto space-y-6 sm:space-y-8">
+        <header className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between animate-fadeIn">
           <div>
-            <h1 className="text-4xl font-bold text-ink-800">Карты и пропуска</h1>
-            <p className="text-ink-600">
-              Управление медицинской картой, абонементами, страховкой и доступом
-              DAO.
+            <h1 className="text-3xl sm:text-4xl font-bold text-warmGraphite-800">
+              Карты и пропуска
+            </h1>
+            <p className="text-base sm:text-lg text-warmGraphite-600 mt-2">
+              Управление медицинской картой, абонементами, страховкой и доступом DAO.
             </p>
           </div>
-          <button className="sketch-button">Добавить документ</button>
+          <NeumorphicButton primary>
+            <Plus className="w-4 h-4 mr-2" />
+            Добавить документ
+          </NeumorphicButton>
         </header>
 
-        <div className="sketch-card p-4 text-sm text-ink-700">
-          ⚠️ Абонементы и пропуска в разработке. Сейчас отображается визуальная
-          модель, а синхронизация с клубами и QR-доступом появится позже.
-        </div>
-
-        {!isAuthed && !loading && (
-          <div className="sketch-card p-4 text-sm text-ink-700">
-            Войдите в аккаунт, чтобы увидеть ваши абонементы.
+        <NeumorphicCard
+          soft
+          className="p-4 sm:p-6 bg-warmPink-50/50 border-2 border-warmPink-200/50 animate-fadeIn"
+          style={{ animationDelay: '0.1s' }}
+        >
+          <div className="flex items-start gap-3">
+            <Shield className="w-5 h-5 text-warmPink-600 flex-shrink-0 mt-0.5" />
+            <p className="text-sm sm:text-base text-warmGraphite-700">
+              ⚠️ Абонементы и пропуска в разработке. Сейчас отображается визуальная модель, а
+              синхронизация с клубами и QR-доступом появится позже.
+            </p>
           </div>
-        )}
+        </NeumorphicCard>
 
-        <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {accessCards.map((card) => (
-            <div key={card.title} className="sketch-card p-6">
-              <h2 className="text-2xl font-semibold text-ink-800 mb-2">
-                {card.title}
-              </h2>
-              <p className="text-ink-600 mb-4">{card.description}</p>
-              <div className="flex flex-wrap gap-2">
-                {card.actions.map((action) => (
-                  <button
-                    key={action}
-                    className="px-3 py-1 rounded-full border border-ink-300 text-xs text-ink-700 hover:bg-parchment-200"
-                  >
-                    {action}
-                  </button>
-                ))}
-              </div>
-            </div>
-          ))}
+        {/* Карточки доступа */}
+        <section className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+          {accessCards.map((card, index) => {
+            const Icon = card.icon
+            return (
+              <NeumorphicCard
+                key={card.title}
+                className="p-4 sm:p-6 hover:scale-[1.02] transition-all duration-300 animate-fadeIn"
+                style={{ animationDelay: `${0.2 + index * 0.1}s` }}
+              >
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="p-2 neumorphic-card-soft rounded-neumorphic-sm">
+                    <Icon className="w-5 h-5 text-warmBlue-600" />
+                  </div>
+                  <h2 className="text-lg sm:text-xl font-semibold text-warmGraphite-800">
+                    {card.title}
+                  </h2>
+                </div>
+                <p className="text-sm text-warmGraphite-600 mb-4">{card.description}</p>
+                <div className="flex flex-wrap gap-2">
+                  {card.actions.map((action) => (
+                    <NeumorphicButton key={action} className="text-xs sm:text-sm px-3 py-1.5">
+                      {action}
+                    </NeumorphicButton>
+                  ))}
+                </div>
+              </NeumorphicCard>
+            )
+          })}
         </section>
 
-        <section className="sketch-card p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-xl font-semibold text-ink-800">Активные абонементы</h3>
-            <button className="ink-link text-sm">Все пропуска</button>
-          </div>
-          {passes.length === 0 ? (
-            <div className="text-sm text-ink-600">
-              Пока нет активных абонементов. Они появятся после подключения
-              поставщиков.
+        {/* Активные пропуска */}
+        <NeumorphicCard className="p-4 sm:p-6 animate-fadeIn" style={{ animationDelay: '0.6s' }}>
+          <h2 className="text-lg sm:text-xl font-semibold text-warmGraphite-800 mb-4">
+            Активные пропуска
+          </h2>
+          {loading ? (
+            <div className="text-sm text-warmGray-600 text-center py-8">Загрузка...</div>
+          ) : passes.length === 0 ? (
+            <div className="text-sm text-warmGray-600 text-center py-8">
+              Пропусков пока нет. Добавьте первый пропуск выше.
             </div>
           ) : (
             <div className="space-y-3">
-              {passes.map((pass) => (
-                <div
+              {passes.map((pass, index) => (
+                <NeumorphicCard
                   key={pass.id}
-                  className="flex items-center justify-between p-4 rounded-lg border border-ink-200 bg-parchment-100"
+                  soft
+                  className="p-4 flex items-center justify-between hover:scale-[1.01] transition-transform animate-fadeIn"
+                  style={{ animationDelay: `${0.7 + index * 0.05}s` }}
                 >
                   <div>
-                    <div className="font-semibold text-ink-800">
+                    <div className="font-semibold text-warmGraphite-800 text-sm sm:text-base">
                       {pass.providerName}
                     </div>
-                    <div className="text-xs text-ink-500">
+                    <div className="text-xs text-warmGray-600 mt-1">
                       {pass.expiresAt
                         ? `До ${new Date(pass.expiresAt).toLocaleDateString('ru-RU')}`
                         : 'Без срока'}
                     </div>
                   </div>
-                  <span
-                    className={`text-xs px-3 py-1 rounded-full ${
-                      pass.status === 'ACTIVE'
-                        ? 'bg-green-100 text-green-800'
+                  <div className="flex items-center gap-3">
+                    <NeumorphicBadge
+                      variant={
+                        pass.status === 'ACTIVE'
+                          ? 'success'
+                          : pass.status === 'PAUSED'
+                            ? 'warning'
+                            : 'error'
+                      }
+                      size="sm"
+                    >
+                      {pass.status === 'ACTIVE'
+                        ? 'Активен'
                         : pass.status === 'PAUSED'
-                        ? 'bg-yellow-100 text-yellow-800'
-                        : 'bg-red-100 text-red-800'
-                    }`}
-                  >
-                    {pass.status === 'ACTIVE'
-                      ? 'Активен'
-                      : pass.status === 'PAUSED'
-                      ? 'Пауза'
-                      : 'Истек'}
-                  </span>
-                </div>
+                          ? 'Приостановлен'
+                          : 'Истек'}
+                    </NeumorphicBadge>
+                    <NeumorphicButton className="text-xs px-3 py-1">
+                      <Download className="w-3 h-3" />
+                    </NeumorphicButton>
+                  </div>
+                </NeumorphicCard>
               ))}
             </div>
           )}
-        </section>
+        </NeumorphicCard>
       </div>
     </div>
   )
