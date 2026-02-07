@@ -206,6 +206,27 @@ html {
   }
 
   .neumorphic-button-primary:hover {
+    background: var(--button-primary-hover) !important;
+    box-shadow: 
+      8px 8px 20px rgba(0, 0, 0, 0.15),
+      -8px -8px 20px rgba(255, 255, 255, 0.9);
+    transform: translateY(-2px);
+  }
+
+  .neumorphic-button-primary:active {
+    box-shadow: 
+      inset 3px 3px 6px rgba(0, 0, 0, 0.15),
+      inset -3px -3px 6px rgba(255, 255, 255, 0.5);
+    transform: translateY(1px);
+  }
+
+  .neumorphic-button-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .neumorphic-button-primary:hover {
     box-shadow: 
       8px 8px 16px rgba(0, 0, 0, 0.2),
       -8px -8px 16px rgba(255, 255, 255, 0.15);
