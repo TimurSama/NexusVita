@@ -13,6 +13,7 @@ interface SidebarProps {
 
 const navigationItems = [
   { href: '/', label: 'Главная', icon: Home },
+  { href: '/about', label: 'Подробнее', icon: BookOpen },
   { href: '/social', label: 'Лента', icon: Users },
   { href: '/specialists', label: 'Специалисты', icon: HeartPulse },
   { href: '/marketplace', label: 'Маркетплейс', icon: Store },
