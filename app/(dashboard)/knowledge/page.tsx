@@ -1,6 +1,14 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { BookOpen, Plus, CheckCircle, XCircle, ShoppingCart } from 'lucide-react'
+import NeumorphicCard from '@/components/ui/NeumorphicCard'
+import NeumorphicButton from '@/components/ui/NeumorphicButton'
+import NeumorphicInput from '@/components/ui/NeumorphicInput'
+import NeumorphicTextarea from '@/components/ui/NeumorphicTextarea'
+import NeumorphicBadge from '@/components/ui/NeumorphicBadge'
+import NeumorphicModal from '@/components/ui/NeumorphicModal'
+import { cn } from '@/lib/utils/cn'
 
 type Item = {
   id: string
@@ -16,6 +24,7 @@ type Item = {
 export default function KnowledgePage() {
   const [items, setItems] = useState<Item[]>([])
   const [error, setError] = useState<string | null>(null)
+  const [showCreateModal, setShowCreateModal] = useState(false)
   const [form, setForm] = useState({
     title: '',
     type: '',
@@ -50,6 +59,8 @@ export default function KnowledgePage() {
     const item = await response.json()
     setItems((prev) => [item, ...prev])
     setForm({ title: '', type: '', url: '', description: '', tags: '', priceNXT: 0 })
+    setShowCreateModal(false)
+    setError(null)
   }
 
   const handleVerify = async (itemId: string, status: string) => {
@@ -82,102 +93,180 @@ export default function KnowledgePage() {
   }
 
   return (
-    <div className="min-h-screen px-6 py-10">
-      <div className="max-w-7xl mx-auto space-y-8">
-        <header>
-          <h1 className="text-4xl font-bold text-ink-800">Библиотека знаний</h1>
-          <p className="text-ink-600">
-            Литература, видео и методики от специалистов и сообщества.
-          </p>
+    <div className="min-h-screen bg-warmGray-50 p-4 sm:p-6 lg:p-8">
+      <div className="max-w-7xl mx-auto space-y-6 sm:space-y-8">
+        <header className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between animate-fadeIn">
+          <div>
+            <h1 className="text-3xl sm:text-4xl font-bold text-warmGraphite-800">
+              Библиотека знаний
+            </h1>
+            <p className="text-base sm:text-lg text-warmGraphite-600 mt-2">
+              Литература, видео и методики от специалистов и сообщества.
+            </p>
+          </div>
+          <NeumorphicButton primary onClick={() => setShowCreateModal(true)}>
+            <Plus className="w-4 h-4 mr-2" />
+            Добавить материал
+          </NeumorphicButton>
         </header>
 
         {error && (
-          <div className="sketch-card p-4 text-sm text-red-700 border border-red-200">
-            {error}
-          </div>
+          <NeumorphicCard
+            soft
+            className="p-4 bg-warmRed-50 border-2 border-warmRed-200 animate-shake"
+          >
+            <p className="text-sm text-warmRed-700">{error}</p>
+          </NeumorphicCard>
         )}
 
-        <section className="sketch-card p-6 space-y-3">
-          <h2 className="text-xl font-semibold text-ink-800">Добавить материал</h2>
-          <input
-            className="sketch-input"
-            placeholder="Название"
-            value={form.title}
-            onChange={(e) => setForm({ ...form, title: e.target.value })}
-          />
-          <input
-            className="sketch-input"
-            placeholder="Тип (книга, видео, протокол)"
-            value={form.type}
-            onChange={(e) => setForm({ ...form, type: e.target.value })}
-          />
-          <input
-            className="sketch-input"
-            placeholder="Ссылка"
-            value={form.url}
-            onChange={(e) => setForm({ ...form, url: e.target.value })}
-          />
-          <textarea
-            className="sketch-input min-h-[100px]"
-            placeholder="Описание"
-            value={form.description}
-            onChange={(e) => setForm({ ...form, description: e.target.value })}
-          />
-          <input
-            className="sketch-input"
-            placeholder="Теги через запятую"
-            value={form.tags}
-            onChange={(e) => setForm({ ...form, tags: e.target.value })}
-          />
-          <input
-            className="sketch-input"
-            type="number"
-            placeholder="Цена (NVT)"
-            value={form.priceNXT}
-            onChange={(e) => setForm({ ...form, priceNXT: Number(e.target.value) })}
-          />
-          <button className="sketch-button" onClick={handleCreate}>
-            Добавить
-          </button>
-        </section>
-
-        <section className="sketch-card p-6">
-          <h2 className="text-xl font-semibold text-ink-800 mb-4">Материалы</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Материалы */}
+        <NeumorphicCard className="p-4 sm:p-6 animate-fadeIn" style={{ animationDelay: '0.1s' }}>
+          <h2 className="text-xl sm:text-2xl font-semibold text-warmGraphite-800 mb-4">
+            Материалы
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {items.length === 0 && (
-              <div className="text-sm text-ink-600">Материалов пока нет.</div>
-            )}
-            {items.map((item) => (
-              <div
-                key={item.id}
-                className="p-4 rounded-lg border border-ink-200 bg-parchment-100"
-              >
-                <div className="font-semibold text-ink-800">{item.title}</div>
-                <div className="text-xs text-ink-500">{item.type}</div>
-                {item.description && (
-                  <div className="text-sm text-ink-600 mt-1">{item.description}</div>
-                )}
-                <div className="text-xs text-ink-500 mt-2">
-                  Статус: {item.status} · Цена: {item.priceNXT} NVT
-                </div>
-                <div className="mt-2 flex items-center gap-2">
-                  <button
-                    className="px-3 py-1 rounded-md border border-ink-300 text-xs text-ink-700 hover:bg-parchment-200"
-                    onClick={() => handlePurchase(item.id, item.priceNXT)}
-                  >
-                    Купить
-                  </button>
-                  <button
-                    className="px-3 py-1 rounded-md border border-ink-300 text-xs text-ink-700 hover:bg-parchment-200"
-                    onClick={() => handleVerify(item.id, 'VERIFIED')}
-                  >
-                    Подтвердить
-                  </button>
-                </div>
+              <div className="col-span-full text-sm text-warmGray-600 text-center py-12">
+                Материалов пока нет. Добавьте первый материал!
               </div>
+            )}
+            {items.map((item, index) => (
+              <NeumorphicCard
+                key={item.id}
+                soft
+                className="p-4 hover:scale-105 transition-all duration-300 animate-fadeIn"
+                style={{ animationDelay: `${0.2 + index * 0.1}s` }}
+              >
+                <div className="flex items-start justify-between mb-2">
+                  <div className="p-2 neumorphic-card-soft rounded-neumorphic-sm">
+                    <BookOpen className="w-4 h-4 text-warmBlue-600" />
+                  </div>
+                  <NeumorphicBadge
+                    variant={item.status === 'VERIFIED' ? 'success' : 'warning'}
+                    size="sm"
+                  >
+                    {item.status === 'VERIFIED' ? 'Проверено' : 'На проверке'}
+                  </NeumorphicBadge>
+                </div>
+                <h3 className="font-semibold text-warmGraphite-800 text-sm sm:text-base mb-1">
+                  {item.title}
+                </h3>
+                <div className="text-xs text-warmGray-600 mb-2">{item.type}</div>
+                {item.description && (
+                  <p className="text-xs sm:text-sm text-warmGraphite-600 mb-3 line-clamp-2">
+                    {item.description}
+                  </p>
+                )}
+                {item.tags && item.tags.length > 0 && (
+                  <div className="flex flex-wrap gap-1 mb-3">
+                    {item.tags.map((tag) => (
+                      <NeumorphicBadge key={tag} variant="info" size="sm">
+                        #{tag}
+                      </NeumorphicBadge>
+                    ))}
+                  </div>
+                )}
+                <div className="flex items-center justify-between pt-3 border-t border-warmGray-300/50">
+                  <NeumorphicBadge variant="info" size="sm">
+                    {item.priceNXT} NVT
+                  </NeumorphicBadge>
+                  <div className="flex items-center gap-2">
+                    <NeumorphicButton
+                      className="text-xs px-3 py-1"
+                      onClick={() => handlePurchase(item.id, item.priceNXT)}
+                    >
+                      <ShoppingCart className="w-3 h-3 mr-1" />
+                      Купить
+                    </NeumorphicButton>
+                    {item.status !== 'VERIFIED' && (
+                      <NeumorphicButton
+                        className="text-xs px-3 py-1"
+                        onClick={() => handleVerify(item.id, 'VERIFIED')}
+                      >
+                        <CheckCircle className="w-3 h-3" />
+                      </NeumorphicButton>
+                    )}
+                  </div>
+                </div>
+              </NeumorphicCard>
             ))}
           </div>
-        </section>
+        </NeumorphicCard>
+
+        {/* Модальное окно создания */}
+        <NeumorphicModal
+          isOpen={showCreateModal}
+          onClose={() => {
+            setShowCreateModal(false)
+            setError(null)
+          }}
+          title="Добавить материал"
+          size="md"
+        >
+          <div className="space-y-4">
+            {error && (
+              <div className="p-3 rounded-lg bg-warmRed-50 border border-warmRed-200 text-sm text-warmRed-700">
+                {error}
+              </div>
+            )}
+            <NeumorphicInput
+              label="Название"
+              placeholder="Название материала"
+              value={form.title}
+              onChange={(e) => setForm({ ...form, title: e.target.value })}
+            />
+            <NeumorphicInput
+              label="Тип"
+              placeholder="книга, видео, протокол"
+              value={form.type}
+              onChange={(e) => setForm({ ...form, type: e.target.value })}
+            />
+            <NeumorphicInput
+              label="Ссылка"
+              placeholder="URL материала"
+              value={form.url}
+              onChange={(e) => setForm({ ...form, url: e.target.value })}
+            />
+            <NeumorphicTextarea
+              label="Описание"
+              placeholder="Описание материала"
+              value={form.description}
+              onChange={(e) => setForm({ ...form, description: e.target.value })}
+              rows={4}
+            />
+            <NeumorphicInput
+              label="Теги"
+              placeholder="через запятую"
+              value={form.tags}
+              onChange={(e) => setForm({ ...form, tags: e.target.value })}
+            />
+            <NeumorphicInput
+              label="Цена (NVT)"
+              type="number"
+              placeholder="0"
+              value={form.priceNXT}
+              onChange={(e) => setForm({ ...form, priceNXT: Number(e.target.value) })}
+            />
+            <div className="flex items-center gap-3">
+              <NeumorphicButton
+                primary
+                onClick={handleCreate}
+                disabled={!form.title.trim()}
+                className="flex-1"
+              >
+                Добавить
+              </NeumorphicButton>
+              <NeumorphicButton
+                onClick={() => {
+                  setShowCreateModal(false)
+                  setError(null)
+                }}
+              >
+                Отмена
+              </NeumorphicButton>
+            </div>
+          </div>
+        </NeumorphicModal>
       </div>
     </div>
   )
