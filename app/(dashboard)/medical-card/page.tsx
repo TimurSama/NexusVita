@@ -1,6 +1,11 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
+import { FileText, Download, Upload, Shield, Pill, Syringe, Plus } from 'lucide-react'
+import NeumorphicCard from '@/components/ui/NeumorphicCard'
+import NeumorphicButton from '@/components/ui/NeumorphicButton'
+import NeumorphicBadge from '@/components/ui/NeumorphicBadge'
+import Link from 'next/link'
 
 type MedicalProfile = {
   bloodType?: string | null
@@ -38,8 +43,8 @@ export default function MedicalCardPage() {
         return
       }
       setUser(me.user)
-      const data = await fetch(`/api/medical-profile?userId=${me.user.id}`).then(
-        (res) => res.json()
+      const data = await fetch(`/api/medical-profile?userId=${me.user.id}`).then((res) =>
+        res.json()
       )
       setProfile(data || null)
       setLoading(false)
@@ -52,9 +57,7 @@ export default function MedicalCardPage() {
       { label: 'Группа крови', value: profile?.bloodType || '—' },
       {
         label: 'Аллергии',
-        value: profile?.allergies?.length
-          ? profile.allergies.join(', ')
-          : '—',
+        value: profile?.allergies?.length ? profile.allergies.join(', ') : '—',
       },
       {
         label: 'Хронические',
@@ -79,136 +82,154 @@ export default function MedicalCardPage() {
   const vaccinations = profile?.vaccinations ?? []
 
   return (
-    <div className="min-h-screen px-6 py-10">
-      <div className="max-w-7xl mx-auto space-y-10">
-        <header className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+    <div className="min-h-screen bg-warmGray-50 p-4 sm:p-6 lg:p-8">
+      <div className="max-w-7xl mx-auto space-y-6 sm:space-y-8">
+        <header className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between animate-fadeIn">
           <div>
-            <h1 className="text-4xl font-bold text-ink-800">Единая медкарта</h1>
-            <p className="text-ink-600">
+            <h1 className="text-3xl sm:text-4xl font-bold text-warmGraphite-800">
+              Единая медкарта
+            </h1>
+            <p className="text-base sm:text-lg text-warmGraphite-600 mt-2">
               История анализов, диагнозов, визитов и персональных протоколов.
             </p>
           </div>
-          <div className="flex gap-3">
-            <button className="sketch-button">Добавить запись</button>
-            <a
-              href="/imports"
-              className="px-5 py-2.5 rounded-lg border-2 border-ink-300 text-ink-700 hover:bg-parchment-200"
-            >
-              Импорт данных
-            </a>
-            <button className="px-5 py-2.5 rounded-lg border-2 border-ink-300 text-ink-700 hover:bg-parchment-200">
+          <div className="flex flex-wrap gap-3">
+            <NeumorphicButton primary>
+              <Plus className="w-4 h-4 mr-2" />
+              Добавить запись
+            </NeumorphicButton>
+            <Link href="/imports">
+              <NeumorphicButton>
+                <Upload className="w-4 h-4 mr-2" />
+                Импорт данных
+              </NeumorphicButton>
+            </Link>
+            <NeumorphicButton>
+              <Download className="w-4 h-4 mr-2" />
               Экспорт PDF
-            </button>
+            </NeumorphicButton>
           </div>
         </header>
 
-        <div className="sketch-card p-4 text-sm text-ink-700">
-          ⚠️ Функции медкарты находятся в разработке. Сейчас это визуальный
-          прототип: данные, экспорт и интеграции будут подключены позже.
-        </div>
-
-        {!user && !loading && (
-          <div className="sketch-card p-4 text-sm text-ink-700">
-            Войдите в аккаунт, чтобы увидеть персональную медкарту.
-          </div>
-        )}
-
-        <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {summary.map((item) => (
-            <div key={item.label} className="sketch-card p-4">
-              <div className="text-xs uppercase tracking-widest text-ink-500">
+        {/* Краткая сводка */}
+        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {summary.map((item, index) => (
+            <NeumorphicCard
+              key={item.label}
+              className="p-4 sm:p-6 animate-fadeIn"
+              style={{ animationDelay: `${0.1 + index * 0.1}s` }}
+            >
+              <div className="text-xs uppercase tracking-widest text-warmGray-600 mb-2">
                 {item.label}
               </div>
-              <div className="text-lg font-semibold text-ink-800 mt-2">
+              <div className="text-base sm:text-lg font-semibold text-warmGraphite-800">
                 {item.value}
               </div>
-            </div>
+            </NeumorphicCard>
           ))}
         </section>
 
-        <section className="grid grid-cols-1 lg:grid-cols-[1.3fr,1fr] gap-6">
-          <div className="sketch-card p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-2xl font-semibold text-ink-800">История записей</h2>
-              <button className="ink-link text-sm">Фильтры</button>
+        <section className="grid grid-cols-1 lg:grid-cols-[1.2fr,1fr] gap-4 sm:gap-6">
+          {/* Лекарства */}
+          <NeumorphicCard className="p-4 sm:p-6 animate-fadeIn" style={{ animationDelay: '0.5s' }}>
+            <div className="flex items-center gap-2 mb-4">
+              <Pill className="w-5 h-5 text-warmBlue-600" />
+              <h2 className="text-xl sm:text-2xl font-semibold text-warmGraphite-800">
+                Лекарства
+              </h2>
             </div>
-            <div className="space-y-3 text-sm text-ink-600">
-              Пока нет синхронизированных записей. История визитов и анализов
-              будет отображаться после подключения клиник и лабораторий.
-            </div>
-          </div>
+            {medications.length === 0 ? (
+              <div className="text-sm text-warmGray-600 text-center py-8">
+                Лекарств пока нет. Добавьте первое лекарство.
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {medications.map((med, index) => (
+                  <NeumorphicCard
+                    key={index}
+                    soft
+                    className="p-3 hover:scale-[1.01] transition-transform animate-fadeIn"
+                    style={{ animationDelay: `${0.6 + index * 0.05}s` }}
+                  >
+                    <div className="font-semibold text-warmGraphite-800 text-sm sm:text-base">
+                      {med.name}
+                    </div>
+                    <div className="text-xs text-warmGray-600 mt-1">
+                      {med.dose && `Доза: ${med.dose}`}
+                      {med.timing && ` · ${med.timing}`}
+                    </div>
+                  </NeumorphicCard>
+                ))}
+              </div>
+            )}
+          </NeumorphicCard>
 
-          <div className="space-y-6">
-            <div className="sketch-card p-6">
-              <h3 className="text-xl font-semibold text-ink-800 mb-3">
-                Текущие назначения
-              </h3>
-              {medications.length === 0 ? (
-                <div className="text-sm text-ink-600">
-                  Назначения появятся после подключения данных врача.
-                </div>
-              ) : (
-                <div className="space-y-3 text-sm text-ink-700">
-                  {medications.map((med) => (
-                    <div
-                      key={med.name}
-                      className="flex items-center justify-between p-3 rounded-lg border border-ink-200 bg-parchment-100"
-                    >
-                      <div>
-                        <div className="font-semibold text-ink-800">{med.name}</div>
-                        <div className="text-xs text-ink-500">
-                          {med.timing || '—'}
-                        </div>
+          {/* Вакцинации */}
+          <NeumorphicCard className="p-4 sm:p-6 animate-fadeIn" style={{ animationDelay: '0.7s' }}>
+            <div className="flex items-center gap-2 mb-4">
+              <Syringe className="w-5 h-5 text-warmGreen-600" />
+              <h2 className="text-xl sm:text-2xl font-semibold text-warmGraphite-800">
+                Вакцинации
+              </h2>
+            </div>
+            {vaccinations.length === 0 ? (
+              <div className="text-sm text-warmGray-600 text-center py-8">
+                Вакцинаций пока нет. Добавьте первую вакцинацию.
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {vaccinations.map((vac, index) => (
+                  <NeumorphicCard
+                    key={index}
+                    soft
+                    className="p-3 hover:scale-[1.01] transition-transform animate-fadeIn"
+                    style={{ animationDelay: `${0.8 + index * 0.05}s` }}
+                  >
+                    <div className="font-semibold text-warmGraphite-800 text-sm sm:text-base">
+                      {vac.name}
+                    </div>
+                    {vac.date && (
+                      <div className="text-xs text-warmGray-600 mt-1">
+                        {new Date(vac.date).toLocaleDateString('ru-RU')}
                       </div>
-                      <span className="text-xs text-ink-700">{med.dose || '—'}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <div className="sketch-card p-6">
-              <h3 className="text-xl font-semibold text-ink-800 mb-3">Вакцинации</h3>
-              {vaccinations.length === 0 ? (
-                <div className="text-sm text-ink-600">
-                  Список появится после загрузки данных.
-                </div>
-              ) : (
-                <div className="space-y-3 text-sm text-ink-700">
-                  {vaccinations.map((vac) => (
-                    <div
-                      key={vac.name}
-                      className="flex items-center justify-between p-3 rounded-lg border border-ink-200 bg-parchment-100"
-                    >
-                      <span>{vac.name}</span>
-                      <span className="text-xs text-ink-500">{vac.date || '—'}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
+                    )}
+                  </NeumorphicCard>
+                ))}
+              </div>
+            )}
+          </NeumorphicCard>
         </section>
 
-        <section className="sketch-card p-6">
-          <h2 className="text-2xl font-semibold text-ink-800 mb-4">
-            Согласия и доступы
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-ink-700">
-            {consents.map((consent) => (
-              <div
+        {/* Согласия */}
+        <NeumorphicCard className="p-4 sm:p-6 animate-fadeIn" style={{ animationDelay: '0.9s' }}>
+          <div className="flex items-center gap-2 mb-4">
+            <Shield className="w-5 h-5 text-warmPink-600" />
+            <h2 className="text-xl sm:text-2xl font-semibold text-warmGraphite-800">
+              Согласия и доступы
+            </h2>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {consents.map((consent, index) => (
+              <NeumorphicCard
                 key={consent.name}
-                className="p-4 rounded-lg border border-ink-200 bg-parchment-100"
+                soft
+                className="p-4 hover:scale-[1.01] transition-transform animate-fadeIn"
+                style={{ animationDelay: `${1 + index * 0.1}s` }}
               >
-                <div className="font-semibold text-ink-800">{consent.name}</div>
-                <div className="text-xs text-ink-500 mt-1">
-                  Статус: {consent.status}
+                <div className="font-semibold text-warmGraphite-800 text-sm sm:text-base mb-1">
+                  {consent.name}
                 </div>
-                <button className="mt-3 text-xs ink-link">Изменить</button>
-              </div>
+                <NeumorphicBadge
+                  variant={consent.status === 'Активно' ? 'success' : 'warning'}
+                  size="sm"
+                  className="mt-2"
+                >
+                  {consent.status}
+                </NeumorphicBadge>
+              </NeumorphicCard>
             ))}
           </div>
-        </section>
+        </NeumorphicCard>
       </div>
     </div>
   )

@@ -2,7 +2,11 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { ArrowLeft, Plus, FileText } from 'lucide-react'
+import { ArrowLeft, Plus, FileText, CheckCircle, AlertTriangle, TrendingUp } from 'lucide-react'
+import NeumorphicCard from '@/components/ui/NeumorphicCard'
+import NeumorphicButton from '@/components/ui/NeumorphicButton'
+import NeumorphicBadge from '@/components/ui/NeumorphicBadge'
+import { cn } from '@/lib/utils/cn'
 
 interface AnalysisRecord {
   id: string
@@ -22,8 +26,6 @@ export default function AnalysesPage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // В реальном приложении здесь будет загрузка из API
-    // fetch('/api/analyses?userId=...')
     setAnalyses([
       {
         id: '1',
@@ -49,119 +51,116 @@ export default function AnalysesPage() {
     return labels[type] || type
   }
 
-  const getStatusColor = (status: string) => {
-    const colors: Record<string, string> = {
-      NORMAL: 'bg-green-100 text-green-800',
-      LOW: 'bg-yellow-100 text-yellow-800',
-      HIGH: 'bg-orange-100 text-orange-800',
-      CRITICAL: 'bg-red-100 text-red-800',
+  const getStatusBadge = (status: string) => {
+    const variants: Record<string, 'success' | 'warning' | 'error' | 'info'> = {
+      NORMAL: 'success',
+      LOW: 'warning',
+      HIGH: 'warning',
+      CRITICAL: 'error',
     }
-    return colors[status] || 'bg-gray-100 text-gray-800'
+    return variants[status] || 'info'
   }
 
   return (
-    <div className="min-h-screen p-8">
+    <div className="min-h-screen bg-warmGray-50 p-4 sm:p-6 lg:p-8">
       <div className="max-w-6xl mx-auto">
         {/* Заголовок */}
-        <div className="mb-8">
+        <div className="mb-6 sm:mb-8 animate-fadeIn">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 text-ink-600 hover:text-ink-800 mb-4"
+            className="inline-flex items-center gap-2 text-warmBlue-600 hover:text-warmBlue-700 mb-4 font-medium transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
             Назад к Dashboard
           </Link>
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-4xl font-bold text-ink-800 mb-2">
+              <h1 className="text-3xl sm:text-4xl font-bold text-warmGraphite-800 mb-2">
                 Медицинские Анализы
               </h1>
-              <p className="text-ink-600">
+              <p className="text-base sm:text-lg text-warmGraphite-600">
                 История ваших лабораторных исследований
               </p>
             </div>
-            <button className="px-6 py-3 bg-ink-700 text-white rounded-lg hover:bg-ink-800 transition-colors flex items-center gap-2">
-              <Plus className="w-5 h-5" />
+            <NeumorphicButton primary>
+              <Plus className="w-4 h-4 mr-2" />
               Добавить анализ
-            </button>
+            </NeumorphicButton>
           </div>
         </div>
 
         {/* Список анализов */}
         {loading ? (
-          <div className="text-center py-12 text-ink-600">Загрузка...</div>
+          <NeumorphicCard className="p-8 text-center">
+            <p className="text-warmGray-600">Загрузка...</p>
+          </NeumorphicCard>
         ) : analyses.length === 0 ? (
-          <div className="text-center py-12 bg-parchment-200/50 rounded-lg border-2 border-ink-200">
-            <FileText className="w-16 h-16 mx-auto mb-4 text-ink-400" />
-            <p className="text-ink-600 text-lg mb-4">
+          <NeumorphicCard className="p-8 sm:p-12 text-center animate-fadeIn">
+            <FileText className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-4 text-warmGray-400" />
+            <p className="text-warmGraphite-600 text-base sm:text-lg mb-4">
               У вас пока нет записей анализов
             </p>
-            <button className="px-6 py-3 bg-ink-700 text-white rounded-lg hover:bg-ink-800 transition-colors">
-              Добавить первый анализ
-            </button>
-          </div>
+            <NeumorphicButton primary>Добавить первый анализ</NeumorphicButton>
+          </NeumorphicCard>
         ) : (
-          <div className="space-y-6">
-            {analyses.map((analysis) => (
-              <div
+          <div className="space-y-4 sm:space-y-6">
+            {analyses.map((analysis, index) => (
+              <NeumorphicCard
                 key={analysis.id}
-                className="bg-parchment-200/80 backdrop-blur-sm border-2 border-ink-300 rounded-lg shadow-lg p-6"
+                className="p-4 sm:p-6 hover:scale-[1.01] transition-all duration-300 animate-fadeIn"
+                style={{ animationDelay: `${0.1 + index * 0.1}s` }}
               >
                 <div className="flex items-start justify-between mb-4">
                   <div>
-                    <h3 className="text-xl font-bold text-ink-800 mb-1">
+                    <h3 className="text-lg sm:text-xl font-semibold text-warmGraphite-800 mb-1">
                       {getAnalysisTypeLabel(analysis.analysisType)}
                     </h3>
-                    <p className="text-ink-600">
-                      {new Date(analysis.dateOfAnalysis).toLocaleDateString('ru-RU')}
-                    </p>
+                    <div className="text-xs sm:text-sm text-warmGray-600">
+                      {new Date(analysis.dateOfAnalysis).toLocaleDateString('ru-RU', {
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric',
+                      })}
+                    </div>
                     {analysis.sourceLab && (
-                      <p className="text-sm text-ink-500 mt-1">
+                      <div className="text-xs text-warmGray-600 mt-1">
                         {analysis.sourceLab}
-                      </p>
+                      </div>
                     )}
                   </div>
                 </div>
 
-                {/* Показатели */}
-                {analysis.indicators.length > 0 && (
-                  <div className="mt-4">
-                    <h4 className="font-semibold text-ink-700 mb-3">
-                      Показатели:
-                    </h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      {analysis.indicators.map((indicator, idx) => (
-                        <div
-                          key={idx}
-                          className="flex items-center justify-between p-3 bg-parchment-100 rounded border border-ink-200"
-                        >
-                          <div>
-                            <div className="font-medium text-ink-800">
-                              {indicator.name}
-                            </div>
-                            <div className="text-sm text-ink-600">
-                              {indicator.value} {indicator.unit}
-                            </div>
-                          </div>
-                          <span
-                            className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(
-                              indicator.status
-                            )}`}
-                          >
-                            {indicator.status === 'NORMAL'
-                              ? 'Норма'
-                              : indicator.status === 'LOW'
-                              ? 'Низкий'
-                              : indicator.status === 'HIGH'
-                              ? 'Высокий'
-                              : 'Критический'}
-                          </span>
+                <div className="space-y-2">
+                  {analysis.indicators.map((indicator, idx) => (
+                    <NeumorphicCard
+                      key={idx}
+                      soft
+                      className="p-3 flex items-center justify-between"
+                    >
+                      <div className="flex-1">
+                        <div className="font-medium text-warmGraphite-800 text-sm sm:text-base">
+                          {indicator.name}
                         </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
+                        <div className="text-xs text-warmGray-600 mt-0.5">
+                          {indicator.value} {indicator.unit}
+                        </div>
+                      </div>
+                      <NeumorphicBadge
+                        variant={getStatusBadge(indicator.status)}
+                        size="sm"
+                        className="ml-3"
+                      >
+                        {indicator.status === 'NORMAL' ? (
+                          <CheckCircle className="w-3 h-3 mr-1" />
+                        ) : (
+                          <AlertTriangle className="w-3 h-3 mr-1" />
+                        )}
+                        {indicator.status}
+                      </NeumorphicBadge>
+                    </NeumorphicCard>
+                  ))}
+                </div>
+              </NeumorphicCard>
             ))}
           </div>
         )}
@@ -169,5 +168,3 @@ export default function AnalysesPage() {
     </div>
   )
 }
-
-
