@@ -1,37 +1,50 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { Search, Star, Clock, MapPin, Filter } from 'lucide-react'
+import NeumorphicCard from '@/components/ui/NeumorphicCard'
+import NeumorphicButton from '@/components/ui/NeumorphicButton'
+import NeumorphicInput from '@/components/ui/NeumorphicInput'
+import NeumorphicBadge from '@/components/ui/NeumorphicBadge'
+import NeumorphicModal from '@/components/ui/NeumorphicModal'
+import { cn } from '@/lib/utils/cn'
 
 const categories = [
   {
     title: 'Врачи и клиники',
     description: 'Терапевты, кардиологи, эндокринологи, клиники и лаборатории.',
     actions: ['Записаться', 'Телемедицина', 'Электронная карта'],
+    color: 'warmBlue',
   },
   {
     title: 'Тренеры и реабилитация',
     description: 'Силовой, функциональный, реабилитация травм, LFK и массаж.',
     actions: ['Подбор тренера', 'Протокол травм', 'Восстановление'],
+    color: 'warmRed',
   },
   {
     title: 'Питание и нутрициология',
     description: 'Рационы, нутрицевтики, план питания, микробиом.',
     actions: ['Консультация', 'Меню на неделю', 'Анализ дефицитов'],
+    color: 'warmGreen',
   },
   {
     title: 'Психическое здоровье',
     description: 'Психологи, психотерапевты, группы поддержки.',
     actions: ['Запись на сессию', 'Дневник эмоций', 'Группы поддержки'],
+    color: 'warmPink',
   },
   {
     title: 'Сексуальное и репродуктивное здоровье',
     description: 'Гинекология, урология, семейное планирование, либидо.',
     actions: ['Анонимные консультации', 'Программы', 'Безопасность'],
+    color: 'warmPink',
   },
   {
     title: 'Образ жизни',
     description: 'Сон, стресс, привычки, детокс, профилактика выгорания.',
     actions: ['Аудит сна', 'Антистресс протокол', 'Трекер привычек'],
+    color: 'warmBlue',
   },
 ]
 
@@ -41,24 +54,28 @@ const topExperts = [
     role: 'Эндокринолог',
     rating: '4.9',
     format: 'Онлайн · 45 мин',
+    reviews: 127,
   },
   {
     name: 'Илья Воронцов',
     role: 'Спортивный врач',
     rating: '4.8',
     format: 'Очно · клиника',
+    reviews: 89,
   },
   {
     name: 'Мария Грин',
     role: 'Нутрициолог',
     rating: '5.0',
     format: 'Онлайн · 30 мин',
+    reviews: 203,
   },
   {
     name: 'Павел К.',
     role: 'Психотерапевт',
     rating: '4.9',
     format: 'Онлайн · 50 мин',
+    reviews: 156,
   },
 ]
 
@@ -73,18 +90,11 @@ export default function SpecialistsPage() {
   const [selectedService, setSelectedService] = useState<any | null>(null)
   const [bookingTitle, setBookingTitle] = useState('Консультация')
   const [error, setError] = useState<string | null>(null)
-  const [newRec, setNewRec] = useState({
-    name: '',
-    category: '',
-    description: '',
-    cashbackOfferId: '',
-  })
+  const [showBookingModal, setShowBookingModal] = useState(false)
 
   useEffect(() => {
     const load = async () => {
-      const recs = await fetch('/api/partners/recommendations').then((res) =>
-        res.json()
-      )
+      const recs = await fetch('/api/partners/recommendations').then((res) => res.json())
       setRecommendations(Array.isArray(recs) ? recs : [])
       const list = await fetch('/api/cashback/offers').then((res) => res.json())
       setOffers(Array.isArray(list) ? list : [])
@@ -95,21 +105,22 @@ export default function SpecialistsPage() {
   }, [])
 
   const handleSearch = async () => {
-    const people = await fetch(`/api/specialists?q=${encodeURIComponent(query)}`).then(
-      (res) => res.json()
-    )
+    const people = await fetch(
+      `/api/specialists?q=${encodeURIComponent(query)}`
+    ).then((res) => res.json())
     setSpecialists(Array.isArray(people) ? people : [])
   }
 
   const handleSelect = async (specialist: any) => {
     setSelectedSpecialist(specialist)
-    const list = await fetch(`/api/specialists/slots?specialistId=${specialist.id}`).then(
-      (res) => res.json()
-    )
+    setShowBookingModal(true)
+    const list = await fetch(
+      `/api/specialists/slots?specialistId=${specialist.id}`
+    ).then((res) => res.json())
     setSlots(Array.isArray(list) ? list : [])
-    const svc = await fetch(`/api/specialists/services?specialistId=${specialist.id}`).then(
-      (res) => res.json()
-    )
+    const svc = await fetch(
+      `/api/specialists/services?specialistId=${specialist.id}`
+    ).then((res) => res.json())
     setServices(Array.isArray(svc) ? svc : [])
     setSelectedService(null)
   }
@@ -132,117 +143,232 @@ export default function SpecialistsPage() {
       return
     }
     setSlots((prev) => prev.filter((s) => s.id !== slotId))
-  }
-
-  const handleCreate = async () => {
+    setShowBookingModal(false)
     setError(null)
-    const response = await fetch('/api/partners/recommendations', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        name: newRec.name,
-        category: newRec.category,
-        description: newRec.description || undefined,
-        cashbackOfferId: newRec.cashbackOfferId || undefined,
-      }),
-    })
-    if (!response.ok) {
-      const data = await response.json().catch(() => ({}))
-      setError(data.error || 'Не удалось добавить рекомендацию')
-      return
-    }
-    const rec = await response.json()
-    setRecommendations((prev) => [rec, ...prev])
-    setNewRec({ name: '', category: '', description: '', cashbackOfferId: '' })
   }
 
   return (
-    <div className="min-h-screen px-6 py-10">
-      <div className="max-w-7xl mx-auto space-y-10">
-        <header className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+    <div className="min-h-screen bg-warmGray-50 p-4 sm:p-6 lg:p-8">
+      <div className="max-w-7xl mx-auto space-y-6 sm:space-y-8">
+        <header className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between animate-fadeIn">
           <div>
-            <h1 className="text-4xl font-bold text-ink-800">Специалисты</h1>
-            <p className="text-ink-600">
-              Каталог врачей, тренеров, нутрициологов и психологов с быстрым
-              доступом к услугам.
+            <h1 className="text-3xl sm:text-4xl font-bold text-warmGraphite-800">
+              Специалисты
+            </h1>
+            <p className="text-base sm:text-lg text-warmGraphite-600 mt-2">
+              Каталог врачей, тренеров, нутрициологов и психологов с быстрым доступом к
+              услугам.
             </p>
           </div>
-          <div className="flex gap-3">
-            <button className="sketch-button">Создать запрос</button>
-            <button className="px-5 py-2.5 rounded-lg border-2 border-ink-300 text-ink-700 hover:bg-parchment-200">
-              Мои специалисты
-            </button>
+          <div className="flex flex-wrap gap-3">
+            <NeumorphicButton primary>Создать запрос</NeumorphicButton>
+            <NeumorphicButton>Мои специалисты</NeumorphicButton>
           </div>
         </header>
 
-        <section className="sketch-card p-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <input className="sketch-input" placeholder="Поиск по специализации" />
-            <input className="sketch-input" placeholder="Город или онлайн" />
-            <input className="sketch-input" placeholder="Цель: сон, гормоны, спорт" />
+        {/* Поиск и фильтры */}
+        <NeumorphicCard className="p-4 sm:p-6 animate-fadeIn">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            <NeumorphicInput placeholder="Поиск по специализации" />
+            <NeumorphicInput placeholder="Город или онлайн" />
+            <NeumorphicInput placeholder="Цель: сон, гормоны, спорт" />
           </div>
-          <div className="mt-4 flex flex-wrap gap-2 text-xs text-ink-600">
-            <span className="px-3 py-1 rounded-full border border-ink-300 bg-parchment-100">
+          <div className="flex flex-wrap gap-2">
+            <NeumorphicBadge variant="info" size="sm">
               ⭐ Топ-рейтинги
-            </span>
-            <span className="px-3 py-1 rounded-full border border-ink-300 bg-parchment-100">
+            </NeumorphicBadge>
+            <NeumorphicBadge variant="info" size="sm">
               🧬 Генетические риски
-            </span>
-            <span className="px-3 py-1 rounded-full border border-ink-300 bg-parchment-100">
+            </NeumorphicBadge>
+            <NeumorphicBadge variant="info" size="sm">
               🩺 Второе мнение
-            </span>
+            </NeumorphicBadge>
           </div>
+        </NeumorphicCard>
+
+        {/* Рекомендуемые эксперты */}
+        <NeumorphicCard className="p-4 sm:p-6 animate-fadeIn" style={{ animationDelay: '0.1s' }}>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg sm:text-xl font-semibold text-warmGraphite-800">
+              Рекомендуемые эксперты
+            </h3>
+            <button className="text-sm text-warmBlue-600 hover:text-warmBlue-700 font-medium transition-colors">
+              Смотреть всех
+            </button>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {topExperts.map((expert, index) => (
+              <NeumorphicCard
+                key={expert.name}
+                soft
+                className="p-4 hover:scale-105 transition-all duration-300 cursor-pointer animate-fadeIn"
+                style={{ animationDelay: `${0.2 + index * 0.1}s` }}
+                onClick={() => handleSelect(expert as any)}
+              >
+                <div className="text-base sm:text-lg font-semibold text-warmGraphite-800 mb-1">
+                  {expert.name}
+                </div>
+                <div className="text-sm text-warmGraphite-600 mb-2">{expert.role}</div>
+                <div className="text-xs text-warmGray-600 mb-3 flex items-center gap-1">
+                  <Clock className="w-3 h-3" />
+                  {expert.format}
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1">
+                    <Star className="w-4 h-4 fill-warmPink-500 text-warmPink-500" />
+                    <span className="text-sm font-semibold text-warmGraphite-800">
+                      {expert.rating}
+                    </span>
+                    <span className="text-xs text-warmGray-600">({expert.reviews})</span>
+                  </div>
+                  <NeumorphicButton className="text-xs px-3 py-1">
+                    Записаться
+                  </NeumorphicButton>
+                </div>
+              </NeumorphicCard>
+            ))}
+          </div>
+        </NeumorphicCard>
+
+        {/* Категории */}
+        <section className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+          {categories.map((category, index) => (
+            <NeumorphicCard
+              key={category.title}
+              className="p-4 sm:p-6 hover:scale-[1.02] transition-all duration-300 animate-fadeIn"
+              style={{ animationDelay: `${0.3 + index * 0.1}s` }}
+            >
+              <h2 className="text-xl sm:text-2xl font-semibold text-warmGraphite-800 mb-2">
+                {category.title}
+              </h2>
+              <p className="text-sm sm:text-base text-warmGraphite-600 mb-4">
+                {category.description}
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {category.actions.map((action) => (
+                  <NeumorphicButton
+                    key={action}
+                    className="text-xs sm:text-sm px-3 py-1.5"
+                  >
+                    {action}
+                  </NeumorphicButton>
+                ))}
+              </div>
+            </NeumorphicCard>
+          ))}
         </section>
 
-        <section className="grid grid-cols-1 lg:grid-cols-[1.2fr,1fr] gap-6">
-          <div className="sketch-card p-6 space-y-4">
+        {/* Поиск специалистов */}
+        <section className="grid grid-cols-1 lg:grid-cols-[1.2fr,1fr] gap-4 sm:gap-6">
+          <NeumorphicCard className="p-4 sm:p-6 space-y-4 animate-fadeIn" style={{ animationDelay: '0.5s' }}>
             <div className="flex items-center gap-3">
-              <input
-                className="sketch-input"
+              <NeumorphicInput
                 placeholder="Найти специалиста"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
+                className="flex-1"
               />
-              <button className="sketch-button" onClick={handleSearch}>
-                Найти
-              </button>
+              <NeumorphicButton onClick={handleSearch}>
+                <Search className="w-4 h-4" />
+              </NeumorphicButton>
             </div>
             <div className="space-y-3">
               {specialists.length === 0 && (
-                <div className="text-sm text-ink-600">Специалистов пока нет.</div>
+                <div className="text-sm text-warmGray-600 text-center py-8">
+                  Специалистов пока нет.
+                </div>
               )}
-              {specialists.map((spec) => (
-                <div
+              {specialists.map((spec, index) => (
+                <NeumorphicCard
                   key={spec.id}
-                  className="p-4 rounded-lg border border-ink-200 bg-parchment-100 flex items-center justify-between"
+                  soft
+                  className="p-4 flex items-center justify-between hover:scale-[1.01] transition-transform animate-fadeIn"
+                  style={{ animationDelay: `${0.6 + index * 0.05}s` }}
                 >
                   <div>
-                    <div className="font-semibold text-ink-800">
+                    <div className="font-semibold text-warmGraphite-800">
                       {spec.firstName || ''} {spec.lastName || ''} {spec.username}
                     </div>
-                    <div className="text-xs text-ink-500">{spec.role}</div>
+                    <div className="text-xs text-warmGray-600 mt-1">{spec.role}</div>
                   </div>
-                  <button
-                    className="px-3 py-1 rounded-md border border-ink-300 text-xs text-ink-700 hover:bg-parchment-200"
+                  <NeumorphicButton
+                    className="text-xs px-3 py-1.5"
                     onClick={() => handleSelect(spec)}
                   >
                     Слоты
-                  </button>
-                </div>
+                  </NeumorphicButton>
+                </NeumorphicCard>
               ))}
             </div>
-          </div>
+          </NeumorphicCard>
 
-          <div className="sketch-card p-6 space-y-3">
-            <h3 className="text-xl font-semibold text-ink-800">Записаться</h3>
-            {selectedSpecialist ? (
-              <>
-                <div className="text-sm text-ink-600">
-                  Специалист: {selectedSpecialist.username}
-                </div>
-                {services.length > 0 && (
+          {/* Рекомендации партнеров */}
+          <NeumorphicCard className="p-4 sm:p-6 space-y-4 animate-fadeIn" style={{ animationDelay: '0.7s' }}>
+            <h3 className="text-lg sm:text-xl font-semibold text-warmGraphite-800">
+              Рекомендации партнеров
+            </h3>
+            {recommendations.length === 0 && (
+              <div className="text-sm text-warmGray-600">
+                Пока нет рекомендаций. Добавьте партнера, чтобы продвигать акции и
+                кэшбэк.
+              </div>
+            )}
+            <div className="space-y-3">
+              {recommendations.map((rec, index) => (
+                <NeumorphicCard
+                  key={rec.id}
+                  soft
+                  className="p-3 hover:scale-[1.01] transition-transform animate-fadeIn"
+                  style={{ animationDelay: `${0.8 + index * 0.1}s` }}
+                >
+                  <div className="font-semibold text-warmGraphite-800 text-sm">
+                    {rec.name}
+                  </div>
+                  <div className="text-xs text-warmGray-600 mt-1">{rec.category}</div>
+                  {rec.description && (
+                    <div className="text-xs text-warmGraphite-600 mt-2">
+                      {rec.description}
+                    </div>
+                  )}
+                  {rec.cashbackOffer && (
+                    <NeumorphicBadge variant="success" size="sm" className="mt-2">
+                      Кэшбэк {rec.cashbackOffer.percent}% · код{' '}
+                      {rec.cashbackOffer.referralCode}
+                    </NeumorphicBadge>
+                  )}
+                </NeumorphicCard>
+              ))}
+            </div>
+          </NeumorphicCard>
+        </section>
+
+        {/* Модальное окно записи */}
+        <NeumorphicModal
+          isOpen={showBookingModal}
+          onClose={() => {
+            setShowBookingModal(false)
+            setError(null)
+          }}
+          title="Записаться к специалисту"
+          size="md"
+        >
+          {error && (
+            <div className="mb-4 p-3 rounded-lg bg-warmRed-50 border border-warmRed-200 text-sm text-warmRed-700">
+              {error}
+            </div>
+          )}
+          {selectedSpecialist && (
+            <div className="space-y-4">
+              <div className="text-sm text-warmGraphite-600">
+                Специалист: {selectedSpecialist.username || selectedSpecialist.name}
+              </div>
+              {services.length > 0 && (
+                <div>
+                  <label className="block text-sm font-medium text-warmGraphite-700 mb-2">
+                    Услуга
+                  </label>
                   <select
-                    className="sketch-input"
+                    className="neumorphic-input w-full"
                     value={selectedService?.id || ''}
                     onChange={(e) => {
                       const service = services.find((s) => s.id === e.target.value)
@@ -257,176 +383,46 @@ export default function SpecialistsPage() {
                       </option>
                     ))}
                   </select>
-                )}
-                <input
-                  className="sketch-input"
-                  placeholder="Название визита"
-                  value={bookingTitle}
-                  onChange={(e) => setBookingTitle(e.target.value)}
-                />
-                <div className="space-y-2">
+                </div>
+              )}
+              <NeumorphicInput
+                label="Название визита"
+                placeholder="Консультация"
+                value={bookingTitle}
+                onChange={(e) => setBookingTitle(e.target.value)}
+              />
+              <div>
+                <label className="block text-sm font-medium text-warmGraphite-700 mb-2">
+                  Доступные слоты
+                </label>
+                <div className="space-y-2 max-h-60 overflow-y-auto">
                   {slots.length === 0 && (
-                    <div className="text-sm text-ink-600">Свободных слотов нет.</div>
+                    <div className="text-sm text-warmGray-600 text-center py-4">
+                      Свободных слотов нет.
+                    </div>
                   )}
                   {slots.map((slot) => (
-                    <div
+                    <NeumorphicCard
                       key={slot.id}
-                      className="p-3 rounded-lg border border-ink-200 bg-parchment-100 flex items-center justify-between"
+                      soft
+                      className="p-3 flex items-center justify-between hover:scale-[1.01] transition-transform"
                     >
-                      <span className="text-xs text-ink-700">
+                      <span className="text-xs sm:text-sm text-warmGraphite-700">
                         {new Date(slot.startsAt).toLocaleString('ru-RU')}
                       </span>
-                      <button
-                        className="px-3 py-1 rounded-md border border-ink-300 text-xs text-ink-700 hover:bg-parchment-200"
+                      <NeumorphicButton
+                        className="text-xs px-3 py-1.5"
                         onClick={() => handleBook(slot.id)}
                       >
                         Записаться
-                      </button>
-                    </div>
+                      </NeumorphicButton>
+                    </NeumorphicCard>
                   ))}
                 </div>
-              </>
-            ) : (
-              <div className="text-sm text-ink-600">
-                Выберите специалиста, чтобы увидеть слоты.
-              </div>
-            )}
-          </div>
-        </section>
-
-        <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {categories.map((category) => (
-            <div key={category.title} className="sketch-card p-6">
-              <h2 className="text-2xl font-semibold text-ink-800 mb-2">
-                {category.title}
-              </h2>
-              <p className="text-ink-600 mb-4">{category.description}</p>
-              <div className="flex flex-wrap gap-2">
-                {category.actions.map((action) => (
-                  <button
-                    key={action}
-                    className="px-3 py-1 rounded-full border border-ink-300 text-xs text-ink-700 hover:bg-parchment-200"
-                  >
-                    {action}
-                  </button>
-                ))}
               </div>
             </div>
-          ))}
-        </section>
-
-        <section className="sketch-card p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-xl font-semibold text-ink-800">Рекомендуемые эксперты</h3>
-            <button className="ink-link text-sm">Смотреть всех</button>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {topExperts.map((expert) => (
-              <div
-                key={expert.name}
-                className="p-4 rounded-lg border border-ink-200 bg-parchment-100"
-              >
-                <div className="text-lg font-semibold text-ink-800">
-                  {expert.name}
-                </div>
-                <div className="text-sm text-ink-600">{expert.role}</div>
-                <div className="text-xs text-ink-500 mt-1">{expert.format}</div>
-                <div className="mt-3 flex items-center justify-between text-sm">
-                  <span className="text-ink-700">⭐ {expert.rating}</span>
-                  <button className="px-3 py-1 rounded-md border border-ink-300 text-xs text-ink-700 hover:bg-parchment-200">
-                    Записаться
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section className="grid grid-cols-1 lg:grid-cols-[1.2fr,1fr] gap-6">
-          <div className="sketch-card p-6 space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="text-xl font-semibold text-ink-800">
-                Рекомендации партнеров
-              </h3>
-            </div>
-            {recommendations.length === 0 && (
-              <div className="text-sm text-ink-600">
-                Пока нет рекомендаций. Добавьте партнера, чтобы продвигать акции
-                и кэшбэк.
-              </div>
-            )}
-            <div className="space-y-3">
-              {recommendations.map((rec) => (
-                <div
-                  key={rec.id}
-                  className="p-4 rounded-lg border border-ink-200 bg-parchment-100"
-                >
-                  <div className="font-semibold text-ink-800">{rec.name}</div>
-                  <div className="text-xs text-ink-500">{rec.category}</div>
-                  {rec.description && (
-                    <div className="text-sm text-ink-600 mt-1">
-                      {rec.description}
-                    </div>
-                  )}
-                  {rec.cashbackOffer && (
-                    <div className="text-xs text-ink-700 mt-2">
-                      Кэшбэк: {rec.cashbackOffer.percent}% · код{' '}
-                      {rec.cashbackOffer.referralCode}
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="sketch-card p-6 space-y-4">
-            <h3 className="text-xl font-semibold text-ink-800">
-              Добавить рекомендацию
-            </h3>
-            {error && (
-              <div className="text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg p-3">
-                {error}
-              </div>
-            )}
-            <input
-              className="sketch-input"
-              placeholder="Компания или площадка"
-              value={newRec.name}
-              onChange={(e) => setNewRec({ ...newRec, name: e.target.value })}
-            />
-            <input
-              className="sketch-input"
-              placeholder="Категория (клиника, зал, спа)"
-              value={newRec.category}
-              onChange={(e) => setNewRec({ ...newRec, category: e.target.value })}
-            />
-            <textarea
-              className="sketch-input min-h-[120px]"
-              placeholder="Описание и выгоды"
-              value={newRec.description}
-              onChange={(e) =>
-                setNewRec({ ...newRec, description: e.target.value })
-              }
-            />
-            <select
-              className="sketch-input"
-              value={newRec.cashbackOfferId}
-              onChange={(e) =>
-                setNewRec({ ...newRec, cashbackOfferId: e.target.value })
-              }
-            >
-              <option value="">Без кэшбэка</option>
-              {offers.map((offer) => (
-                <option key={offer.id} value={offer.id}>
-                  {offer.title} · {offer.percent}%
-                </option>
-              ))}
-            </select>
-            <button className="sketch-button" onClick={handleCreate}>
-              Добавить
-            </button>
-          </div>
-        </section>
+          )}
+        </NeumorphicModal>
       </div>
     </div>
   )

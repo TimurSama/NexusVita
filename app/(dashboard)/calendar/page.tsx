@@ -1,7 +1,12 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Calendar, Users, MapPin } from 'lucide-react'
+import { Calendar as CalendarIcon, Users, MapPin, Download, Upload, Clock, CheckCircle, XCircle } from 'lucide-react'
+import NeumorphicCard from '@/components/ui/NeumorphicCard'
+import NeumorphicButton from '@/components/ui/NeumorphicButton'
+import NeumorphicInput from '@/components/ui/NeumorphicInput'
+import NeumorphicBadge from '@/components/ui/NeumorphicBadge'
+import { cn } from '@/lib/utils/cn'
 
 type EventItem = {
   id: string
@@ -11,7 +16,20 @@ type EventItem = {
   endsAt?: string | null
   location?: string | null
   status?: string | null
-  specialist?: { username?: string | null; role?: string | null; id?: string | null } | null
+  specialist?: {
+    username?: string | null
+    role?: string | null
+    id?: string | null
+  } | null
+}
+
+const eventTypeColors: Record<string, string> = {
+  CONSULTATION: 'warmBlue',
+  TRAINING: 'warmRed',
+  NUTRITION: 'warmGreen',
+  ANALYSIS: 'warmPink',
+  PERSONAL: 'warmGray',
+  REMINDER: 'warmGraphite',
 }
 
 export default function CalendarPage() {
@@ -62,167 +80,238 @@ export default function CalendarPage() {
   }
 
   return (
-    <div className="min-h-screen px-6 py-10">
-      <div className="max-w-6xl mx-auto space-y-8">
-        <header className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+    <div className="min-h-screen bg-warmGray-50 p-4 sm:p-6 lg:p-8">
+      <div className="max-w-6xl mx-auto space-y-6 sm:space-y-8">
+        <header className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between animate-fadeIn">
           <div>
-            <h1 className="text-4xl font-bold text-ink-800">Календарь</h1>
-            <p className="text-ink-600">
+            <h1 className="text-3xl sm:text-4xl font-bold text-warmGraphite-800">Календарь</h1>
+            <p className="text-base sm:text-lg text-warmGraphite-600 mt-2">
               Синхронизация занятий с тренерами, специалистами и группами.
             </p>
           </div>
           <div className="flex items-center gap-3">
             {userId && (
               <a
-                className="px-4 py-2 rounded-lg border border-ink-300 text-sm text-ink-700 hover:bg-parchment-200"
                 href={`/api/calendar/ics?userId=${userId}`}
+                className="neumorphic-button text-sm px-4 py-2"
               >
+                <Download className="w-4 h-4 mr-2" />
                 Экспорт iCal
               </a>
             )}
-            <button className="sketch-button">Запланировать</button>
+            <NeumorphicButton primary>Запланировать</NeumorphicButton>
           </div>
         </header>
 
         {error && (
-          <div className="sketch-card p-4 text-sm text-red-700 border border-red-200">
-            {error}
-          </div>
+          <NeumorphicCard className="p-4 bg-warmRed-50 border-2 border-warmRed-200 animate-shake">
+            <p className="text-sm text-warmRed-700">{error}</p>
+          </NeumorphicCard>
         )}
 
-        <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="sketch-card p-6">
+        {/* Статистика */}
+        <section className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
+          <NeumorphicCard className="p-4 sm:p-6 animate-fadeIn" style={{ animationDelay: '0.1s' }}>
             <div className="flex items-center gap-3">
-              <Calendar className="w-6 h-6 text-ink-700" />
+              <div className="p-3 neumorphic-card-soft rounded-neumorphic-sm">
+                <CalendarIcon className="w-5 h-5 sm:w-6 sm:h-6 text-warmBlue-600" />
+              </div>
               <div>
-                <div className="text-sm text-ink-500">Сегодня</div>
-                <div className="text-xl font-semibold text-ink-800">3 события</div>
+                <div className="text-xs sm:text-sm text-warmGray-600">Сегодня</div>
+                <div className="text-xl sm:text-2xl font-semibold text-warmGraphite-800">
+                  {events.filter((e) => {
+                    const today = new Date().toDateString()
+                    return new Date(e.startsAt).toDateString() === today
+                  }).length}{' '}
+                  событий
+                </div>
               </div>
             </div>
-          </div>
-          <div className="sketch-card p-6">
+          </NeumorphicCard>
+          <NeumorphicCard className="p-4 sm:p-6 animate-fadeIn" style={{ animationDelay: '0.2s' }}>
             <div className="flex items-center gap-3">
-              <Users className="w-6 h-6 text-ink-700" />
+              <div className="p-3 neumorphic-card-soft rounded-neumorphic-sm">
+                <Users className="w-5 h-5 sm:w-6 sm:h-6 text-warmGreen-600" />
+              </div>
               <div>
-                <div className="text-sm text-ink-500">Специалисты</div>
-                <div className="text-xl font-semibold text-ink-800">2 активных</div>
+                <div className="text-xs sm:text-sm text-warmGray-600">Специалисты</div>
+                <div className="text-xl sm:text-2xl font-semibold text-warmGraphite-800">
+                  {new Set(events.map((e) => e.specialist?.id).filter(Boolean)).size} активных
+                </div>
               </div>
             </div>
-          </div>
-          <div className="sketch-card p-6">
+          </NeumorphicCard>
+          <NeumorphicCard className="p-4 sm:p-6 animate-fadeIn" style={{ animationDelay: '0.3s' }}>
             <div className="flex items-center gap-3">
-              <MapPin className="w-6 h-6 text-ink-700" />
+              <div className="p-3 neumorphic-card-soft rounded-neumorphic-sm">
+                <MapPin className="w-5 h-5 sm:w-6 sm:h-6 text-warmPink-600" />
+              </div>
               <div>
-                <div className="text-sm text-ink-500">Локации</div>
-                <div className="text-xl font-semibold text-ink-800">5 мест</div>
+                <div className="text-xs sm:text-sm text-warmGray-600">Локации</div>
+                <div className="text-xl sm:text-2xl font-semibold text-warmGraphite-800">
+                  {new Set(events.map((e) => e.location).filter(Boolean)).size} мест
+                </div>
               </div>
             </div>
-          </div>
+          </NeumorphicCard>
         </section>
 
-        <section className="sketch-card p-6">
-          <h2 className="text-2xl font-semibold text-ink-800 mb-4">
+        {/* Ближайшие события */}
+        <NeumorphicCard className="p-4 sm:p-6 animate-fadeIn" style={{ animationDelay: '0.4s' }}>
+          <h2 className="text-xl sm:text-2xl font-semibold text-warmGraphite-800 mb-4">
             Ближайшие события
           </h2>
           <div className="space-y-3">
             {events.length === 0 && (
-              <div className="text-sm text-ink-600">
-                Событий пока нет. Добавьте занятия или синхронизируйте календарь
-                со специалистом.
+              <div className="text-sm text-warmGray-600 text-center py-8">
+                Событий пока нет. Добавьте занятия или синхронизируйте календарь со
+                специалистом.
               </div>
             )}
-            {events.map((event) => (
-              <div
-                key={event.id}
-                className="p-4 rounded-lg border border-ink-200 bg-parchment-100"
-              >
-                <div className="font-semibold text-ink-800">{event.title}</div>
-                <div className="text-sm text-ink-600">
-                  {new Date(event.startsAt).toLocaleString('ru-RU')}
-                </div>
-                <div className="text-xs text-ink-500">
-                  {event.type}
-                  {event.specialist?.username
-                    ? ` · ${event.specialist.username}`
-                    : ''}
-                </div>
-                <div className="text-xs text-ink-500 mt-1">Статус: {event.status}</div>
-                {event.location && (
-                  <div className="text-xs text-ink-500">{event.location}</div>
-                )}
-                {role && event.specialist?.id === userId && (
-                  <div className="mt-2 flex items-center gap-2">
-                    <button
-                      className="px-3 py-1 rounded-md border border-ink-300 text-xs text-ink-700 hover:bg-parchment-200"
-                      onClick={() => handleStatus(event.id, 'CONFIRMED')}
-                    >
-                      Подтвердить
-                    </button>
-                    <button
-                      className="px-3 py-1 rounded-md border border-ink-300 text-xs text-ink-700 hover:bg-parchment-200"
-                      onClick={() => handleStatus(event.id, 'DECLINED')}
-                    >
-                      Отклонить
-                    </button>
+            {events.map((event, index) => {
+              const typeColor = eventTypeColors[event.type] || 'warmGray'
+              return (
+                <NeumorphicCard
+                  key={event.id}
+                  soft
+                  className="p-4 hover:scale-[1.01] transition-all duration-300 animate-fadeIn"
+                  style={{ animationDelay: `${0.5 + index * 0.05}s` }}
+                >
+                  <div className="flex items-start justify-between mb-2">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <h3 className="font-semibold text-warmGraphite-800 text-base sm:text-lg">
+                          {event.title}
+                        </h3>
+                        <NeumorphicBadge
+                          variant={typeColor as any}
+                          size="sm"
+                          className="text-xs"
+                        >
+                          {event.type}
+                        </NeumorphicBadge>
+                      </div>
+                      <div className="flex items-center gap-4 text-xs sm:text-sm text-warmGray-600 mb-1">
+                        <div className="flex items-center gap-1">
+                          <Clock className="w-3 h-3" />
+                          {new Date(event.startsAt).toLocaleString('ru-RU', {
+                            day: 'numeric',
+                            month: 'short',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })}
+                        </div>
+                        {event.specialist?.username && (
+                          <div className="flex items-center gap-1">
+                            <Users className="w-3 h-3" />
+                            {event.specialist.username}
+                          </div>
+                        )}
+                      </div>
+                      {event.location && (
+                        <div className="flex items-center gap-1 text-xs text-warmGray-600 mt-1">
+                          <MapPin className="w-3 h-3" />
+                          {event.location}
+                        </div>
+                      )}
+                      {event.status && (
+                        <NeumorphicBadge
+                          variant={
+                            event.status === 'CONFIRMED'
+                              ? 'success'
+                              : event.status === 'DECLINED'
+                                ? 'error'
+                                : 'warning'
+                          }
+                          size="sm"
+                          className="mt-2"
+                        >
+                          {event.status}
+                        </NeumorphicBadge>
+                      )}
+                    </div>
                   </div>
-                )}
-              </div>
-            ))}
+                  {role && event.specialist?.id === userId && (
+                    <div className="mt-3 flex items-center gap-2 pt-3 border-t border-warmGray-300/50">
+                      <NeumorphicButton
+                        className="text-xs px-3 py-1.5"
+                        onClick={() => handleStatus(event.id, 'CONFIRMED')}
+                      >
+                        <CheckCircle className="w-3 h-3 mr-1" />
+                        Подтвердить
+                      </NeumorphicButton>
+                      <NeumorphicButton
+                        className="text-xs px-3 py-1.5"
+                        onClick={() => handleStatus(event.id, 'DECLINED')}
+                      >
+                        <XCircle className="w-3 h-3 mr-1" />
+                        Отклонить
+                      </NeumorphicButton>
+                    </div>
+                  )}
+                </NeumorphicCard>
+              )
+            })}
           </div>
-        </section>
+        </NeumorphicCard>
 
+        {/* Запросы на занятия (для специалистов) */}
         {role && (role === 'TRAINER' || role === 'DOCTOR') && (
-          <section className="sketch-card p-6">
-            <h2 className="text-2xl font-semibold text-ink-800 mb-4">
+          <NeumorphicCard className="p-4 sm:p-6 animate-fadeIn" style={{ animationDelay: '0.6s' }}>
+            <h2 className="text-xl sm:text-2xl font-semibold text-warmGraphite-800 mb-4">
               Запросы на занятия
             </h2>
             <div className="space-y-3">
               {events.filter((e) => e.status === 'REQUESTED').length === 0 && (
-                <div className="text-sm text-ink-600">
+                <div className="text-sm text-warmGray-600 text-center py-8">
                   Нет новых запросов.
                 </div>
               )}
               {events
                 .filter((e) => e.status === 'REQUESTED')
-                .map((event) => (
-                  <div
+                .map((event, index) => (
+                  <NeumorphicCard
                     key={event.id}
-                    className="p-4 rounded-lg border border-ink-200 bg-parchment-100"
+                    soft
+                    className="p-4 hover:scale-[1.01] transition-all duration-300 animate-fadeIn"
+                    style={{ animationDelay: `${0.7 + index * 0.1}s` }}
                   >
-                    <div className="font-semibold text-ink-800">{event.title}</div>
-                    <div className="text-sm text-ink-600">
+                    <div className="font-semibold text-warmGraphite-800 mb-1">{event.title}</div>
+                    <div className="text-sm text-warmGraphite-600 mb-3">
                       {new Date(event.startsAt).toLocaleString('ru-RU')}
                     </div>
-                    <div className="mt-2 flex items-center gap-2">
-                      <button
-                        className="px-3 py-1 rounded-md border border-ink-300 text-xs text-ink-700 hover:bg-parchment-200"
+                    <div className="flex items-center gap-2">
+                      <NeumorphicButton
+                        className="text-xs px-3 py-1.5"
                         onClick={() => handleStatus(event.id, 'CONFIRMED')}
                       >
+                        <CheckCircle className="w-3 h-3 mr-1" />
                         Подтвердить
-                      </button>
-                      <button
-                        className="px-3 py-1 rounded-md border border-ink-300 text-xs text-ink-700 hover:bg-parchment-200"
+                      </NeumorphicButton>
+                      <NeumorphicButton
+                        className="text-xs px-3 py-1.5"
                         onClick={() => handleStatus(event.id, 'DECLINED')}
                       >
+                        <XCircle className="w-3 h-3 mr-1" />
                         Отклонить
-                      </button>
+                      </NeumorphicButton>
                     </div>
-                  </div>
+                  </NeumorphicCard>
                 ))}
             </div>
-          </section>
+          </NeumorphicCard>
         )}
 
-        <section className="sketch-card p-6 space-y-3">
-          <h2 className="text-xl font-semibold text-ink-800">Импорт iCal</h2>
+        {/* Импорт iCal */}
+        <NeumorphicCard className="p-4 sm:p-6 space-y-3 animate-fadeIn" style={{ animationDelay: '0.8s' }}>
+          <h2 className="text-lg sm:text-xl font-semibold text-warmGraphite-800">Импорт iCal</h2>
           <input
-            className="sketch-input"
             type="file"
             accept=".ics"
             onChange={(e) => setImportFile(e.target.files?.[0] || null)}
+            className="neumorphic-input w-full"
           />
-          <button
-            className="sketch-button"
+          <NeumorphicButton
             onClick={async () => {
               if (!importFile) return
               const formData = new FormData()
@@ -238,47 +327,45 @@ export default function CalendarPage() {
               }
               setImportFile(null)
             }}
+            disabled={!importFile}
+            className="w-full sm:w-auto"
           >
+            <Upload className="w-4 h-4 mr-2" />
             Импортировать
-          </button>
-        </section>
+          </NeumorphicButton>
+        </NeumorphicCard>
 
-        <section className="sketch-card p-6 space-y-3">
-          <h2 className="text-xl font-semibold text-ink-800">
+        {/* Запрос занятия */}
+        <NeumorphicCard className="p-4 sm:p-6 space-y-3 animate-fadeIn" style={{ animationDelay: '0.9s' }}>
+          <h2 className="text-lg sm:text-xl font-semibold text-warmGraphite-800">
             Запросить занятие у специалиста
           </h2>
-          <input
-            className="sketch-input"
+          <NeumorphicInput
             placeholder="UUID специалиста"
             value={requestForm.specialistId}
             onChange={(e) =>
               setRequestForm({ ...requestForm, specialistId: e.target.value })
             }
           />
-          <input
-            className="sketch-input"
+          <NeumorphicInput
             placeholder="Название занятия"
             value={requestForm.title}
             onChange={(e) => setRequestForm({ ...requestForm, title: e.target.value })}
           />
-          <input
-            className="sketch-input"
+          <NeumorphicInput
             type="datetime-local"
+            placeholder="Начало"
             value={requestForm.startsAt}
-            onChange={(e) =>
-              setRequestForm({ ...requestForm, startsAt: e.target.value })
-            }
+            onChange={(e) => setRequestForm({ ...requestForm, startsAt: e.target.value })}
           />
-          <input
-            className="sketch-input"
+          <NeumorphicInput
             type="datetime-local"
+            placeholder="Конец"
             value={requestForm.endsAt}
-            onChange={(e) =>
-              setRequestForm({ ...requestForm, endsAt: e.target.value })
-            }
+            onChange={(e) => setRequestForm({ ...requestForm, endsAt: e.target.value })}
           />
-          <button
-            className="sketch-button"
+          <NeumorphicButton
+            primary
             onClick={async () => {
               const response = await fetch('/api/calendar/requests', {
                 method: 'POST',
@@ -301,10 +388,14 @@ export default function CalendarPage() {
               setEvents((prev) => [...prev, event])
               setRequestForm({ specialistId: '', title: '', startsAt: '', endsAt: '' })
             }}
+            disabled={
+              !requestForm.specialistId || !requestForm.title || !requestForm.startsAt
+            }
+            className="w-full sm:w-auto"
           >
             Отправить запрос
-          </button>
-        </section>
+          </NeumorphicButton>
+        </NeumorphicCard>
       </div>
     </div>
   )

@@ -2,7 +2,13 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { Sparkles, Plus, BookOpen } from 'lucide-react'
+import { Sparkles, Plus, BookOpen, Calendar, Heart } from 'lucide-react'
+import NeumorphicCard from '@/components/ui/NeumorphicCard'
+import NeumorphicButton from '@/components/ui/NeumorphicButton'
+import NeumorphicInput from '@/components/ui/NeumorphicInput'
+import NeumorphicTextarea from '@/components/ui/NeumorphicTextarea'
+import NeumorphicBadge from '@/components/ui/NeumorphicBadge'
+import { cn } from '@/lib/utils/cn'
 
 type Entry = {
   id: string
@@ -19,17 +25,14 @@ export default function JournalPage() {
   const [hasSubscription, setHasSubscription] = useState(false)
 
   useEffect(() => {
-    // Check authentication
     fetch('/api/auth/me')
       .then((res) => res.json())
       .then((data) => {
         setIsAuthenticated(!!data?.user?.id)
-        // Check subscription status (simplified)
-        setHasSubscription(false) // Will be implemented with actual subscription check
+        setHasSubscription(false)
       })
       .catch(() => setIsAuthenticated(false))
 
-    // Load entries
     setEntries([
       {
         id: '1',
@@ -56,103 +59,108 @@ export default function JournalPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="space-y-6">
-          {/* Header */}
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Личный дневник</h1>
-            <p className="text-gray-600">
-              Планирование дня, заметки о здоровье и отслеживание прогресса.
-            </p>
-          </div>
+    <div className="min-h-screen bg-warmGray-50 p-4 sm:p-6 lg:p-8">
+      <div className="max-w-4xl mx-auto space-y-6">
+        {/* Header */}
+        <div className="animate-fadeIn">
+          <h1 className="text-3xl sm:text-4xl font-bold text-warmGraphite-800 mb-2">
+            Личный дневник
+          </h1>
+          <p className="text-base sm:text-lg text-warmGraphite-600">
+            Планирование дня, заметки о здоровье и отслеживание прогресса.
+          </p>
+        </div>
 
-          {/* AI Subscription Banner */}
-          {!hasSubscription && (
-            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-4">
-              <div className="flex items-start gap-3">
-                <div className="p-2 bg-blue-100 rounded-lg">
-                  <Sparkles className="w-5 h-5 text-blue-600" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-semibold text-gray-900 mb-1">
-                    AI-помощник в дневнике
-                  </h3>
-                  <p className="text-sm text-gray-700 mb-3">
-                    Получите персональные рекомендации и анализ ваших записей с помощью
-                    AI Health+. Бесплатный тестовый период на 7 дней.
-                  </p>
-                  <Link
-                    href="/subscriptions"
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
-                  >
+        {/* AI Subscription Banner */}
+        {!hasSubscription && (
+          <NeumorphicCard
+            className="p-4 sm:p-6 bg-gradient-to-r from-warmBlue-50/50 to-warmPink-50/50 border-2 border-warmBlue-200/50 animate-fadeIn"
+            style={{ animationDelay: '0.1s' }}
+          >
+            <div className="flex items-start gap-3 sm:gap-4">
+              <div className="p-2 sm:p-3 neumorphic-card-soft rounded-neumorphic-sm">
+                <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-warmBlue-600" />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-semibold text-warmGraphite-800 mb-1 text-base sm:text-lg">
+                  AI-помощник в дневнике
+                </h3>
+                <p className="text-sm text-warmGraphite-700 mb-3">
+                  Получите персональные рекомендации и анализ ваших записей с помощью AI
+                  Health+. Бесплатный тестовый период на 7 дней.
+                </p>
+                <Link href="/subscriptions">
+                  <NeumorphicButton primary className="text-sm">
                     Подключить подписку
-                  </Link>
-                </div>
+                  </NeumorphicButton>
+                </Link>
               </div>
             </div>
-          )}
+          </NeumorphicCard>
+        )}
 
-          {/* New Entry Form */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Новая запись</h2>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Заголовок
-                </label>
-                <input
-                  type="text"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  placeholder="Например: Сон, Тренировка, Настроение..."
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Заметка
-                </label>
-                <textarea
-                  value={note}
-                  onChange={(e) => setNote(e.target.value)}
-                  placeholder="Что важного сегодня? Как вы себя чувствуете?"
-                  rows={6}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-                />
-              </div>
-              <button
-                onClick={handleSave}
-                disabled={!title.trim() || !note.trim()}
-                className="inline-flex items-center gap-2 px-6 py-2.5 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                <Plus className="w-5 h-5" />
-                Сохранить запись
-              </button>
-            </div>
+        {/* New Entry Form */}
+        <NeumorphicCard className="p-4 sm:p-6 animate-fadeIn" style={{ animationDelay: '0.2s' }}>
+          <h2 className="text-lg sm:text-xl font-semibold text-warmGraphite-800 mb-4">
+            Новая запись
+          </h2>
+          <div className="space-y-4">
+            <NeumorphicInput
+              label="Заголовок"
+              placeholder="Например: Сон, Тренировка, Настроение..."
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+            />
+            <NeumorphicTextarea
+              label="Заметка"
+              placeholder="Что важного сегодня? Как вы себя чувствуете?"
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+              rows={6}
+              showCounter
+              maxLength={1000}
+            />
+            <NeumorphicButton
+              primary
+              onClick={handleSave}
+              disabled={!title.trim() || !note.trim()}
+              className="w-full sm:w-auto"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Сохранить запись
+            </NeumorphicButton>
           </div>
+        </NeumorphicCard>
 
-          {/* Entries List */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <div className="flex items-center gap-2 mb-4">
-              <BookOpen className="w-5 h-5 text-gray-600" />
-              <h2 className="text-lg font-semibold text-gray-900">История записей</h2>
+        {/* Entries List */}
+        <NeumorphicCard className="p-4 sm:p-6 animate-fadeIn" style={{ animationDelay: '0.3s' }}>
+          <div className="flex items-center gap-2 mb-4">
+            <BookOpen className="w-5 h-5 text-warmBlue-600" />
+            <h2 className="text-lg sm:text-xl font-semibold text-warmGraphite-800">
+              История записей
+            </h2>
+          </div>
+          {entries.length === 0 ? (
+            <div className="text-center py-12">
+              <BookOpen className="w-12 h-12 mx-auto mb-3 text-warmGray-400" />
+              <p className="text-warmGray-600">Пока нет записей. Создайте первую запись выше.</p>
             </div>
-            {entries.length === 0 ? (
-              <div className="text-center py-12 text-gray-500">
-                <BookOpen className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-                <p>Пока нет записей. Создайте первую запись выше.</p>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {entries.map((entry) => (
-                  <div
-                    key={entry.id}
-                    className="p-4 border border-gray-200 rounded-lg hover:border-gray-300 transition-colors"
-                  >
-                    <div className="flex items-start justify-between mb-2">
-                      <h3 className="font-semibold text-gray-900">{entry.title}</h3>
-                      <span className="text-xs text-gray-500">
+          ) : (
+            <div className="space-y-4">
+              {entries.map((entry, index) => (
+                <NeumorphicCard
+                  key={entry.id}
+                  soft
+                  className="p-4 hover:scale-[1.01] transition-all duration-300 animate-fadeIn"
+                  style={{ animationDelay: `${0.4 + index * 0.1}s` }}
+                >
+                  <div className="flex items-start justify-between mb-2">
+                    <h3 className="font-semibold text-warmGraphite-800 text-base sm:text-lg">
+                      {entry.title}
+                    </h3>
+                    <div className="flex items-center gap-2 text-xs text-warmGray-600">
+                      <Calendar className="w-3 h-3" />
+                      <span>
                         {new Date(entry.createdAt).toLocaleDateString('ru-RU', {
                           day: 'numeric',
                           month: 'long',
@@ -160,15 +168,15 @@ export default function JournalPage() {
                         })}
                       </span>
                     </div>
-                    <p className="text-sm text-gray-700 whitespace-pre-wrap">
-                      {entry.note}
-                    </p>
                   </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
+                  <p className="text-sm sm:text-base text-warmGraphite-700 whitespace-pre-wrap leading-relaxed">
+                    {entry.note}
+                  </p>
+                </NeumorphicCard>
+              ))}
+            </div>
+          )}
+        </NeumorphicCard>
       </div>
     </div>
   )
