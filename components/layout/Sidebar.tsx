@@ -69,34 +69,34 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
     <>
       {/* Overlay */}
       <div
-        className="fixed inset-0 bg-black/50 z-40 transition-opacity"
+        className="fixed inset-0 bg-warmGraphite-900/50 backdrop-blur-sm z-40 transition-opacity"
         onClick={onClose}
       />
 
       {/* Sidebar */}
-      <aside className="fixed left-0 top-0 bottom-0 w-80 bg-white shadow-xl z-50 transform transition-transform duration-300 ease-in-out overflow-y-auto">
+      <aside className="fixed left-0 top-0 bottom-0 w-80 neumorphic-surface z-50 transform transition-transform duration-300 ease-in-out overflow-y-auto">
         <div className="flex flex-col h-full">
           {/* Header */}
-          <div className="flex items-center justify-between p-4 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900">Меню</h2>
+          <div className="flex items-center justify-between p-4 border-b border-warmGray-300/50">
+            <h2 className="text-lg font-semibold text-warmGraphite-800">Меню</h2>
             <button
               onClick={onClose}
-              className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+              className="neumorphic-button p-2 rounded-neumorphic-sm text-warmGraphite-600"
               aria-label="Закрыть меню"
             >
-              <X className="w-5 h-5 text-gray-600" />
+              <X className="w-5 h-5" />
             </button>
           </div>
 
           {/* Auth Section */}
           {!isAuthenticated && (
-            <div className="p-4 border-b border-gray-200">
+            <div className="p-4 border-b border-warmGray-300/50">
               <Link
                 href="/login"
                 onClick={onClose}
                 className={cn(
-                  'flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors',
-                  'bg-blue-600 text-white hover:bg-blue-700'
+                  'neumorphic-button-primary flex items-center gap-3 px-4 py-3 rounded-neumorphic text-sm font-medium',
+                  'text-white'
                 )}
               >
                 <LogIn className="w-5 h-5" />
@@ -108,7 +108,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
           {/* Navigation Items */}
           <nav className="flex-1 overflow-y-auto p-4 space-y-1">
             <div className="mb-4">
-              <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 px-2">
+              <div className="text-xs font-semibold text-warmGray-600 uppercase tracking-wider mb-2 px-2">
                 Экосистема
               </div>
               {navigationItems.map((item) => {
@@ -120,10 +120,10 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                     href={item.href}
                     onClick={onClose}
                     className={cn(
-                      'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors',
+                      'flex items-center gap-3 px-3 py-2.5 rounded-neumorphic-sm text-sm font-medium transition-all',
                       isActive
-                        ? 'bg-blue-50 text-blue-700'
-                        : 'text-gray-700 hover:bg-gray-100'
+                        ? 'neumorphic-card-pressed text-warmBlue-600'
+                        : 'text-warmGraphite-700 hover:neumorphic-card-soft'
                     )}
                   >
                     <Icon className="w-5 h-5" />
@@ -134,7 +134,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             </div>
 
             <div className="mt-6 mb-4">
-              <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 px-2">
+              <div className="text-xs font-semibold text-warmGray-600 uppercase tracking-wider mb-2 px-2">
                 Мое здоровье
               </div>
               {healthItems.map((item) => {
@@ -146,10 +146,10 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                     href={item.href}
                     onClick={onClose}
                     className={cn(
-                      'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors',
+                      'flex items-center gap-3 px-3 py-2.5 rounded-neumorphic-sm text-sm font-medium transition-all',
                       isActive
-                        ? 'bg-blue-50 text-blue-700'
-                        : 'text-gray-700 hover:bg-gray-100'
+                        ? 'neumorphic-card-pressed text-warmBlue-600'
+                        : 'text-warmGraphite-700 hover:neumorphic-card-soft'
                     )}
                   >
                     <Icon className="w-5 h-5" />

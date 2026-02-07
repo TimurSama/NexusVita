@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { Menu, X, Search } from 'lucide-react'
 import Sidebar from './Sidebar'
+import { cn } from '@/lib/utils/cn'
 
 export default function Header() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
@@ -12,21 +13,24 @@ export default function Header() {
 
   return (
     <>
-      <header className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-200 shadow-sm">
+      <header className="fixed top-0 left-0 right-0 z-50 neumorphic-surface border-b border-warmGray-300/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Left: Burger Menu */}
             <button
               onClick={() => setIsSidebarOpen(true)}
-              className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+              className={cn(
+                'neumorphic-button p-2 rounded-neumorphic-sm',
+                'text-warmGraphite-700 hover:text-warmBlue-600'
+              )}
               aria-label="Открыть меню"
             >
-              <Menu className="w-6 h-6 text-gray-700" />
+              <Menu className="w-6 h-6" />
             </button>
 
             {/* Center: Logo */}
             <Link href="/" className="flex items-center">
-              <span className="text-2xl font-bold text-gray-900 tracking-tight">
+              <span className="text-2xl font-bold text-warmGraphite-800 tracking-tight">
                 NexusVita
               </span>
             </Link>
@@ -40,7 +44,7 @@ export default function Header() {
                     placeholder="Поиск..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-64 px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                    className="neumorphic-input w-64 text-sm text-warmGraphite-800 placeholder-warmGray-500"
                     autoFocus
                     onBlur={() => {
                       if (!searchQuery) setIsSearchOpen(false)
@@ -51,18 +55,21 @@ export default function Header() {
                       setSearchQuery('')
                       setIsSearchOpen(false)
                     }}
-                    className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                    className="neumorphic-button p-2 rounded-neumorphic-sm text-warmGraphite-600"
                   >
-                    <X className="w-5 h-5 text-gray-600" />
+                    <X className="w-5 h-5" />
                   </button>
                 </div>
               ) : (
                 <button
                   onClick={() => setIsSearchOpen(true)}
-                  className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                  className={cn(
+                    'neumorphic-button p-2 rounded-neumorphic-sm',
+                    'text-warmGraphite-700 hover:text-warmBlue-600'
+                  )}
                   aria-label="Поиск"
                 >
-                  <Search className="w-6 h-6 text-gray-700" />
+                  <Search className="w-6 h-6" />
                 </button>
               )}
             </div>

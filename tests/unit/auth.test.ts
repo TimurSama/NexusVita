@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { hashPassword, verifyPassword } from '@/lib/auth/password'
-import { generateAuthToken, verifyAuthToken } from '@/lib/auth/token'
+import { createSessionToken, verifySessionToken } from '@/lib/auth/token'
 
 describe('Authentication Utils', () => {
   it('should hash and verify password', async () => {
@@ -16,13 +16,13 @@ describe('Authentication Utils', () => {
     expect(isInvalid).toBe(false)
   })
 
-  it('should generate and verify JWT token', () => {
+  it('should generate and verify session token', () => {
     const payload = { userId: 'test-user-id', role: 'USER' }
-    const token = generateAuthToken(payload)
+    const token = createSessionToken(payload)
     expect(token).toBeTruthy()
     expect(typeof token).toBe('string')
 
-    const decoded = verifyAuthToken(token)
+    const decoded = verifySessionToken(token)
     expect(decoded).toBeTruthy()
     expect(decoded?.userId).toBe(payload.userId)
     expect(decoded?.role).toBe(payload.role)
@@ -30,7 +30,7 @@ describe('Authentication Utils', () => {
 
   it('should reject invalid token', () => {
     const invalidToken = 'invalid.token.here'
-    const decoded = verifyAuthToken(invalidToken)
+    const decoded = verifySessionToken(invalidToken)
     expect(decoded).toBeNull()
   })
 })
