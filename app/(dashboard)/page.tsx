@@ -2,15 +2,18 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { Clock, MessageCircle, Bell, TrendingUp, Target, Calendar, CheckCircle, ArrowRight } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
 import VitruvianMan from '@/components/vitruvian/VitruvianMan'
 import MetricLabel from '@/components/dashboard/MetricLabel'
 import { DashboardMetric } from '@/types'
 import NeumorphicCard from '@/components/ui/NeumorphicCard'
 import NeumorphicButton from '@/components/ui/NeumorphicButton'
+import NeumorphicInput from '@/components/ui/NeumorphicInput'
 import NeumorphicBadge from '@/components/ui/NeumorphicBadge'
 import { cn } from '@/lib/utils/cn'
 
-// Моковые данные - в реальном приложении будут загружаться из API
+// Моковые данные
 const mockMetrics: DashboardMetric[] = [
   {
     id: 'health',
@@ -18,7 +21,7 @@ const mockMetrics: DashboardMetric[] = [
     value: 'Сон 7ч 10м',
     unit: 'пульс 62',
     link: '/medical-card',
-    position: { x: 50, y: 20 }, // Верх
+    position: { x: 50, y: 20 },
   },
   {
     id: 'sport',
@@ -26,7 +29,7 @@ const mockMetrics: DashboardMetric[] = [
     value: 'Тренировка',
     unit: 'силовая 40м',
     link: '/training',
-    position: { x: 15, y: 50 }, // Лево
+    position: { x: 15, y: 50 },
   },
   {
     id: 'nutrition',
@@ -34,7 +37,7 @@ const mockMetrics: DashboardMetric[] = [
     value: '1,840',
     unit: 'ккал на день',
     link: '/nutrition',
-    position: { x: 85, y: 50 }, // Право
+    position: { x: 85, y: 50 },
   },
   {
     id: 'psyche',
@@ -42,7 +45,7 @@ const mockMetrics: DashboardMetric[] = [
     value: 'Стресс',
     unit: 'умеренный',
     link: '/journal',
-    position: { x: 50, y: 80 }, // Низ
+    position: { x: 50, y: 80 },
   },
   {
     id: 'social',
@@ -50,69 +53,65 @@ const mockMetrics: DashboardMetric[] = [
     value: 'Группы',
     unit: '2 занятия',
     link: '/social',
-    position: { x: 50, y: 5 }, // Над головой
+    position: { x: 50, y: 5 },
   },
 ]
 
-const dailyModules = [
-  {
-    title: 'Здоровье',
-    metric: 'Пульс 62 · Сон 7ч 10м',
-    plan: 'Чек-ап крови, 10:30',
-    link: '/medical-card',
-  },
-  {
-    title: 'Спорт',
-    metric: 'Силовая 40м · растяжка 10м',
-    plan: 'Тренировка в 18:00',
-    link: '/training',
-  },
-  {
-    title: 'Питание',
-    metric: '1 840/2 100 ккал',
-    plan: 'Добавить белок в ужин',
-    link: '/nutrition',
-  },
-  {
-    title: 'Психика',
-    metric: 'Стресс умеренный',
-    plan: 'Дыхательная практика 10 мин',
-    link: '/journal',
-  },
-  {
-    title: 'Социальное',
-    metric: '2 групповых занятия',
-    plan: 'Йога в субботу 09:00',
-    link: '/social',
-  },
+const reminders = [
+  { id: '1', time: 'через 1 час', title: 'Тренировка', desc: 'Силовая тренировка в 18:00', action: 'Не забыть поесть и выпить предтрен' },
+  { id: '2', time: 'через 2 часа', title: 'Прием пищи', desc: 'Ужин с высоким содержанием белка' },
+  { id: '3', time: 'завтра 09:00', title: 'Йога', desc: 'Групповое занятие' },
 ]
 
 export default function DashboardPage() {
   const [metrics, setMetrics] = useState<DashboardMetric[]>([])
-  const [dailyPlan, setDailyPlan] = useState<
-    Array<{ title: string; detail: string }>
-  >([])
+  const [aiMessages, setAiMessages] = useState<Array<{ role: 'user' | 'ai'; content: string; timestamp: Date }>>([])
+  const [aiInput, setAiInput] = useState('')
+  const [isAiTyping, setIsAiTyping] = useState(false)
 
   useEffect(() => {
-    // В реальном приложении здесь будет загрузка данных из API
     setMetrics(mockMetrics)
-    const loadPlan = async () => {
-      const response = await fetch('/api/ai-agent/plan')
-      if (!response.ok) return
-      const data = await response.json().catch(() => null)
-      if (data?.items?.length) {
-        setDailyPlan(data.items)
-      }
-    }
-    loadPlan()
+    // Приветственное сообщение от AI
+    setAiMessages([
+      {
+        role: 'ai',
+        content: 'Привет! Я ваш персональный AI-ассистент. Как дела? Могу помочь с планами, ответить на вопросы или обновить статус.',
+        timestamp: new Date(),
+      },
+    ])
   }, [])
 
+  const handleAiSend = async () => {
+    if (!aiInput.trim()) return
+
+    const userMessage = {
+      role: 'user' as const,
+      content: aiInput,
+      timestamp: new Date(),
+    }
+    setAiMessages((prev) => [...prev, userMessage])
+    setAiInput('')
+    setIsAiTyping(true)
+
+    // Имитация ответа AI
+    setTimeout(() => {
+      const aiResponse = {
+        role: 'ai' as const,
+        content: 'Понял! Обновил ваш статус. Рекомендую сегодня легкую тренировку и ранний отход ко сну.',
+        timestamp: new Date(),
+      }
+      setAiMessages((prev) => [...prev, aiResponse])
+      setIsAiTyping(false)
+    }, 1500)
+  }
+
   return (
-    <div className="min-h-screen bg-warmGray-50 p-4 sm:p-6 lg:p-8">
-      <div className="max-w-7xl mx-auto">
-        <header className="text-center mb-8 sm:mb-12 animate-fadeIn">
+    <div className="min-h-screen p-4 sm:p-6 lg:p-8 relative">
+      <div className="max-w-7xl mx-auto space-y-6 sm:space-y-8">
+        {/* Заголовок */}
+        <header className="text-center animate-fadeIn">
           <NeumorphicBadge variant="info" className="mb-4">
-            ✦ Личный хаб здоровья и DAO-профиль
+            ✦ Личный хаб здоровья
           </NeumorphicBadge>
           <h1 className="text-4xl sm:text-5xl font-bold text-warmGraphite-800 mt-4 mb-3">
             Витрувианский профиль
@@ -122,8 +121,8 @@ export default function DashboardPage() {
           </p>
         </header>
 
-        {/* Центральная область с Витрувианским человеком */}
-        <NeumorphicCard className="relative flex items-center justify-center min-h-[500px] sm:min-h-[640px] p-8 sm:p-12 mb-8 sm:mb-10 animate-scaleIn">
+        {/* Центральная область с Витрувианским человеком и секторами */}
+        <NeumorphicCard className="relative flex items-center justify-center min-h-[500px] sm:min-h-[640px] p-8 sm:p-12 animate-scaleIn">
           <div className="absolute inset-10 border-2 border-dashed border-warmGray-300/50 rounded-full opacity-50" />
           <div className="absolute inset-24 border border-warmGray-300/30 rounded-full opacity-30" />
 
@@ -132,7 +131,7 @@ export default function DashboardPage() {
             <VitruvianMan width={400} height={400} className="sm:w-[500px] sm:h-[500px]" />
           </div>
 
-          {/* Интерактивные метки */}
+          {/* Интерактивные метки секторов */}
           {metrics.map((metric, index) => (
             <MetricLabel
               key={metric.id}
@@ -146,319 +145,226 @@ export default function DashboardPage() {
           ))}
         </NeumorphicCard>
 
-        {/* Краткий план на день по сегментам */}
-        <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-          {(dailyPlan.length ? dailyPlan : dailyModules).map((module, index) => (
-            <NeumorphicCard
-              key={module.title}
-              className={cn(
-                'p-4 sm:p-6 hover:scale-[1.02] transition-all duration-300',
-                'animate-fadeIn'
-              )}
-              style={{ animationDelay: `${index * 0.1}s` }}
-            >
-              <div className="text-xs uppercase tracking-widest text-warmGray-600 font-semibold">
-                {module.title}
-              </div>
-              <div className="text-base sm:text-lg font-semibold text-warmGraphite-800 mt-2">
-                {'metric' in module ? module.metric : module.detail}
-              </div>
-              {'plan' in module ? (
-                <>
-                  <div className="text-sm text-warmGraphite-600 mt-1">{module.plan}</div>
-                  <Link
-                    href={module.link}
-                    className="text-sm text-warmBlue-600 hover:text-warmBlue-700 mt-3 inline-block font-medium transition-colors"
-                  >
-                    Открыть модуль →
-                  </Link>
-                </>
-              ) : (
-                <div className="text-sm text-warmGraphite-600 mt-1">AI план на день</div>
-              )}
-            </NeumorphicCard>
+        {/* Секторы здоровья с метриками */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 sm:gap-6">
+          {[
+            { id: 'health', title: 'Здоровье', metric: 'Пульс 62', submetric: 'Сон 7ч 10м', link: '/medical-card', color: 'warmBlue' },
+            { id: 'sport', title: 'Спорт', metric: 'Силовая 40м', submetric: 'Растяжка 10м', link: '/training', color: 'warmRed' },
+            { id: 'nutrition', title: 'Питание', metric: '1 840 ккал', submetric: 'из 2 100', link: '/nutrition', color: 'warmGreen' },
+            { id: 'psyche', title: 'Психика', metric: 'Стресс', submetric: 'умеренный', link: '/journal', color: 'warmPink' },
+            { id: 'social', title: 'Социальное', metric: '2 занятия', submetric: 'Йога, бег', link: '/social', color: 'warmBlue' },
+          ].map((sector, index) => (
+            <Link key={sector.id} href={sector.link}>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <NeumorphicCard className="p-4 sm:p-6 text-center cursor-pointer h-full">
+                  <h3 className="text-sm sm:text-base font-semibold text-warmGraphite-800 mb-2">
+                    {sector.title}
+                  </h3>
+                  <div className="text-xl sm:text-2xl font-bold text-warmGraphite-800 mb-1">
+                    {sector.metric}
+                  </div>
+                  <div className="text-xs sm:text-sm text-warmGray-600">{sector.submetric}</div>
+                  <ArrowRight className="w-4 h-4 mx-auto mt-3 text-warmBlue-600 opacity-0 group-hover:opacity-100 transition-opacity" />
+                </NeumorphicCard>
+              </motion.div>
+            </Link>
           ))}
-        </section>
-
-        {/* Быстрые действия */}
-        <div className="mt-8 sm:mt-12 grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
-          <QuickActionCard
-            title="Добавить замер"
-            description="Зафиксируйте текущие параметры тела"
-            link="/metrics/add"
-            icon="📏"
-            delay={0}
-          />
-          <QuickActionCard
-            title="Новая тренировка"
-            description="Начните тренировку по программе"
-            link="/training/start"
-            icon="💪"
-            delay={0.1}
-          />
-          <QuickActionCard
-            title="Записать питание"
-            description="Внесите данные о приеме пищи"
-            link="/nutrition/add"
-            icon="🍎"
-            delay={0.2}
-          />
         </div>
 
-        <section className="mt-8 sm:mt-12 grid grid-cols-1 lg:grid-cols-[1.2fr,1fr] gap-4 sm:gap-6">
-          <NeumorphicCard className="p-4 sm:p-6 animate-fadeIn">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl sm:text-2xl font-semibold text-warmGraphite-800">
-                Инсайты и рекомендации
-              </h2>
-              <Link
-                href="/ecosystem"
-                className="text-sm text-warmBlue-600 hover:text-warmBlue-700 font-medium transition-colors"
-              >
-                AI Health+
-              </Link>
-            </div>
-            <div className="space-y-3 text-sm text-warmGraphite-700">
-              <NeumorphicCard
-                soft
-                className="p-4 hover:scale-[1.01] transition-transform"
-              >
-                Сон ниже нормы 3 дня подряд. Рекомендуется сдвинуть время отбоя
-                на 30 минут и снизить кофеин после 16:00.
-              </NeumorphicCard>
-              <NeumorphicCard
-                soft
-                className="p-4 hover:scale-[1.01] transition-transform"
-              >
-                Уровень стресса повышен. Запланируйте дыхательную практику на 10
-                минут и прогулку 2 км.
-              </NeumorphicCard>
-              <NeumorphicCard
-                soft
-                className="p-4 hover:scale-[1.01] transition-transform bg-warmPink-50/50"
-              >
-                <span className="font-semibold text-warmPink-700">Скидка -20%</span> для ранних пользователей на подписку
-                AI Health+ и консультации специалистов.
-              </NeumorphicCard>
-            </div>
-          </NeumorphicCard>
-
-          <NeumorphicCard className="p-4 sm:p-6 space-y-4 animate-fadeIn" style={{ animationDelay: '0.1s' }}>
+        {/* Напоминания ближайших действий */}
+        <NeumorphicCard className="p-4 sm:p-6 animate-fadeIn">
+          <div className="flex items-center gap-2 mb-4">
+            <Bell className="w-5 h-5 text-warmPink-600" />
             <h2 className="text-xl sm:text-2xl font-semibold text-warmGraphite-800">
-              Расписание и события
+              Ближайшие действия
             </h2>
-            <div className="space-y-3 text-sm text-warmGraphite-700">
-              <NeumorphicCard
-                soft
-                className="p-3 flex items-center justify-between hover:scale-[1.01] transition-transform"
+          </div>
+          <div className="space-y-3">
+            {reminders.map((reminder, index) => (
+              <motion.div
+                key={reminder.id}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: index * 0.1 }}
               >
-                <div>
-                  <div className="font-semibold text-warmGraphite-800">
-                    Чек-ап крови
+                <NeumorphicCard
+                  soft
+                  className="p-4 flex items-start justify-between hover:scale-[1.01] transition-transform"
+                >
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Clock className="w-4 h-4 text-warmBlue-600" />
+                      <span className="text-xs text-warmGray-600">{reminder.time}</span>
+                    </div>
+                    <h3 className="font-semibold text-warmGraphite-800 text-sm sm:text-base mb-1">
+                      {reminder.title}
+                    </h3>
+                    <p className="text-xs sm:text-sm text-warmGraphite-600 mb-1">
+                      {reminder.desc}
+                    </p>
+                    {reminder.action && (
+                      <p className="text-xs text-warmPink-600 font-medium mt-2">
+                        💡 {reminder.action}
+                      </p>
+                    )}
                   </div>
-                  <div className="text-xs text-warmGray-600">Пт, 10:30</div>
-                </div>
-                <button className="text-xs text-warmBlue-600 hover:text-warmBlue-700 font-medium transition-colors">
-                  Перенести
-                </button>
-              </NeumorphicCard>
-              <NeumorphicCard
-                soft
-                className="p-3 flex items-center justify-between hover:scale-[1.01] transition-transform"
-              >
-                <div>
-                  <div className="font-semibold text-warmGraphite-800">
-                    Групповая йога
-                  </div>
-                  <div className="text-xs text-warmGray-600">Сб, 09:00</div>
-                </div>
-                <button className="text-xs text-warmBlue-600 hover:text-warmBlue-700 font-medium transition-colors">
-                  Открыть
-                </button>
-              </NeumorphicCard>
-              <NeumorphicCard
-                soft
-                className="p-3 flex items-center justify-between hover:scale-[1.01] transition-transform"
-              >
-                <div>
-                  <div className="font-semibold text-warmGraphite-800">
-                    Сессия с психологом
-                  </div>
-                  <div className="text-xs text-warmGray-600">Вс, 19:00</div>
-                </div>
-                <button className="text-xs text-warmBlue-600 hover:text-warmBlue-700 font-medium transition-colors">
-                  Видеосвязь
-                </button>
-              </NeumorphicCard>
-            </div>
-          </NeumorphicCard>
-        </section>
+                  <CheckCircle className="w-5 h-5 text-warmGreen-600 flex-shrink-0 ml-3" />
+                </NeumorphicCard>
+              </motion.div>
+            ))}
+          </div>
+        </NeumorphicCard>
 
-        <section className="mt-8 sm:mt-12 grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
-          <NeumorphicCard className="p-4 sm:p-6 animate-fadeIn" style={{ animationDelay: '0.2s' }}>
-            <h3 className="text-lg sm:text-xl font-semibold text-warmGraphite-800 mb-3">
-              Команда здоровья
-            </h3>
-            <div className="space-y-3 text-sm text-warmGraphite-700">
-              <NeumorphicCard soft className="p-3 hover:scale-[1.01] transition-transform">
-                <div className="font-medium text-warmGraphite-800">
-                  Доктор Левицкая · эндокринолог
-                </div>
-                <div className="text-xs text-warmGray-600 mt-1">Следующая встреча: 12.02</div>
-              </NeumorphicCard>
-              <NeumorphicCard soft className="p-3 hover:scale-[1.01] transition-transform">
-                <div className="font-medium text-warmGraphite-800">
-                  Мария Грин · нутрициолог
-                </div>
-                <div className="text-xs text-warmGray-600 mt-1">План питания обновлен</div>
-              </NeumorphicCard>
-              <NeumorphicCard soft className="p-3 hover:scale-[1.01] transition-transform">
-                <div className="font-medium text-warmGraphite-800">
-                  Алексей Т. · тренер
-                </div>
-                <div className="text-xs text-warmGray-600 mt-1">Новая программа</div>
-              </NeumorphicCard>
-            </div>
-            <div className="mt-4">
-              <Link
-                href="/specialists"
-                className="text-sm text-warmBlue-600 hover:text-warmBlue-700 font-medium transition-colors"
-              >
-                Смотреть всех специалистов →
-              </Link>
-            </div>
-          </NeumorphicCard>
-
-          <NeumorphicCard className="p-4 sm:p-6 animate-fadeIn" style={{ animationDelay: '0.3s' }}>
-            <h3 className="text-lg sm:text-xl font-semibold text-warmGraphite-800 mb-3">
-              Библиотека протоколов
-            </h3>
-            <div className="space-y-3 text-sm text-warmGraphite-700">
-              <NeumorphicCard soft className="p-3 hover:scale-[1.01] transition-transform">
-                Протокол восстановления после травмы колена
-              </NeumorphicCard>
-              <NeumorphicCard soft className="p-3 hover:scale-[1.01] transition-transform">
-                План нормализации сна и циркадных ритмов
-              </NeumorphicCard>
-              <NeumorphicCard soft className="p-3 hover:scale-[1.01] transition-transform">
-                Гайд по микронутриентам для спортсменов
-              </NeumorphicCard>
-            </div>
-            <div className="mt-4">
-              <Link
-                href="/ecosystem"
-                className="text-sm text-warmBlue-600 hover:text-warmBlue-700 font-medium transition-colors"
-              >
-                Подключить AI Health+ →
-              </Link>
-            </div>
-          </NeumorphicCard>
-
-          <NeumorphicCard className="p-4 sm:p-6 animate-fadeIn" style={{ animationDelay: '0.4s' }}>
-            <h3 className="text-lg sm:text-xl font-semibold text-warmGraphite-800 mb-3">
-              DAO активность
-            </h3>
-            <div className="space-y-3 text-sm text-warmGraphite-700">
-              <NeumorphicCard soft className="p-3 hover:scale-[1.01] transition-transform">
-                Голосование: гранты на исследования микробиома
-              </NeumorphicCard>
-              <NeumorphicCard soft className="p-3 hover:scale-[1.01] transition-transform">
-                Уровень участия: 4/7 голосований
-              </NeumorphicCard>
-              <NeumorphicCard soft className="p-3 hover:scale-[1.01] transition-transform bg-warmBlue-50/50">
-                <span className="font-semibold text-warmBlue-700">Баланс NVT: 12 400</span> · доступ к премиум исследованию
-              </NeumorphicCard>
-            </div>
-            <div className="mt-4">
-              <Link
-                href="/dao"
-                className="text-sm text-warmBlue-600 hover:text-warmBlue-700 font-medium transition-colors"
-              >
-                Перейти в DAO кабинет →
-              </Link>
-            </div>
-          </NeumorphicCard>
-        </section>
-
-        <section className="mt-8 sm:mt-12 grid grid-cols-1 lg:grid-cols-[1.3fr,1fr] gap-4 sm:gap-6">
-          <NeumorphicCard className="p-4 sm:p-6 animate-fadeIn" style={{ animationDelay: '0.5s' }}>
-            <h2 className="text-xl sm:text-2xl font-semibold text-warmGraphite-800 mb-4">
-              Настройка и персонализация
+        {/* AI Чат */}
+        <NeumorphicCard className="p-4 sm:p-6 animate-fadeIn">
+          <div className="flex items-center gap-2 mb-4">
+            <MessageCircle className="w-5 h-5 text-warmBlue-600" />
+            <h2 className="text-xl sm:text-2xl font-semibold text-warmGraphite-800">
+              AI-ассистент
             </h2>
-            <div className="space-y-3 text-sm text-warmGraphite-700">
-              <NeumorphicCard soft className="p-3 hover:scale-[1.01] transition-transform cursor-pointer">
-                Подключить устройства и интеграции
-              </NeumorphicCard>
-              <NeumorphicCard soft className="p-3 hover:scale-[1.01] transition-transform cursor-pointer">
-                Настроить цели и награды
-              </NeumorphicCard>
-              <NeumorphicCard soft className="p-3 hover:scale-[1.01] transition-transform cursor-pointer">
-                Выбрать специалистов и расписание
-              </NeumorphicCard>
-              <NeumorphicCard soft className="p-3 hover:scale-[1.01] transition-transform cursor-pointer">
-                Личный дневник и планирование дня
-              </NeumorphicCard>
+            <NeumorphicBadge variant="info" size="sm" className="ml-auto">
+              AI Health+
+            </NeumorphicBadge>
+          </div>
+
+          {/* История сообщений */}
+          <div className="space-y-3 mb-4 max-h-64 overflow-y-auto pr-2">
+            <AnimatePresence>
+              {aiMessages.map((msg, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  className={cn(
+                    'flex',
+                    msg.role === 'user' ? 'justify-end' : 'justify-start'
+                  )}
+                >
+                  <NeumorphicCard
+                    soft
+                    className={cn(
+                      'p-3 max-w-[80%]',
+                      msg.role === 'user'
+                        ? 'bg-warmBlue-50/50 border border-warmBlue-200/50'
+                        : 'bg-warmGray-50/50'
+                    )}
+                  >
+                    <p className="text-sm text-warmGraphite-700">{msg.content}</p>
+                    <span className="text-xs text-warmGray-500 mt-1 block">
+                      {msg.timestamp.toLocaleTimeString('ru-RU', {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
+                    </span>
+                  </NeumorphicCard>
+                </motion.div>
+              ))}
+              {isAiTyping && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="flex justify-start"
+                >
+                  <NeumorphicCard soft className="p-3">
+                    <div className="flex gap-1">
+                      <div className="w-2 h-2 bg-warmBlue-600 rounded-full animate-bounce" />
+                      <div className="w-2 h-2 bg-warmBlue-600 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }} />
+                      <div className="w-2 h-2 bg-warmBlue-600 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
+                    </div>
+                  </NeumorphicCard>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+
+          {/* Поле ввода */}
+          <div className="flex items-center gap-3">
+            <NeumorphicInput
+              placeholder="Задайте вопрос или обновите статус..."
+              value={aiInput}
+              onChange={(e) => setAiInput(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && handleAiSend()}
+              className="flex-1"
+            />
+            <NeumorphicButton primary onClick={handleAiSend} disabled={!aiInput.trim() || isAiTyping}>
+              <MessageCircle className="w-4 h-4" />
+            </NeumorphicButton>
+          </div>
+        </NeumorphicCard>
+
+        {/* Быстрые действия и планы */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+          <NeumorphicCard className="p-4 sm:p-6 animate-fadeIn">
+            <div className="flex items-center gap-2 mb-4">
+              <Target className="w-5 h-5 text-warmGreen-600" />
+              <h2 className="text-xl sm:text-2xl font-semibold text-warmGraphite-800">
+                Планы и задачи
+              </h2>
             </div>
-            <div className="mt-4">
-              <Link
-                href="/profile"
-                className="text-sm text-warmBlue-600 hover:text-warmBlue-700 font-medium transition-colors"
-              >
-                Перейти в профиль →
-              </Link>
+            <div className="space-y-3">
+              {[
+                { title: 'Тренировка', status: 'Запланировано', time: '18:00', link: '/training' },
+                { title: 'Прием пищи', status: 'Напоминание', time: '19:30', link: '/nutrition' },
+                { title: 'Дыхательная практика', status: 'Рекомендовано', time: '20:00', link: '/journal' },
+              ].map((task, index) => (
+                <Link key={index} href={task.link}>
+                  <NeumorphicCard
+                    soft
+                    className="p-3 flex items-center justify-between hover:scale-[1.01] transition-transform"
+                  >
+                    <div>
+                      <div className="font-semibold text-warmGraphite-800 text-sm sm:text-base">
+                        {task.title}
+                      </div>
+                      <div className="text-xs text-warmGray-600 mt-1">
+                        {task.status} · {task.time}
+                      </div>
+                    </div>
+                    <ArrowRight className="w-4 h-4 text-warmBlue-600" />
+                  </NeumorphicCard>
+                </Link>
+              ))}
             </div>
           </NeumorphicCard>
 
-          <NeumorphicCard className="p-4 sm:p-6 animate-fadeIn" style={{ animationDelay: '0.6s' }}>
-            <h2 className="text-xl sm:text-2xl font-semibold text-warmGraphite-800 mb-4">
-              Инструменты и функции
-            </h2>
-            <div className="space-y-3 text-sm text-warmGraphite-700">
-              <NeumorphicCard soft className="p-3 hover:scale-[1.01] transition-transform cursor-pointer">
-                AI агент и персональные планы
-              </NeumorphicCard>
-              <NeumorphicCard soft className="p-3 hover:scale-[1.01] transition-transform cursor-pointer">
-                Маркетплейс абонементов и услуг
-              </NeumorphicCard>
-              <NeumorphicCard soft className="p-3 hover:scale-[1.01] transition-transform cursor-pointer">
-                DAO голосования и гранты
-              </NeumorphicCard>
+          <NeumorphicCard className="p-4 sm:p-6 animate-fadeIn">
+            <div className="flex items-center gap-2 mb-4">
+              <TrendingUp className="w-5 h-5 text-warmPink-600" />
+              <h2 className="text-xl sm:text-2xl font-semibold text-warmGraphite-800">
+                Достижения сегодня
+              </h2>
+            </div>
+            <div className="space-y-3">
+              {[
+                { title: '7 часов сна', reward: '+25 NVT' },
+                { title: 'Тренировка завершена', reward: '+40 NVT' },
+                { title: 'План питания выполнен', reward: '+20 NVT' },
+              ].map((achievement, index) => (
+                <NeumorphicCard
+                  key={index}
+                  soft
+                  className="p-3 flex items-center justify-between hover:scale-[1.01] transition-transform"
+                >
+                  <div className="flex items-center gap-2">
+                    <CheckCircle className="w-4 h-4 text-warmGreen-600" />
+                    <span className="text-sm text-warmGraphite-800">{achievement.title}</span>
+                  </div>
+                  <NeumorphicBadge variant="success" size="sm">
+                    {achievement.reward}
+                  </NeumorphicBadge>
+                </NeumorphicCard>
+              ))}
             </div>
           </NeumorphicCard>
-        </section>
+        </div>
       </div>
     </div>
   )
 }
-
-function QuickActionCard({
-  title,
-  description,
-  link,
-  icon,
-  delay = 0,
-}: {
-  title: string
-  description: string
-  link: string
-  icon: string
-  delay?: number
-}) {
-  return (
-    <Link
-      href={link}
-      className="block neumorphic-card p-4 sm:p-6 hover:scale-[1.02] transition-all duration-300 animate-fadeIn group"
-      style={{ animationDelay: `${delay}s` }}
-    >
-      <div className="text-3xl sm:text-4xl mb-3 sm:mb-4 group-hover:scale-110 transition-transform duration-300">
-        {icon}
-      </div>
-      <h3 className="text-lg sm:text-xl font-bold text-warmGraphite-800 mb-2">
-        {title}
-      </h3>
-      <p className="text-sm sm:text-base text-warmGraphite-600">{description}</p>
-    </Link>
-  )
-}
-
-
