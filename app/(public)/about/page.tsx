@@ -815,18 +815,18 @@ export default function AboutPage() {
                   <span className="font-semibold">AI Помощник</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <button
+                  <NeumorphicButton
                     onClick={() => setChatMinimized(!chatMinimized)}
-                    className="p-1 hover:bg-white/20 rounded-lg transition-colors"
+                    className="p-1 !rounded-full"
                   >
                     {chatMinimized ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                  </button>
-                  <button
+                  </NeumorphicButton>
+                  <NeumorphicButton
                     onClick={() => setChatOpen(false)}
-                    className="p-1 hover:bg-white/20 rounded-lg transition-colors"
+                    className="p-1 !rounded-full"
                   >
                     <X className="w-4 h-4" />
-                  </button>
+                  </NeumorphicButton>
                 </div>
               </div>
 
