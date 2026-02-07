@@ -1,7 +1,7 @@
 'use client'
 
 import { cn } from '@/lib/utils/cn'
-import { ReactNode } from 'react'
+import { ReactNode, CSSProperties } from 'react'
 
 interface NeumorphicCardProps {
   children: ReactNode
@@ -9,6 +9,7 @@ interface NeumorphicCardProps {
   pressed?: boolean
   soft?: boolean
   onClick?: () => void
+  style?: CSSProperties
 }
 
 export default function NeumorphicCard({
@@ -17,6 +18,7 @@ export default function NeumorphicCard({
   pressed = false,
   soft = false,
   onClick,
+  style,
 }: NeumorphicCardProps) {
   return (
     <div
@@ -30,6 +32,7 @@ export default function NeumorphicCard({
         className
       )}
       onClick={onClick}
+      style={style}
     >
       {children}
     </div>
