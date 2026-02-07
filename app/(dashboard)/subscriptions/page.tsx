@@ -1,6 +1,11 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { CreditCard, Sparkles, TrendingUp, CheckCircle, XCircle, Clock } from 'lucide-react'
+import NeumorphicCard from '@/components/ui/NeumorphicCard'
+import NeumorphicButton from '@/components/ui/NeumorphicButton'
+import NeumorphicBadge from '@/components/ui/NeumorphicBadge'
+import { cn } from '@/lib/utils/cn'
 
 const plans = [
   {
@@ -9,25 +14,28 @@ const plans = [
     price: '990 ₽/мес',
     amount: 990,
     highlight: 'Лучший выбор',
+    popular: true,
   },
   {
     name: 'Pro Team',
     desc: 'Семейный доступ, телемедицина и приоритетные слоты.',
     price: '2 490 ₽/мес',
     amount: 2490,
+    popular: false,
   },
   {
     name: 'Research+',
     desc: 'Доступ к исследованиям, грантам и закрытым сообществам.',
     price: '1 590 ₽/мес',
     amount: 1590,
+    popular: false,
   },
 ]
 
 const tokenPayments = [
-  { label: 'Баланс NVT', value: '12 400' },
-  { label: 'Бонусные токены', value: '1 200' },
-  { label: 'Доступный кешбэк', value: '5%' },
+  { label: 'Баланс NVT', value: '12 400', icon: TrendingUp },
+  { label: 'Бонусные токены', value: '1 200', icon: Sparkles },
+  { label: 'Доступный кешбэк', value: '5%', icon: CreditCard },
 ]
 
 export default function SubscriptionsPage() {
@@ -54,8 +62,8 @@ export default function SubscriptionsPage() {
         return
       }
       setIsAuthed(true)
-      const data = await fetch(`/api/subscriptions?userId=${me.user.id}`).then(
-        (res) => res.json()
+      const data = await fetch(`/api/subscriptions?userId=${me.user.id}`).then((res) =>
+        res.json()
       )
       setSubscriptions(Array.isArray(data) ? data : [])
       setLoading(false)
@@ -93,145 +101,194 @@ export default function SubscriptionsPage() {
   }
 
   return (
-    <div className="min-h-screen px-6 py-10">
-      <div className="max-w-7xl mx-auto space-y-10">
-        <header className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+    <div className="min-h-screen bg-warmGray-50 p-4 sm:p-6 lg:p-8">
+      <div className="max-w-7xl mx-auto space-y-6 sm:space-y-8">
+        <header className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between animate-fadeIn">
           <div>
-            <h1 className="text-4xl font-bold text-ink-800">Подписки и оплаты</h1>
-            <p className="text-ink-600">
+            <h1 className="text-3xl sm:text-4xl font-bold text-warmGraphite-800">
+              Подписки и оплаты
+            </h1>
+            <p className="text-base sm:text-lg text-warmGraphite-600 mt-2">
               Управляйте подписками, абонементами и оплатой токенами NVT.
             </p>
           </div>
-          <button className="sketch-button">Добавить карту</button>
+          <NeumorphicButton primary>
+            <CreditCard className="w-4 h-4 mr-2" />
+            Добавить карту
+          </NeumorphicButton>
         </header>
 
-        <div className="sketch-card p-4 text-sm text-ink-700">
-          AI Health+ — платная функция. Доступен бесплатный тестовый период на 7 дней.
-        </div>
+        <NeumorphicCard
+          soft
+          className="p-4 sm:p-6 bg-warmBlue-50/50 border-2 border-warmBlue-200/50 animate-fadeIn"
+          style={{ animationDelay: '0.1s' }}
+        >
+          <div className="flex items-start gap-3">
+            <Sparkles className="w-5 h-5 text-warmBlue-600 flex-shrink-0 mt-0.5" />
+            <p className="text-sm sm:text-base text-warmGraphite-700">
+              AI Health+ — платная функция. Доступен бесплатный тестовый период на 7 дней.
+            </p>
+          </div>
+        </NeumorphicCard>
 
         {error && (
-          <div className="sketch-card p-4 text-sm text-red-700 border border-red-200">
-            {error}
-          </div>
+          <NeumorphicCard
+            soft
+            className="p-4 bg-warmRed-50 border-2 border-warmRed-200 animate-shake"
+          >
+            <p className="text-sm text-warmRed-700">{error}</p>
+          </NeumorphicCard>
         )}
 
         {!isAuthed && !loading && (
-          <div className="sketch-card p-4 text-sm text-ink-700">
-            Войдите в аккаунт, чтобы увидеть ваши подписки.
-          </div>
+          <NeumorphicCard soft className="p-4 sm:p-6">
+            <p className="text-sm text-warmGray-600">
+              Войдите в аккаунт, чтобы увидеть ваши подписки.
+            </p>
+          </NeumorphicCard>
         )}
 
-        <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {tokenPayments.map((item) => (
-            <div key={item.label} className="sketch-card p-4">
-              <div className="text-xs uppercase tracking-widest text-ink-500">
-                {item.label}
-              </div>
-              <div className="text-lg font-semibold text-ink-800 mt-2">
-                {item.value}
-              </div>
-            </div>
-          ))}
+        <section className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {tokenPayments.map((item, index) => {
+            const Icon = item.icon
+            return (
+              <NeumorphicCard
+                key={item.label}
+                className="p-4 sm:p-6 animate-fadeIn"
+                style={{ animationDelay: `${0.2 + index * 0.1}s` }}
+              >
+                <div className="flex items-center gap-2 mb-2">
+                  <Icon className="w-4 h-4 text-warmBlue-600" />
+                  <div className="text-xs uppercase tracking-widest text-warmGray-600">
+                    {item.label}
+                  </div>
+                </div>
+                <div className="text-2xl sm:text-3xl font-semibold text-warmGraphite-800">
+                  {item.value}
+                </div>
+              </NeumorphicCard>
+            )
+          })}
         </section>
 
-        <section className="sketch-card p-6">
-          <h2 className="text-2xl font-semibold text-ink-800 mb-4">
+        <NeumorphicCard className="p-4 sm:p-6 animate-fadeIn" style={{ animationDelay: '0.5s' }}>
+          <h2 className="text-xl sm:text-2xl font-semibold text-warmGraphite-800 mb-4">
             Активные подписки
           </h2>
           {subscriptions.length === 0 ? (
-            <div className="text-sm text-ink-600">
-              Подписок пока нет. Они появятся после подключения биллинга и
-              специалистов.
+            <div className="text-sm text-warmGray-600 text-center py-8">
+              Подписок пока нет. Они появятся после подключения биллинга и специалистов.
             </div>
           ) : (
             <div className="space-y-3">
-              {subscriptions.map((sub) => (
-                <div
+              {subscriptions.map((sub, index) => (
+                <NeumorphicCard
                   key={sub.id}
-                  className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 p-4 rounded-lg border border-ink-200 bg-parchment-100"
+                  soft
+                  className="p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 hover:scale-[1.01] transition-transform animate-fadeIn"
+                  style={{ animationDelay: `${0.6 + index * 0.1}s` }}
                 >
                   <div>
-                    <div className="font-semibold text-ink-800">
+                    <div className="font-semibold text-warmGraphite-800 text-sm sm:text-base">
                       {sub.provider?.username || 'Подписка'}
                     </div>
-                    <div className="text-xs text-ink-500">
+                    <div className="text-xs text-warmGray-600 mt-1">
                       {sub.expiresAt
                         ? `До ${new Date(sub.expiresAt).toLocaleDateString('ru-RU')}`
                         : 'Без срока'}
                     </div>
                   </div>
-                  <div className="flex items-center gap-3 text-sm">
-                    <span className="text-ink-700">
+                  <div className="flex items-center gap-3 text-sm flex-wrap">
+                    <span className="text-warmGraphite-700 font-medium">
                       {sub.priceNXTMonthly} NVT/мес
                     </span>
-                    <span
-                      className={`px-3 py-1 rounded-full text-xs ${
+                    <NeumorphicBadge
+                      variant={
                         sub.status === 'ACTIVE'
-                          ? 'bg-green-100 text-green-800'
+                          ? 'success'
                           : sub.status === 'CANCELED'
-                          ? 'bg-yellow-100 text-yellow-800'
-                          : 'bg-red-100 text-red-800'
-                      }`}
+                            ? 'warning'
+                            : 'error'
+                      }
+                      size="sm"
                     >
                       {sub.status === 'ACTIVE'
                         ? 'Активна'
                         : sub.status === 'CANCELED'
-                        ? 'Отменена'
-                        : 'Истекла'}
-                    </span>
-                    <button className="ink-link text-xs">Управлять</button>
+                          ? 'Отменена'
+                          : 'Истекла'}
+                    </NeumorphicBadge>
+                    <button className="text-xs text-warmBlue-600 hover:text-warmBlue-700 font-medium transition-colors">
+                      Управлять →
+                    </button>
                   </div>
-                </div>
+                </NeumorphicCard>
               ))}
             </div>
           )}
-        </section>
+        </NeumorphicCard>
 
-        <section className="grid grid-cols-1 lg:grid-cols-[1.2fr,1fr] gap-6">
-          <div className="sketch-card p-6">
-            <h2 className="text-2xl font-semibold text-ink-800 mb-4">Тарифы</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {plans.map((plan) => (
-                <div
+        <section className="grid grid-cols-1 lg:grid-cols-[1.2fr,1fr] gap-4 sm:gap-6">
+          <NeumorphicCard className="p-4 sm:p-6 animate-fadeIn" style={{ animationDelay: '0.7s' }}>
+            <h2 className="text-xl sm:text-2xl font-semibold text-warmGraphite-800 mb-4">
+              Тарифы
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {plans.map((plan, index) => (
+                <NeumorphicCard
                   key={plan.name}
-                  className="p-4 rounded-lg border border-ink-200 bg-parchment-100"
+                  soft={!plan.popular}
+                  className={cn(
+                    'p-4 hover:scale-105 transition-all duration-300 animate-fadeIn',
+                    plan.popular && 'ring-2 ring-warmBlue-500'
+                  )}
+                  style={{ animationDelay: `${0.8 + index * 0.1}s` }}
                 >
-                  <div className="flex items-center justify-between">
-                    <div className="font-semibold text-ink-800">{plan.name}</div>
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="font-semibold text-warmGraphite-800 text-sm sm:text-base">
+                      {plan.name}
+                    </div>
                     {plan.highlight && (
-                      <span className="text-xs px-2 py-1 rounded-full bg-ink-700 text-white">
+                      <NeumorphicBadge variant="warning" size="sm">
                         {plan.highlight}
-                      </span>
+                      </NeumorphicBadge>
                     )}
                   </div>
-                  <div className="text-sm text-ink-600 mt-2">{plan.desc}</div>
-                  <div className="text-sm font-semibold text-ink-800 mt-3">
+                  <div className="text-xs sm:text-sm text-warmGraphite-600 mt-2 mb-3">
+                    {plan.desc}
+                  </div>
+                  <div className="text-base sm:text-lg font-semibold text-warmGraphite-800 mb-4">
                     {plan.price}
                   </div>
-                  <button
-                    className="mt-4 w-full sketch-button"
+                  <NeumorphicButton
+                    primary={plan.popular}
+                    className="w-full text-sm"
                     onClick={() => handleCheckout(plan)}
                   >
                     Выбрать
-                  </button>
-                </div>
+                  </NeumorphicButton>
+                </NeumorphicCard>
               ))}
             </div>
-          </div>
+          </NeumorphicCard>
 
-          <div className="sketch-card p-6 space-y-4">
-            <h2 className="text-2xl font-semibold text-ink-800">
+          <NeumorphicCard className="p-4 sm:p-6 space-y-4 animate-fadeIn" style={{ animationDelay: '1s' }}>
+            <h2 className="text-xl sm:text-2xl font-semibold text-warmGraphite-800">
               Ранняя поддержка
             </h2>
-            <p className="text-sm text-ink-600">
-              Для ранних пользователей — скидка и дополнительные токены за оплату
-              подписок на 6-12 месяцев вперед.
+            <p className="text-sm text-warmGraphite-600">
+              Для ранних пользователей — скидка и дополнительные токены за оплату подписок
+              на 6-12 месяцев вперед.
             </p>
-            <div className="p-4 rounded-lg border border-ink-200 bg-parchment-100 text-sm text-ink-700">
-              -20% на AI Health+ и +15% токенов NVT при оплате годового плана.
-            </div>
-            <button className="sketch-button w-full">Активировать скидку</button>
-          </div>
+            <NeumorphicCard soft className="p-4 bg-warmPink-50/50 border border-warmPink-200">
+              <p className="text-sm text-warmGraphite-700">
+                -20% на AI Health+ и +15% токенов NVT при оплате годового плана.
+              </p>
+            </NeumorphicCard>
+            <NeumorphicButton primary className="w-full">
+              Активировать скидку
+            </NeumorphicButton>
+          </NeumorphicCard>
         </section>
       </div>
     </div>

@@ -3,6 +3,11 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { ArrowLeft, Target, CheckCircle, Circle, Trophy, Plus } from 'lucide-react'
+import NeumorphicCard from '@/components/ui/NeumorphicCard'
+import NeumorphicButton from '@/components/ui/NeumorphicButton'
+import NeumorphicProgress from '@/components/ui/NeumorphicProgress'
+import NeumorphicBadge from '@/components/ui/NeumorphicBadge'
+import { cn } from '@/lib/utils/cn'
 
 interface Goal {
   id: string
@@ -76,104 +81,135 @@ export default function GoalsPage() {
     return Math.max(0, Math.min(100, ((totalChange - currentChange) / totalChange) * 100))
   }
 
+  const activeGoals = goals.filter((g) => g.status === 'ACTIVE').length
+  const completedGoals = goals.filter((g) => g.status === 'COMPLETED').length
+  const totalRewards = goals.reduce((sum, g) => sum + (g.rewardNXT || 0), 0)
+
   return (
-    <div className="min-h-screen p-8">
+    <div className="min-h-screen bg-warmGray-50 p-4 sm:p-6 lg:p-8">
       <div className="max-w-6xl mx-auto">
         {/* Заголовок */}
-        <div className="mb-8">
+        <div className="mb-6 sm:mb-8 animate-fadeIn">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 text-ink-600 hover:text-ink-800 mb-4"
+            className="inline-flex items-center gap-2 text-warmBlue-600 hover:text-warmBlue-700 mb-4 font-medium transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
             Назад к Dashboard
           </Link>
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-4xl font-bold text-ink-800 mb-2">
+              <h1 className="text-3xl sm:text-4xl font-bold text-warmGraphite-800 mb-2">
                 Мои Цели
               </h1>
-              <p className="text-ink-600">
+              <p className="text-base sm:text-lg text-warmGraphite-600">
                 Отслеживание прогресса и достижение целей
               </p>
             </div>
-            <button className="px-6 py-3 bg-ink-700 text-white rounded-lg hover:bg-ink-800 transition-colors flex items-center gap-2">
-              <Plus className="w-5 h-5" />
+            <NeumorphicButton primary>
+              <Plus className="w-4 h-4 mr-2" />
               Новая цель
-            </button>
+            </NeumorphicButton>
           </div>
         </div>
 
         {/* Статистика */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="sketch-card p-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
+          <NeumorphicCard className="p-4 sm:p-6 animate-fadeIn" style={{ animationDelay: '0.1s' }}>
             <div className="flex items-center gap-3 mb-2">
-              <Target className="w-6 h-6 text-ink-700" />
-              <h3 className="text-lg font-semibold text-ink-800">Активных целей</h3>
+              <div className="p-2 neumorphic-card-soft rounded-neumorphic-sm">
+                <Target className="w-5 h-5 sm:w-6 sm:h-6 text-warmBlue-600" />
+              </div>
+              <h3 className="text-base sm:text-lg font-semibold text-warmGraphite-800">
+                Активных целей
+              </h3>
             </div>
-            <div className="text-4xl font-bold text-ink-800">
-              {goals.filter((g) => g.status === 'ACTIVE').length}
+            <div className="text-3xl sm:text-4xl font-bold text-warmGraphite-800">
+              {activeGoals}
             </div>
-          </div>
-          <div className="sketch-card p-6">
+          </NeumorphicCard>
+          <NeumorphicCard className="p-4 sm:p-6 animate-fadeIn" style={{ animationDelay: '0.2s' }}>
             <div className="flex items-center gap-3 mb-2">
-              <CheckCircle className="w-6 h-6 text-green-600" />
-              <h3 className="text-lg font-semibold text-ink-800">Выполнено</h3>
+              <div className="p-2 neumorphic-card-soft rounded-neumorphic-sm">
+                <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6 text-warmGreen-600" />
+              </div>
+              <h3 className="text-base sm:text-lg font-semibold text-warmGraphite-800">
+                Выполнено
+              </h3>
             </div>
-            <div className="text-4xl font-bold text-green-600">
-              {goals.filter((g) => g.status === 'COMPLETED').length}
+            <div className="text-3xl sm:text-4xl font-bold text-warmGreen-600">
+              {completedGoals}
             </div>
-          </div>
-          <div className="sketch-card p-6">
+          </NeumorphicCard>
+          <NeumorphicCard className="p-4 sm:p-6 animate-fadeIn" style={{ animationDelay: '0.3s' }}>
             <div className="flex items-center gap-3 mb-2">
-              <Trophy className="w-6 h-6 text-yellow-600" />
-              <h3 className="text-lg font-semibold text-ink-800">Награды</h3>
+              <div className="p-2 neumorphic-card-soft rounded-neumorphic-sm">
+                <Trophy className="w-5 h-5 sm:w-6 sm:h-6 text-warmPink-600" />
+              </div>
+              <h3 className="text-base sm:text-lg font-semibold text-warmGraphite-800">
+                Награды
+              </h3>
             </div>
-            <div className="text-4xl font-bold text-yellow-600">
-              {goals.reduce((sum, g) => sum + (g.rewardNXT || 0), 0)} NXT
+            <div className="text-3xl sm:text-4xl font-bold text-warmPink-600">
+              {totalRewards} NXT
             </div>
-          </div>
+          </NeumorphicCard>
         </div>
 
-        <div className="sketch-card p-6 mb-8">
+        <NeumorphicCard className="p-4 sm:p-6 mb-6 sm:mb-8 animate-fadeIn" style={{ animationDelay: '0.4s' }}>
           <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-semibold text-ink-800">Награды и трофеи</h2>
-            <a className="ink-link text-sm" href="/achievements">
-              Открыть достижения
-            </a>
+            <h2 className="text-xl sm:text-2xl font-semibold text-warmGraphite-800">
+              Награды и трофеи
+            </h2>
+            <Link
+              href="/achievements"
+              className="text-sm text-warmBlue-600 hover:text-warmBlue-700 font-medium transition-colors"
+            >
+              Открыть достижения →
+            </Link>
           </div>
-          <p className="text-sm text-ink-600 mt-2">
+          <p className="text-sm text-warmGraphite-600 mt-2">
             Выполняйте цели, чтобы получать токены и открывать достижения.
           </p>
-        </div>
+        </NeumorphicCard>
 
         {/* Список целей */}
-        <div className="space-y-6">
-          {goals.map((goal) => {
+        <div className="space-y-4 sm:space-y-6">
+          {goals.map((goal, index) => {
             const progress = getProgress(goal)
             const isCompleted = progress >= 100
 
             return (
-              <div key={goal.id} className="sketch-card p-6">
+              <NeumorphicCard
+                key={goal.id}
+                className="p-4 sm:p-6 hover:scale-[1.01] transition-all duration-300 animate-fadeIn"
+                style={{ animationDelay: `${0.5 + index * 0.1}s` }}
+              >
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
+                    <div className="flex items-center gap-3 mb-2 flex-wrap">
                       {isCompleted ? (
-                        <CheckCircle className="w-6 h-6 text-green-600" />
+                        <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6 text-warmGreen-600 flex-shrink-0" />
                       ) : (
-                        <Circle className="w-6 h-6 text-ink-400" />
+                        <Circle className="w-5 h-5 sm:w-6 sm:h-6 text-warmGray-400 flex-shrink-0" />
                       )}
-                      <h3 className="text-2xl font-bold text-ink-800">{goal.title}</h3>
+                      <h3 className="text-xl sm:text-2xl font-bold text-warmGraphite-800">
+                        {goal.title}
+                      </h3>
                       {goal.rewardNXT && (
-                        <span className="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm font-medium flex items-center gap-1">
-                          <Trophy className="w-4 h-4" />
-                          {goal.rewardNXT} NXT
-                        </span>
+                        <NeumorphicBadge variant="warning" size="sm" className="flex items-center gap-1">
+                          <Trophy className="w-3 h-3" />
+                          {goal.rewardNXT} NVT
+                        </NeumorphicBadge>
                       )}
                     </div>
-                    <p className="text-ink-600 mb-2">{goal.description}</p>
-                    <div className="flex items-center gap-4 text-sm text-ink-500">
-                      <span>{getGoalTypeLabel(goal.type)}</span>
+                    <p className="text-sm sm:text-base text-warmGraphite-600 mb-2">
+                      {goal.description}
+                    </p>
+                    <div className="flex items-center gap-4 text-xs sm:text-sm text-warmGray-600 flex-wrap">
+                      <NeumorphicBadge variant="info" size="sm">
+                        {getGoalTypeLabel(goal.type)}
+                      </NeumorphicBadge>
                       {goal.deadline && (
                         <span>
                           До: {new Date(goal.deadline).toLocaleDateString('ru-RU')}
@@ -186,20 +222,19 @@ export default function GoalsPage() {
                 {/* Прогресс */}
                 <div className="mb-4">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium text-ink-700">Прогресс</span>
-                    <span className="text-sm font-bold text-ink-800">
+                    <span className="text-sm font-medium text-warmGraphite-700">Прогресс</span>
+                    <span className="text-sm font-bold text-warmGraphite-800">
                       {progress.toFixed(0)}%
                     </span>
                   </div>
-                  <div className="w-full bg-ink-200 rounded-full h-4">
-                    <div
-                      className={`h-4 rounded-full transition-all duration-500 ${
-                        isCompleted ? 'bg-green-600' : 'bg-ink-700'
-                      }`}
-                      style={{ width: `${Math.min(100, progress)}%` }}
-                    />
-                  </div>
-                  <div className="flex items-center justify-between mt-2 text-sm text-ink-600">
+                  <NeumorphicProgress
+                    value={progress}
+                    max={100}
+                    color={isCompleted ? 'green' : 'blue'}
+                    size="md"
+                    showLabel={false}
+                  />
+                  <div className="flex items-center justify-between mt-2 text-xs sm:text-sm text-warmGray-600">
                     <span>
                       Текущее: {goal.currentValue}
                       {goal.type !== 'CONSISTENCY' && ' кг'}
@@ -214,14 +249,17 @@ export default function GoalsPage() {
                 </div>
 
                 {isCompleted && (
-                  <div className="mt-4 p-4 bg-green-50 border-2 border-green-200 rounded-lg">
-                    <div className="flex items-center gap-2 text-green-800 font-semibold">
+                  <NeumorphicCard
+                    soft
+                    className="mt-4 p-4 bg-warmGreen-50/50 border-2 border-warmGreen-200"
+                  >
+                    <div className="flex items-center gap-2 text-warmGreen-800 font-semibold">
                       <CheckCircle className="w-5 h-5" />
                       Цель достигнута! Награда начислена.
                     </div>
-                  </div>
+                  </NeumorphicCard>
                 )}
-              </div>
+              </NeumorphicCard>
             )
           })}
         </div>
@@ -229,5 +267,3 @@ export default function GoalsPage() {
     </div>
   )
 }
-
-
