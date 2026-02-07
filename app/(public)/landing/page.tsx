@@ -574,6 +574,11 @@ export default function LandingPage() {
                         },
                       ].map((benefit, idx) => {
                         const Icon = benefit.icon
+                        const colorClasses = {
+                          warmPink: 'text-warmPink-600',
+                          warmBlue: 'text-warmBlue-600',
+                          warmGreen: 'text-warmGreen-600',
+                        }
                         return (
                           <motion.div
                             key={idx}
@@ -585,7 +590,7 @@ export default function LandingPage() {
                               <Icon
                                 className={cn(
                                   'w-8 h-8 mx-auto mb-3',
-                                  `text-${benefit.color}-600`
+                                  colorClasses[benefit.color as keyof typeof colorClasses]
                                 )}
                               />
                               <h3 className="font-semibold text-warmGraphite-800 mb-1">
