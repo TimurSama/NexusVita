@@ -1,3 +1,25 @@
+'use client'
+
+import { useState } from 'react'
+import Link from 'next/link'
+import {
+  Heart,
+  MessageCircle,
+  Share2,
+  Bookmark,
+  MoreHorizontal,
+  Send,
+  Image as ImageIcon,
+  Video,
+  BarChart3,
+  Plus,
+} from 'lucide-react'
+import NeumorphicCard from '@/components/ui/NeumorphicCard'
+import NeumorphicButton from '@/components/ui/NeumorphicButton'
+import NeumorphicInput from '@/components/ui/NeumorphicInput'
+import NeumorphicBadge from '@/components/ui/NeumorphicBadge'
+import { cn } from '@/lib/utils/cn'
+
 const stories = [
   { name: 'Алина', role: 'Йога-тренер', status: 'Новая практика' },
   { name: 'Денис', role: 'Кардио', status: 'Забег 10 км' },
@@ -15,6 +37,7 @@ const posts = [
     text: 'Наконец-то добрала норму сна 7.5 часов и заметила, как улучшилось восстановление после силовых.',
     tags: ['сон', 'восстановление', 'силовые'],
     stats: { likes: 42, comments: 8, saves: 12 },
+    liked: false,
   },
   {
     id: '2',
@@ -24,6 +47,7 @@ const posts = [
     text: 'Подготовила чек-лист по микронутриентам. Проверяем железо, D3, B12 и магний.',
     tags: ['нутрициология', 'анализы', 'микронутриенты'],
     stats: { likes: 118, comments: 24, saves: 56 },
+    liked: true,
   },
   {
     id: '3',
@@ -33,6 +57,7 @@ const posts = [
     text: 'Запустил новый курс по безопасной технике становой тяги. Старт через 5 дней.',
     tags: ['тренировки', 'техника', 'курс'],
     stats: { likes: 86, comments: 12, saves: 31 },
+    liked: false,
   },
 ]
 
@@ -43,8 +68,17 @@ const friendSuggestions = [
 ]
 
 const subscriptions = [
-  { name: 'Pro AI', price: '990 ₽/мес', desc: 'ИИ-коуч + аналитика', badge: 'Популярно' },
-  { name: 'Team Health', price: '2 490 ₽/мес', desc: 'Семейный доступ + телемедицина' },
+  {
+    name: 'Pro AI',
+    price: '990 ₽/мес',
+    desc: 'ИИ-коуч + аналитика',
+    badge: 'Популярно',
+  },
+  {
+    name: 'Team Health',
+    price: '2 490 ₽/мес',
+    desc: 'Семейный доступ + телемедицина',
+  },
 ]
 
 const groups = [
@@ -54,183 +88,298 @@ const groups = [
 ]
 
 export default function SocialPage() {
+  const [postText, setPostText] = useState('')
+  const [likedPosts, setLikedPosts] = useState<Set<string>>(
+    new Set(posts.filter((p) => p.liked).map((p) => p.id))
+  )
+
+  const handleLike = (postId: string) => {
+    setLikedPosts((prev) => {
+      const newSet = new Set(prev)
+      if (newSet.has(postId)) {
+        newSet.delete(postId)
+      } else {
+        newSet.add(postId)
+      }
+      return newSet
+    })
+  }
+
   return (
-    <div className="min-h-screen px-6 py-10">
-      <div className="max-w-7xl mx-auto space-y-8">
-        <header className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+    <div className="min-h-screen bg-warmGray-50 p-4 sm:p-6 lg:p-8">
+      <div className="max-w-7xl mx-auto space-y-6 sm:space-y-8">
+        <header className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between animate-fadeIn">
           <div>
-            <h1 className="text-4xl font-bold text-ink-800">Социальная лента</h1>
-            <p className="text-ink-600">
+            <h1 className="text-3xl sm:text-4xl font-bold text-warmGraphite-800">
+              Социальная лента
+            </h1>
+            <p className="text-base sm:text-lg text-warmGraphite-600 mt-2">
               Истории, прогресс, мероприятия и подписки на специалистов.
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
-            <button className="sketch-button">Создать пост</button>
-            <button className="px-5 py-2.5 rounded-lg border-2 border-ink-300 text-ink-700 hover:bg-parchment-200">
-              Мои подписки
-            </button>
+            <NeumorphicButton primary>Создать пост</NeumorphicButton>
+            <NeumorphicButton>Мои подписки</NeumorphicButton>
           </div>
         </header>
 
-        <section className="sketch-card p-6">
+        {/* Истории */}
+        <NeumorphicCard className="p-4 sm:p-6 animate-fadeIn">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold text-ink-800">Истории дня</h2>
-            <button className="ink-link text-sm">Добавить историю</button>
+            <h2 className="text-lg sm:text-xl font-semibold text-warmGraphite-800">
+              Истории дня
+            </h2>
+            <button className="text-sm text-warmBlue-600 hover:text-warmBlue-700 font-medium transition-colors">
+              Добавить историю
+            </button>
           </div>
-          <div className="flex flex-wrap gap-4">
-            {stories.map((story) => (
-              <div
+          <div className="flex flex-wrap gap-3 sm:gap-4 overflow-x-auto pb-2">
+            {stories.map((story, index) => (
+              <NeumorphicCard
                 key={story.name}
-                className="w-36 p-3 rounded-xl border-2 border-ink-200 bg-parchment-100 text-center"
+                soft
+                className={cn(
+                  'w-28 sm:w-36 p-3 text-center cursor-pointer',
+                  'hover:scale-110 transition-all duration-300',
+                  'animate-fadeIn'
+                )}
+                style={{ animationDelay: `${index * 0.1}s` }}
               >
-                <div className="w-12 h-12 mx-auto rounded-full border-2 border-ink-400 bg-parchment-200 flex items-center justify-center text-lg">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 mx-auto rounded-full neumorphic-card-soft flex items-center justify-center text-base sm:text-lg font-bold text-warmGraphite-700 mb-2">
                   {story.name[0]}
                 </div>
-                <div className="mt-2 text-sm font-semibold text-ink-800">
+                <div className="text-xs sm:text-sm font-semibold text-warmGraphite-800">
                   {story.name}
                 </div>
-                <div className="text-xs text-ink-500">{story.role}</div>
-                <div className="text-xs text-ink-600 mt-1">{story.status}</div>
-              </div>
+                <div className="text-xs text-warmGray-600">{story.role}</div>
+                <div className="text-xs text-warmBlue-600 mt-1 font-medium">
+                  {story.status}
+                </div>
+              </NeumorphicCard>
             ))}
           </div>
-        </section>
+        </NeumorphicCard>
 
-        <div className="grid grid-cols-1 lg:grid-cols-[2fr,1fr] gap-6">
-          <div className="space-y-6">
-            <section className="sketch-card p-6">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full border-2 border-ink-400 bg-parchment-200 flex items-center justify-center text-lg">
+        <div className="grid grid-cols-1 lg:grid-cols-[2fr,1fr] gap-4 sm:gap-6">
+          {/* Основная лента */}
+          <div className="space-y-4 sm:space-y-6">
+            {/* Создание поста */}
+            <NeumorphicCard className="p-4 sm:p-6 animate-fadeIn">
+              <div className="flex items-start gap-3 sm:gap-4">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full neumorphic-card-soft flex items-center justify-center text-base sm:text-lg font-bold text-warmGraphite-700 flex-shrink-0">
                   Я
                 </div>
-                <input
-                  className="sketch-input"
-                  placeholder="Поделиться прогрессом, анализами или идеей..."
-                />
-                <button className="sketch-button">Опубликовать</button>
+                <div className="flex-1">
+                  <NeumorphicInput
+                    placeholder="Поделиться прогрессом, анализами или идеей..."
+                    value={postText}
+                    onChange={(e) => setPostText(e.target.value)}
+                    className="mb-3"
+                  />
+                  <div className="flex flex-wrap gap-2">
+                    <NeumorphicButton className="text-xs sm:text-sm px-3 py-1.5">
+                      <ImageIcon className="w-4 h-4 mr-1.5" />
+                      Фото
+                    </NeumorphicButton>
+                    <NeumorphicButton className="text-xs sm:text-sm px-3 py-1.5">
+                      <Video className="w-4 h-4 mr-1.5" />
+                      Видео
+                    </NeumorphicButton>
+                    <NeumorphicButton className="text-xs sm:text-sm px-3 py-1.5">
+                      <BarChart3 className="w-4 h-4 mr-1.5" />
+                      Метрики
+                    </NeumorphicButton>
+                    <NeumorphicButton
+                      primary
+                      className="text-xs sm:text-sm px-3 py-1.5 ml-auto"
+                      disabled={!postText.trim()}
+                    >
+                      <Send className="w-4 h-4 mr-1.5" />
+                      Опубликовать
+                    </NeumorphicButton>
+                  </div>
+                </div>
               </div>
-              <div className="mt-4 flex flex-wrap gap-3 text-xs text-ink-600">
-                <span className="px-3 py-1 rounded-full border border-ink-300 bg-parchment-100">
-                  📊 Добавить метрики
-                </span>
-                <span className="px-3 py-1 rounded-full border border-ink-300 bg-parchment-100">
-                  🎥 Прямой эфир
-                </span>
-                <span className="px-3 py-1 rounded-full border border-ink-300 bg-parchment-100">
-                  🤝 Совместная тренировка
-                </span>
-              </div>
-            </section>
+            </NeumorphicCard>
 
-            {posts.map((post) => (
-              <article key={post.id} className="sketch-card p-6 space-y-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="text-lg font-semibold text-ink-800">
-                      {post.author}
+            {/* Посты */}
+            {posts.map((post, index) => {
+              const isLiked = likedPosts.has(post.id)
+              return (
+                <NeumorphicCard
+                  key={post.id}
+                  className="p-4 sm:p-6 space-y-4 animate-fadeIn"
+                  style={{ animationDelay: `${index * 0.1}s` }}
+                >
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="text-base sm:text-lg font-semibold text-warmGraphite-800">
+                        {post.author}
+                      </div>
+                      <div className="text-xs text-warmGray-600">
+                        {post.role} · {post.time}
+                      </div>
                     </div>
-                    <div className="text-xs text-ink-500">
-                      {post.role} · {post.time}
+                    <div className="flex items-center gap-2">
+                      <NeumorphicButton className="text-xs sm:text-sm px-3 py-1.5">
+                        Подписаться
+                      </NeumorphicButton>
+                      <button className="p-2 rounded-lg hover:bg-warmGray-200/50 transition-colors">
+                        <MoreHorizontal className="w-4 h-4 text-warmGraphite-600" />
+                      </button>
                     </div>
                   </div>
-                  <button className="text-sm text-ink-600 hover:text-ink-800">
-                    Подписаться
-                  </button>
-                </div>
-                <p className="text-ink-700">{post.text}</p>
-                <div className="flex flex-wrap gap-2">
-                  {post.tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="px-3 py-1 rounded-full bg-parchment-100 border border-ink-200 text-xs text-ink-600"
+
+                  <p className="text-sm sm:text-base text-warmGraphite-700 leading-relaxed">
+                    {post.text}
+                  </p>
+
+                  <div className="flex flex-wrap gap-2">
+                    {post.tags.map((tag) => (
+                      <NeumorphicBadge
+                        key={tag}
+                        variant="info"
+                        size="sm"
+                        className="cursor-pointer hover:scale-105 transition-transform"
+                      >
+                        #{tag}
+                      </NeumorphicBadge>
+                    ))}
+                  </div>
+
+                  <div className="flex items-center gap-4 sm:gap-6 pt-3 border-t border-warmGray-300/50">
+                    <button
+                      onClick={() => handleLike(post.id)}
+                      className={cn(
+                        'flex items-center gap-2 text-sm font-medium transition-all',
+                        isLiked
+                          ? 'text-warmRed-600 hover:text-warmRed-700'
+                          : 'text-warmGraphite-600 hover:text-warmRed-600'
+                      )}
                     >
-                      #{tag}
-                    </span>
-                  ))}
-                </div>
-                <div className="flex items-center gap-6 text-sm text-ink-600">
-                  <span>❤️ {post.stats.likes}</span>
-                  <span>💬 {post.stats.comments}</span>
-                  <span>🔖 {post.stats.saves}</span>
-                  <button className="ink-link text-sm">Сохранить в прогресс</button>
-                </div>
-              </article>
-            ))}
+                      <Heart
+                        className={cn(
+                          'w-5 h-5 transition-all',
+                          isLiked && 'fill-warmRed-600 scale-110'
+                        )}
+                      />
+                      <span>{post.stats.likes + (isLiked ? 1 : 0)}</span>
+                    </button>
+                    <button className="flex items-center gap-2 text-sm text-warmGraphite-600 hover:text-warmBlue-600 font-medium transition-colors">
+                      <MessageCircle className="w-5 h-5" />
+                      <span>{post.stats.comments}</span>
+                    </button>
+                    <button className="flex items-center gap-2 text-sm text-warmGraphite-600 hover:text-warmBlue-600 font-medium transition-colors">
+                      <Share2 className="w-5 h-5" />
+                      Поделиться
+                    </button>
+                    <button className="flex items-center gap-2 text-sm text-warmGraphite-600 hover:text-warmBlue-600 font-medium transition-colors ml-auto">
+                      <Bookmark className="w-5 h-5" />
+                      <span>{post.stats.saves}</span>
+                    </button>
+                  </div>
+                </NeumorphicCard>
+              )
+            })}
           </div>
 
-          <aside className="space-y-6">
-            <section className="sketch-card p-6">
-              <h3 className="text-lg font-semibold text-ink-800 mb-3">
+          {/* Сайдбар */}
+          <aside className="space-y-4 sm:space-y-6">
+            {/* Рекомендации друзей */}
+            <NeumorphicCard className="p-4 sm:p-6 animate-fadeIn" style={{ animationDelay: '0.3s' }}>
+              <h3 className="text-base sm:text-lg font-semibold text-warmGraphite-800 mb-3">
                 Рекомендации друзей
               </h3>
               <div className="space-y-3">
-                {friendSuggestions.map((friend) => (
-                  <div
+                {friendSuggestions.map((friend, index) => (
+                  <NeumorphicCard
                     key={friend.name}
-                    className="flex items-center justify-between p-3 bg-parchment-100 rounded-lg border border-ink-200"
+                    soft
+                    className="p-3 flex items-center justify-between hover:scale-[1.02] transition-transform animate-fadeIn"
+                    style={{ animationDelay: `${0.4 + index * 0.1}s` }}
                   >
                     <div>
-                      <div className="font-semibold text-ink-800">{friend.name}</div>
-                      <div className="text-xs text-ink-500">
+                      <div className="font-semibold text-warmGraphite-800 text-sm">
+                        {friend.name}
+                      </div>
+                      <div className="text-xs text-warmGray-600">
                         {friend.focus} · общих друзей {friend.mutual}
                       </div>
                     </div>
-                    <button className="px-3 py-1 rounded-md border border-ink-300 text-xs text-ink-700 hover:bg-parchment-200">
+                    <NeumorphicButton className="text-xs px-3 py-1">
                       Добавить
-                    </button>
-                  </div>
+                    </NeumorphicButton>
+                  </NeumorphicCard>
                 ))}
               </div>
-            </section>
+            </NeumorphicCard>
 
-            <section className="sketch-card p-6">
-              <h3 className="text-lg font-semibold text-ink-800 mb-3">
+            {/* Подписки */}
+            <NeumorphicCard className="p-4 sm:p-6 animate-fadeIn" style={{ animationDelay: '0.5s' }}>
+              <h3 className="text-base sm:text-lg font-semibold text-warmGraphite-800 mb-3">
                 Подписки и абонементы
               </h3>
               <div className="space-y-3">
-                {subscriptions.map((sub) => (
-                  <div
+                {subscriptions.map((sub, index) => (
+                  <NeumorphicCard
                     key={sub.name}
-                    className="p-4 rounded-lg border border-ink-200 bg-parchment-100"
+                    soft
+                    className="p-4 hover:scale-[1.02] transition-transform animate-fadeIn"
+                    style={{ animationDelay: `${0.6 + index * 0.1}s` }}
                   >
-                    <div className="flex items-center justify-between">
-                      <div className="font-semibold text-ink-800">{sub.name}</div>
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="font-semibold text-warmGraphite-800 text-sm">
+                        {sub.name}
+                      </div>
                       {sub.badge && (
-                        <span className="text-xs px-2 py-1 rounded-full bg-ink-700 text-white">
+                        <NeumorphicBadge variant="warning" size="sm">
                           {sub.badge}
-                        </span>
+                        </NeumorphicBadge>
                       )}
                     </div>
-                    <div className="text-sm text-ink-600">{sub.desc}</div>
-                    <div className="text-sm font-semibold text-ink-800 mt-2">
+                    <div className="text-xs sm:text-sm text-warmGraphite-600 mb-2">
+                      {sub.desc}
+                    </div>
+                    <div className="text-sm sm:text-base font-semibold text-warmGraphite-800 mb-3">
                       {sub.price}
                     </div>
-                    <button className="mt-3 w-full sketch-button">Подключить</button>
-                  </div>
+                    <NeumorphicButton primary className="w-full text-sm">
+                      Подключить
+                    </NeumorphicButton>
+                  </NeumorphicCard>
                 ))}
               </div>
-            </section>
+            </NeumorphicCard>
 
-            <section className="sketch-card p-6">
-              <h3 className="text-lg font-semibold text-ink-800 mb-3">
+            {/* Группы */}
+            <NeumorphicCard className="p-4 sm:p-6 animate-fadeIn" style={{ animationDelay: '0.7s' }}>
+              <h3 className="text-base sm:text-lg font-semibold text-warmGraphite-800 mb-3">
                 Групповые занятия
               </h3>
               <div className="space-y-3">
-                {groups.map((group) => (
-                  <div
+                {groups.map((group, index) => (
+                  <NeumorphicCard
                     key={group.name}
-                    className="p-3 rounded-lg border border-ink-200 bg-parchment-100"
+                    soft
+                    className="p-3 hover:scale-[1.02] transition-transform animate-fadeIn"
+                    style={{ animationDelay: `${0.8 + index * 0.1}s` }}
                   >
-                    <div className="font-semibold text-ink-800">{group.name}</div>
-                    <div className="text-xs text-ink-500">
+                    <div className="font-semibold text-warmGraphite-800 text-sm mb-1">
+                      {group.name}
+                    </div>
+                    <div className="text-xs text-warmGray-600 mb-1">
                       {group.members} участников
                     </div>
-                    <div className="text-xs text-ink-600">{group.schedule}</div>
-                    <button className="mt-2 text-sm ink-link">Присоединиться</button>
-                  </div>
+                    <div className="text-xs text-warmGraphite-700 mb-2">
+                      {group.schedule}
+                    </div>
+                    <button className="text-xs sm:text-sm text-warmBlue-600 hover:text-warmBlue-700 font-medium transition-colors">
+                      Присоединиться →
+                    </button>
+                  </NeumorphicCard>
                 ))}
               </div>
-            </section>
+            </NeumorphicCard>
           </aside>
         </div>
       </div>
