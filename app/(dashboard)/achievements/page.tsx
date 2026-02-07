@@ -1,7 +1,11 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Trophy } from 'lucide-react'
+import { Trophy, Gift, Star, CheckCircle } from 'lucide-react'
+import NeumorphicCard from '@/components/ui/NeumorphicCard'
+import NeumorphicButton from '@/components/ui/NeumorphicButton'
+import NeumorphicBadge from '@/components/ui/NeumorphicBadge'
+import { cn } from '@/lib/utils/cn'
 
 const fallbackAchievements = [
   {
@@ -38,9 +42,7 @@ export default function AchievementsPage() {
 
   useEffect(() => {
     const load = async () => {
-      const achievementsData = await fetch('/api/achievements').then((res) =>
-        res.json()
-      )
+      const achievementsData = await fetch('/api/achievements').then((res) => res.json())
       setAchievements(
         Array.isArray(achievementsData) && achievementsData.length > 0
           ? achievementsData
@@ -49,9 +51,7 @@ export default function AchievementsPage() {
 
       const rewardsData = await fetch('/api/rewards').then((res) => res.json())
       setRewards(
-        Array.isArray(rewardsData) && rewardsData.length > 0
-          ? rewardsData
-          : fallbackRewards
+        Array.isArray(rewardsData) && rewardsData.length > 0 ? rewardsData : fallbackRewards
       )
 
       const me = await fetch('/api/auth/me').then((res) => res.json())
@@ -84,66 +84,114 @@ export default function AchievementsPage() {
   }
 
   return (
-    <div className="min-h-screen px-6 py-10">
-      <div className="max-w-6xl mx-auto space-y-10">
-        <header className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div>
-            <h1 className="text-4xl font-bold text-ink-800">Достижения и награды</h1>
-            <p className="text-ink-600">
-              Выполняйте цели, получайте токены и обменивайте на бонусы.
-            </p>
-          </div>
-          <button className="sketch-button">Получить награду</button>
+    <div className="min-h-screen bg-warmGray-50 p-4 sm:p-6 lg:p-8">
+      <div className="max-w-6xl mx-auto space-y-6 sm:space-y-8">
+        <header className="animate-fadeIn">
+          <h1 className="text-3xl sm:text-4xl font-bold text-warmGraphite-800">
+            Достижения и награды
+          </h1>
+          <p className="text-base sm:text-lg text-warmGraphite-600 mt-2">
+            Отслеживайте прогресс, получайте достижения и обменивайте токены на награды.
+          </p>
         </header>
 
         {error && (
-          <div className="sketch-card p-4 text-sm text-red-700 border border-red-200">
-            {error}
-          </div>
+          <NeumorphicCard
+            soft
+            className="p-4 bg-warmRed-50 border-2 border-warmRed-200 animate-shake"
+          >
+            <p className="text-sm text-warmRed-700">{error}</p>
+          </NeumorphicCard>
         )}
 
-        <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {achievements.map((item) => {
-            return (
-              <div key={item.id} className="sketch-card p-6">
-                <div className="flex items-center gap-3 mb-2">
-                  <Trophy className="w-6 h-6 text-ink-700" />
-                  <h2 className="text-xl font-semibold text-ink-800">{item.title}</h2>
-                </div>
-                <p className="text-sm text-ink-600">{item.description}</p>
-                <div className="mt-3 text-sm font-semibold text-ink-800">
-                  Награда: +{item.rewardNXT} NVT
-                </div>
-                {earned.includes(item.id) && (
-                  <div className="mt-2 text-xs text-green-700">Получено</div>
-                )}
-              </div>
-            )
-          })}
-        </section>
-
-        <section className="sketch-card p-6">
-          <h2 className="text-2xl font-semibold text-ink-800 mb-4">
-            Магазин наград
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {rewards.map((reward) => (
-              <div
-                key={reward.id}
-                className="p-4 rounded-lg border border-ink-200 bg-parchment-100"
-              >
-                <div className="font-semibold text-ink-800">{reward.title}</div>
-                <div className="text-sm text-ink-600 mt-1">{reward.costNXT} NVT</div>
-                <button
-                  className="mt-3 w-full sketch-button"
-                  onClick={() => handleRedeem(reward.id)}
+        {/* Достижения */}
+        <NeumorphicCard className="p-4 sm:p-6 animate-fadeIn" style={{ animationDelay: '0.1s' }}>
+          <div className="flex items-center gap-2 mb-4">
+            <Trophy className="w-5 h-5 text-warmPink-600" />
+            <h2 className="text-xl sm:text-2xl font-semibold text-warmGraphite-800">
+              Достижения
+            </h2>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {achievements.map((achievement, index) => {
+              const isEarned = earned.includes(achievement.id)
+              return (
+                <NeumorphicCard
+                  key={achievement.id}
+                  soft={!isEarned}
+                  className={cn(
+                    'p-4 hover:scale-105 transition-all duration-300 animate-fadeIn',
+                    isEarned && 'ring-2 ring-warmGreen-500'
+                  )}
+                  style={{ animationDelay: `${0.2 + index * 0.1}s` }}
                 >
-                  Обменять
-                </button>
-              </div>
+                  <div className="flex items-start justify-between mb-2">
+                    <div className="p-2 neumorphic-card-soft rounded-neumorphic-sm">
+                      <Trophy
+                        className={cn(
+                          'w-5 h-5',
+                          isEarned ? 'text-warmGreen-600' : 'text-warmGray-400'
+                        )}
+                      />
+                    </div>
+                    {isEarned && (
+                      <NeumorphicBadge variant="success" size="sm">
+                        Получено
+                      </NeumorphicBadge>
+                    )}
+                  </div>
+                  <h3 className="font-semibold text-warmGraphite-800 text-sm sm:text-base mb-1">
+                    {achievement.title}
+                  </h3>
+                  <p className="text-xs sm:text-sm text-warmGraphite-600 mb-2">
+                    {achievement.description}
+                  </p>
+                  <NeumorphicBadge variant="warning" size="sm">
+                    +{achievement.rewardNXT} NVT
+                  </NeumorphicBadge>
+                </NeumorphicCard>
+              )
+            })}
+          </div>
+        </NeumorphicCard>
+
+        {/* Награды */}
+        <NeumorphicCard className="p-4 sm:p-6 animate-fadeIn" style={{ animationDelay: '0.4s' }}>
+          <div className="flex items-center gap-2 mb-4">
+            <Gift className="w-5 h-5 text-warmBlue-600" />
+            <h2 className="text-xl sm:text-2xl font-semibold text-warmGraphite-800">
+              Обменять токены
+            </h2>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {rewards.map((reward, index) => (
+              <NeumorphicCard
+                key={reward.id}
+                soft
+                className="p-4 hover:scale-105 transition-all duration-300 animate-fadeIn"
+                style={{ animationDelay: `${0.5 + index * 0.1}s` }}
+              >
+                <div className="p-2 neumorphic-card-soft rounded-neumorphic-sm w-fit mb-2">
+                  <Gift className="w-5 h-5 text-warmBlue-600" />
+                </div>
+                <h3 className="font-semibold text-warmGraphite-800 text-sm sm:text-base mb-1">
+                  {reward.title}
+                </h3>
+                <div className="flex items-center justify-between mt-3">
+                  <NeumorphicBadge variant="info" size="sm">
+                    {reward.costNXT} NVT
+                  </NeumorphicBadge>
+                  <NeumorphicButton
+                    className="text-xs px-3 py-1"
+                    onClick={() => handleRedeem(reward.id)}
+                  >
+                    Обменять
+                  </NeumorphicButton>
+                </div>
+              </NeumorphicCard>
             ))}
           </div>
-        </section>
+        </NeumorphicCard>
       </div>
     </div>
   )
