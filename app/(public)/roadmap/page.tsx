@@ -3,23 +3,18 @@
 import { useState } from 'react'
 import {
   Calendar,
-  TrendingUp,
   DollarSign,
   Users,
-  Target,
   CheckCircle,
   Clock,
   Rocket,
   BarChart3,
-  PieChart,
-  ArrowRight,
   Download,
   Presentation,
   Globe,
   MapPin,
   Building2,
   UserCheck,
-  Zap,
 } from 'lucide-react'
 import { motion } from 'framer-motion'
 import NeumorphicCard from '@/components/ui/NeumorphicCard'
@@ -372,7 +367,7 @@ export default function RoadmapPage() {
                 </NeumorphicBadge>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {marketingPlan.channels.map((channel, index) => (
+                {marketingPlan.channels.map((channel) => (
                   <NeumorphicCard key={channel.name} soft className="p-4">
                     <div className="flex items-center justify-between mb-2">
                       <h3 className="font-semibold text-warmGraphite-800">{channel.name}</h3>

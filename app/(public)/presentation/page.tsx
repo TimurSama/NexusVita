@@ -111,7 +111,6 @@ export default function PresentationPage() {
   const { scrollYProgress } = useScroll()
   const opacity = useTransform(scrollYProgress, [0, 0.2], [1, 0])
   
-  const [currentSection, setCurrentSection] = useState(0)
   const [selectedSector, setSelectedSector] = useState<string | null>(null)
   const [selectedModule, setSelectedModule] = useState<string | null>(null)
   const [chatOpen, setChatOpen] = useState(false)
@@ -119,22 +118,9 @@ export default function PresentationPage() {
   const [chatMessages, setChatMessages] = useState<Array<{ sender: 'user' | 'ai'; text: string; type?: string }>>([])
   const [chatInput, setChatInput] = useState('')
   const [currentQuestion, setCurrentQuestion] = useState(0)
-  const [formData, setFormData] = useState<FormData>({})
   const [formProgress, setFormProgress] = useState(0)
   const [showPlan, setShowPlan] = useState(false)
   const [planGenerated, setPlanGenerated] = useState(false)
-
-  const sections = [
-    'hero',
-    'sectors',
-    'modules',
-    'ai-planner',
-    'specialists',
-    'marketplace',
-    'subscriptions',
-    'testimonials',
-    'faq',
-  ]
 
   const sectors: Sector[] = [
     {
@@ -505,11 +491,7 @@ export default function PresentationPage() {
     const question = questions[currentQuestion]
     const answer = chatInput.trim()
 
-    // Сохраняем ответ
-    setFormData((prev) => ({
-      ...prev,
-      [question.id]: question.type === 'multiselect' ? [answer] : answer,
-    }))
+    // Ответ сохраняется в chatMessages
 
     const newUserMessage = { sender: 'user' as const, text: answer, type: question.type }
     setChatMessages((prev) => [...prev, newUserMessage])
@@ -535,18 +517,6 @@ export default function PresentationPage() {
     }, 1000)
   }
 
-  const handleFormChange = (id: string, value: any) => {
-    setFormData((prev) => ({
-      ...prev,
-      [id]: value,
-    }))
-  }
-
-  const generatePlan = () => {
-    // Генерация плана на основе собранных данных
-    setPlanGenerated(true)
-    setShowPlan(true)
-  }
 
   return (
     <div className="min-h-screen relative">
@@ -1350,14 +1320,14 @@ export default function PresentationPage() {
             size="lg"
           >
             {(() => {
-              const module = modules.find(m => m.id === selectedModule)!
+              const selectedModuleData = modules.find(m => m.id === selectedModule)!
               return (
                 <div className="space-y-6">
                   <div className="text-warmBlue-500 text-6xl mb-4 flex justify-center">
-                    {module.icon}
+                    {selectedModuleData.icon}
                   </div>
                   <p className="text-lg text-warmGraphite-600 text-center">
-                    {module.description}
+                    {selectedModuleData.description}
                   </p>
                   
                   <div>
@@ -1365,8 +1335,8 @@ export default function PresentationPage() {
                       Функции:
                     </h3>
                     <ul className="space-y-2">
-                      {module.features.map((item, index) => (
-                        <li key={index} className="flex items-start gap-2 text-warmGraphite-700">
+                      {selectedModuleData.features.map((item, idx) => (
+                        <li key={idx} className="flex items-start gap-2 text-warmGraphite-700">
                           <CheckCircle className="w-5 h-5 text-warmGreen-500 mt-0.5 flex-shrink-0" />
                           <span>{item}</span>
                         </li>
@@ -1379,8 +1349,8 @@ export default function PresentationPage() {
                       Преимущества:
                     </h3>
                     <ul className="space-y-2">
-                      {module.benefits.map((item, index) => (
-                        <li key={index} className="flex items-start gap-2 text-warmGraphite-700">
+                      {selectedModuleData.benefits.map((item, idx) => (
+                        <li key={idx} className="flex items-start gap-2 text-warmGraphite-700">
                           <Star className="w-5 h-5 text-warmYellow-500 mt-0.5 flex-shrink-0" />
                           <span>{item}</span>
                         </li>
