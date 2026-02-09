@@ -65,7 +65,7 @@ export const mockSpecialists = [
   {
     id: '1',
     name: 'Анна Петрова',
-    role: 'DOCTOR',
+    role: 'DOCTOR' as const,
     specialization: 'Кардиолог',
     rating: 4.9,
     experience: '10 лет',
@@ -74,7 +74,7 @@ export const mockSpecialists = [
   {
     id: '2',
     name: 'Иван Сидоров',
-    role: 'TRAINER',
+    role: 'TRAINER' as const,
     specialization: 'Фитнес-тренер',
     rating: 4.8,
     experience: '5 лет',
@@ -83,7 +83,7 @@ export const mockSpecialists = [
   {
     id: '3',
     name: 'Мария Козлова',
-    role: 'PSYCHOLOGIST',
+    role: 'PSYCHOLOGIST' as const,
     specialization: 'Психолог',
     rating: 4.9,
     experience: '8 лет',
