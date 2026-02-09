@@ -289,7 +289,7 @@ export default function RoadmapPage() {
               <NeumorphicButton
                 key={tab.id}
                 primary={activeTab === tab.id}
-                onClick={() => setActiveTab(tab.id as any)}
+                onClick={() => setActiveTab(tab.id as 'development' | 'marketing' | 'finance' | 'market' | 'pitch')}
                 className="px-6 py-3"
               >
                 <Icon className="w-5 h-5 mr-2" />
