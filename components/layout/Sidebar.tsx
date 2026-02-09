@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { X, Home, Users, HeartPulse, Store, CreditCard, Book, Wallet, Dumbbell, Apple, FileText, Target, Calendar, ClipboardList, User, Award, Gift, Building2, Briefcase, BookOpen, PenTool, LogIn, Map } from 'lucide-react'
+import { X, Home, Users, HeartPulse, Store, CreditCard, Book, Wallet, Dumbbell, Apple, FileText, Target, Calendar, ClipboardList, User, Award, Gift, Building2, Briefcase, BookOpen, PenTool, LogIn, Map, Sparkles } from 'lucide-react'
 import { cn } from '@/lib/utils/cn'
 import { useEffect, useState } from 'react'
 
@@ -13,6 +13,7 @@ interface SidebarProps {
 
 const navigationItems = [
   { href: '/', label: 'Главная', icon: Home },
+  { href: '/presentation', label: 'Презентация', icon: Sparkles },
   { href: '/about', label: 'Подробнее', icon: BookOpen },
   { href: '/roadmap', label: 'Дорожная карта', icon: Map },
   { href: '/social', label: 'Лента', icon: Users },
