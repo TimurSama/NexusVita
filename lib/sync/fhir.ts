@@ -83,7 +83,7 @@ export async function syncFhir(userId: string) {
         value: value ?? null,
         unit: unit ?? null,
         effectiveDate: effective ? new Date(effective) : null,
-        raw: resource as any,
+        raw: resource as Record<string, unknown>,
       },
       create: {
         userId,
@@ -92,7 +92,7 @@ export async function syncFhir(userId: string) {
         value: value ?? null,
         unit: unit ?? null,
         effectiveDate: effective ? new Date(effective) : null,
-        raw: resource as any,
+        raw: resource as Record<string, unknown>,
       },
     })
 
@@ -115,7 +115,7 @@ export async function syncFhir(userId: string) {
           value,
           unit: unit ?? null,
           measuredAt: new Date(effective),
-          raw: resource as any,
+          raw: resource as Record<string, unknown>,
         },
       })
     }

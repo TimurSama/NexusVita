@@ -1,14 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db/prisma'
+import { UserRole } from '@prisma/client'
 
 export async function GET(request: NextRequest) {
   try {
     const role = request.nextUrl.searchParams.get('role')
     const q = request.nextUrl.searchParams.get('q')
-    const roles = role ? [role] : ['TRAINER', 'DOCTOR', 'PSYCHOLOGIST']
+    const roles: UserRole[] = role ? [role as UserRole] : ['TRAINER', 'DOCTOR', 'PSYCHOLOGIST']
     const list = await prisma.user.findMany({
       where: {
-        role: { in: roles as any },
+        role: { in: roles },
         OR: q
           ? [
               { username: { contains: q, mode: 'insensitive' } },

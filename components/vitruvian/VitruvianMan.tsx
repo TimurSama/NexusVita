@@ -16,7 +16,6 @@ export default function VitruvianMan({
   height = 400,
   className = '',
   highlightedMuscles = [],
-  pose,
 }: VitruvianManProps) {
   const [isLoaded, setIsLoaded] = useState(false)
 

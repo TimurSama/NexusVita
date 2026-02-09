@@ -3,7 +3,6 @@
 import { ReactNode, useEffect } from 'react'
 import { X } from 'lucide-react'
 import { cn } from '@/lib/utils/cn'
-import NeumorphicButton from './NeumorphicButton'
 
 interface NeumorphicModalProps {
   isOpen: boolean

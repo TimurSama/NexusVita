@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Onboarding progress not found' }, { status: 404 })
     }
 
-    const updateData: any = { step }
+    const updateData: Record<string, unknown> = { step }
     const completedSteps = [...progress.completedSteps]
 
     if (completed) {
