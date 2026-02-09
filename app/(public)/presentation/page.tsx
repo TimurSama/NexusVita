@@ -40,14 +40,10 @@ import {
   Settings,
   Bell,
   Globe,
-  Mail,
-  Phone,
   Facebook,
   Instagram,
   Twitter,
   Youtube,
-  Menu,
-  XCircle,
 } from 'lucide-react'
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion'
 import NeumorphicCard from '@/components/ui/NeumorphicCard'
@@ -58,26 +54,7 @@ import NeumorphicBadge from '@/components/ui/NeumorphicBadge'
 import NeumorphicModal from '@/components/ui/NeumorphicModal'
 import { cn } from '@/lib/utils/cn'
 
-type UserFormData = {
-  name?: string
-  age?: string
-  gender?: string
-  goals?: string[]
-  primaryGoal?: string
-  mood?: string
-  activityLevel?: string
-  planLevel?: string
-  healthIssues?: string[]
-  preferences?: string[]
-  weight?: string
-  height?: string
-  sleepHours?: string
-  stressLevel?: string
-  nutritionHabits?: string[]
-  trainingExperience?: string
-  budget?: string
-  timeAvailable?: string
-}
+// Данные формы собираются через chatMessages, отдельный тип не нужен
 
 type Sector = {
   id: string

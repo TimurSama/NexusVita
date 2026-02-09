@@ -108,7 +108,7 @@ export async function syncFhir(userId: string) {
             measuredAt: new Date(effective),
           },
         },
-        update: { value, unit: unit ?? null, raw: resource as Record<string, unknown> },
+        update: { value, unit: unit ?? null, raw: resource as Prisma.InputJsonValue },
         create: {
           userId,
           source: 'FHIR',
