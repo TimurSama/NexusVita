@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/db/prisma'
+import { Prisma } from '@prisma/client'
 
 type FhirObservation = {
   id?: string
@@ -83,7 +84,7 @@ export async function syncFhir(userId: string) {
         value: value ?? null,
         unit: unit ?? null,
         effectiveDate: effective ? new Date(effective) : null,
-        raw: resource as Record<string, unknown>,
+        raw: resource as Prisma.InputJsonValue,
       },
       create: {
         userId,
@@ -92,7 +93,7 @@ export async function syncFhir(userId: string) {
         value: value ?? null,
         unit: unit ?? null,
         effectiveDate: effective ? new Date(effective) : null,
-        raw: resource as Record<string, unknown>,
+        raw: resource as Prisma.InputJsonValue,
       },
     })
 
@@ -115,7 +116,7 @@ export async function syncFhir(userId: string) {
           value,
           unit: unit ?? null,
           measuredAt: new Date(effective),
-          raw: resource as Record<string, unknown>,
+          raw: resource as Prisma.InputJsonValue,
         },
       })
     }

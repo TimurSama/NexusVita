@@ -48,10 +48,6 @@ import {
   Youtube,
   Menu,
   XCircle,
-  Plus,
-  Minus,
-  Sliders,
-  RotateCcw,
 } from 'lucide-react'
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion'
 import NeumorphicCard from '@/components/ui/NeumorphicCard'
@@ -61,9 +57,8 @@ import NeumorphicProgress from '@/components/ui/NeumorphicProgress'
 import NeumorphicBadge from '@/components/ui/NeumorphicBadge'
 import NeumorphicModal from '@/components/ui/NeumorphicModal'
 import { cn } from '@/lib/utils/cn'
-import Image from 'next/image'
 
-type FormData = {
+type UserFormData = {
   name?: string
   age?: string
   gender?: string
@@ -119,6 +114,7 @@ export default function PresentationPage() {
   const [chatInput, setChatInput] = useState('')
   const [currentQuestion, setCurrentQuestion] = useState(0)
   const [formProgress, setFormProgress] = useState(0)
+  // formData хранится в chatMessages, поэтому отдельная переменная не нужна
   const [showPlan, setShowPlan] = useState(false)
   const [planGenerated, setPlanGenerated] = useState(false)
 
