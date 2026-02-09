@@ -1,9 +1,8 @@
 {
-  "buildCommand": "cd \"Nexus Vita\" && prisma generate && npm run build",
-  "devCommand": "cd \"Nexus Vita\" && npm run dev",
-  "installCommand": "cd \"Nexus Vita\" && npm install",
+  "buildCommand": "prisma generate && npm run build",
+  "devCommand": "npm run dev",
+  "installCommand": "npm install",
   "framework": "nextjs",
-  "rootDirectory": "Nexus Vita",
   "regions": ["iad1"],
   "crons": [
     {
