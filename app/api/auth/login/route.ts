@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
-import { prisma } from '@/lib/db/prisma'
+import { prisma, isDatabaseAvailable } from '@/lib/db/prisma'
 import { verifyPassword } from '@/lib/auth/password'
 import { createSessionToken } from '@/lib/auth/token'
 
@@ -12,6 +12,34 @@ const schema = z.object({
 export async function POST(request: NextRequest) {
   try {
     const body = schema.parse(await request.json())
+    const dbAvailable = await isDatabaseAvailable()
+
+    // Демо-режим: принимаем любой пароль
+    if (!dbAvailable) {
+      const demoUser = {
+        id: 'demo_user_123',
+        email: body.identifier.includes('@') ? body.identifier : `${body.identifier}@demo.local`,
+        username: body.identifier.includes('@') ? body.identifier.split('@')[0] : body.identifier,
+        role: 'USER',
+      }
+      const session = createSessionToken({ userId: demoUser.id, role: demoUser.role })
+      const response = NextResponse.json({
+        id: demoUser.id,
+        email: demoUser.email,
+        username: demoUser.username,
+        role: demoUser.role,
+      })
+      response.cookies.set('nv_session', session, {
+        httpOnly: true,
+        sameSite: 'lax',
+        secure: process.env.NODE_ENV === 'production',
+        path: '/',
+        maxAge: 60 * 60 * 24 * 7,
+      })
+      return response
+    }
+
+    // Режим с БД
     const user = await prisma.user.findFirst({
       where: {
         OR: [{ email: body.identifier }, { username: body.identifier }],

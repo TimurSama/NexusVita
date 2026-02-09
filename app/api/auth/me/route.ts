@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSessionFromRequest } from '@/lib/auth/session'
-import { prisma } from '@/lib/db/prisma'
+import { prisma, isDatabaseAvailable } from '@/lib/db/prisma'
 
 export async function GET(request: NextRequest) {
   try {
@@ -9,6 +9,23 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ user: null }, { status: 200 })
     }
 
+    const dbAvailable = await isDatabaseAvailable()
+
+    // Демо-режим: возвращаем демо-пользователя
+    if (!dbAvailable) {
+      return NextResponse.json({
+        user: {
+          id: session.userId,
+          email: 'demo@nexusvita.local',
+          username: 'demo_user',
+          firstName: 'Демо',
+          lastName: 'Пользователь',
+          role: session.role,
+        },
+      })
+    }
+
+    // Режим с БД
     const user = await prisma.user.findUnique({
       where: { id: session.userId },
       select: {

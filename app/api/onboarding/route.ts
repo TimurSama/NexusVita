@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
-import { prisma } from '@/lib/db/prisma'
+import { prisma, isDatabaseAvailable } from '@/lib/db/prisma'
 import { requireAuth } from '@/lib/auth/requireRole'
 import { logAudit } from '@/lib/audit/log'
 
@@ -13,6 +13,23 @@ export async function GET(request: NextRequest) {
   try {
     const auth = requireAuth(request)
     if (auth.error) return auth.error
+
+    const dbAvailable = await isDatabaseAvailable()
+
+    // Демо-режим: возвращаем демо-прогресс
+    if (!dbAvailable) {
+      return NextResponse.json({
+        id: 'demo_progress',
+        userId: auth.session!.userId,
+        step: 1,
+        completedSteps: [],
+        step1Completed: false,
+        step2Completed: false,
+        step3Completed: false,
+        step4Completed: false,
+        step5Completed: false,
+      })
+    }
 
     const progress = await prisma.onboardingProgress.findUnique({
       where: { userId: auth.session!.userId },
@@ -43,6 +60,24 @@ export async function POST(request: NextRequest) {
 
     const body = updateSchema.parse(await request.json())
     const { step, completed } = body
+
+    const dbAvailable = await isDatabaseAvailable()
+
+    // Демо-режим: возвращаем обновленный прогресс
+    if (!dbAvailable) {
+      const completedSteps = completed ? [step.toString()] : []
+      return NextResponse.json({
+        id: 'demo_progress',
+        userId: auth.session!.userId,
+        step: completed && step < 5 ? step + 1 : step,
+        completedSteps,
+        step1Completed: step === 1 && completed,
+        step2Completed: step === 2 && completed,
+        step3Completed: step === 3 && completed,
+        step4Completed: step === 4 && completed,
+        step5Completed: step === 5 && completed,
+      })
+    }
 
     const progress = await prisma.onboardingProgress.findUnique({
       where: { userId: auth.session!.userId },

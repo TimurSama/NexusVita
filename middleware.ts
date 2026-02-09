@@ -32,19 +32,24 @@ export async function middleware(request: NextRequest) {
   // Проверка онбординга только для авторизованных пользователей
   if (session && !pathname.startsWith('/onboarding') && !pathname.startsWith('/api')) {
     try {
-      const { prisma } = await import('@/lib/db/prisma')
-      const user = await prisma.user.findUnique({
-        where: { id: session.userId },
-        select: { onboardingCompleted: true },
-      })
+      const { prisma, isDatabaseAvailable } = await import('@/lib/db/prisma')
+      const dbAvailable = await isDatabaseAvailable()
+      
+      if (dbAvailable) {
+        const user = await prisma.user.findUnique({
+          where: { id: session.userId },
+          select: { onboardingCompleted: true },
+        })
 
-      if (user && !user.onboardingCompleted && pathname !== '/onboarding') {
-        // Перенаправляем на онбординг, если не завершен
-        return NextResponse.redirect(new URL('/onboarding', request.url))
+        if (user && !user.onboardingCompleted && pathname !== '/onboarding') {
+          // Перенаправляем на онбординг, если не завершен
+          return NextResponse.redirect(new URL('/onboarding', request.url))
+        }
       }
+      // В демо-режиме пропускаем проверку онбординга
     } catch (error) {
       console.error('Middleware error:', error)
-      // Продолжаем, если ошибка
+      // Продолжаем, если ошибка (демо-режим)
     }
   }
 
