@@ -209,7 +209,7 @@ export default function App() {
               >
                 <SketchCard title={t(`Ценность для ${perspective === 'users' ? 'пользователей' : perspective === 'specialists' ? 'специалистов' : 'партнёров'}`, `Value for ${perspective}`)}>
                   <ul className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {getValuePoints(perspective, lang).map((point, i) => (
+                    {getValuePoints(perspective, lang).map((point: string, i: number) => (
                       <li key={i} className="flex gap-3 items-start">
                         <CheckCircle2 className="w-5 h-5 mt-1 text-ink" />
                         <span>{point}</span>
