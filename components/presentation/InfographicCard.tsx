@@ -12,7 +12,7 @@ interface InfographicCardProps {
   value: string | number
   subtitle?: string
   progress?: number
-  color?: 'blue' | 'green' | 'orange' | 'purple' | 'pink'
+  color?: 'blue' | 'green' | 'pink' | 'red'
   trend?: 'up' | 'down' | 'neutral'
   trendValue?: string
   className?: string
@@ -34,17 +34,15 @@ export default function InfographicCard({
   const colorClasses = {
     blue: 'text-warmBlue-500',
     green: 'text-warmGreen-500',
-    orange: 'text-warmOrange-500',
-    purple: 'text-warmPurple-500',
     pink: 'text-warmPink-500',
+    red: 'text-warmRed-500',
   }
 
   const progressColors = {
     blue: 'blue' as const,
     green: 'green' as const,
-    orange: 'orange' as const,
-    purple: 'purple' as const,
     pink: 'pink' as const,
+    red: 'red' as const,
   }
 
   return (

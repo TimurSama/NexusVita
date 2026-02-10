@@ -9,9 +9,9 @@ import { useI18n } from '@/lib/i18n/I18nProvider'
 
 type LocalTrainingNutrition = {
   workoutsPerWeek: number
-  workoutType: 'Силовые' | 'Кардио' | 'Смешанные'
+  workoutType: string
   caloriesTarget: number
-  nutritionFocus: 'Баланс' | 'Дефицит' | 'Профицит'
+  nutritionFocus: string
 }
 
 const WORKOUT_MIN = 1
@@ -110,23 +110,27 @@ export default function TrainingNutritionInteractive() {
           <div className="flex flex-wrap gap-2">
             {(lang === 'en'
               ? ['Strength', 'Cardio', 'Mixed']
-              : ['Силовые', 'Кардио', 'Смешанные']).map((type) => (
-              <button
-                key={type}
-                type="button"
-                onClick={() => update({ workoutType: type as any })}
-                className={cn(
-                  'px-3 py-1.5 rounded-full text-xs sm:text-sm transition-all',
-                  (state.workoutType === type ||
-                    (lang === 'en' && type === 'Mixed' && state.workoutType === 'Смешанные') ||
-                    (lang === 'ru' && type === 'Смешанные' && state.workoutType === 'Mixed'))
-                    ? 'bg-warmBlue-500 text-white'
-                    : 'bg-warmGray-100 text-warmGraphite-700 hover:bg-warmGray-200'
-                )}
-              >
-                {type}
-              </button>
-            ))}
+              : ['Силовые', 'Кардио', 'Смешанные']).map((type) => {
+              const isActive = 
+                state.workoutType === type ||
+                (lang === 'en' && type === 'Mixed' && state.workoutType === 'Смешанные') ||
+                (lang === 'ru' && type === 'Смешанные' && (state.workoutType === 'Mixed' || state.workoutType === 'Смешанные'))
+              return (
+                <button
+                  key={type}
+                  type="button"
+                  onClick={() => update({ workoutType: type })}
+                  className={cn(
+                    'px-3 py-1.5 rounded-full text-xs sm:text-sm transition-all',
+                    isActive
+                      ? 'bg-warmBlue-500 text-white'
+                      : 'bg-warmGray-100 text-warmGraphite-700 hover:bg-warmGray-200'
+                  )}
+                >
+                  {type}
+                </button>
+              )
+            })}
           </div>
         </div>
       </NeumorphicCard>
@@ -178,23 +182,27 @@ export default function TrainingNutritionInteractive() {
           <div className="flex flex-wrap gap-2">
             {(lang === 'en'
               ? ['Balance', 'Deficit', 'Surplus']
-              : ['Баланс', 'Дефицит', 'Профицит']).map((focus) => (
-              <button
-                key={focus}
-                type="button"
-                onClick={() => update({ nutritionFocus: focus as any })}
-                className={cn(
-                  'px-3 py-1.5 rounded-full text-xs sm:text-sm transition-all',
-                  (state.nutritionFocus === focus ||
-                    (lang === 'en' && focus === 'Balance' && state.nutritionFocus === 'Баланс') ||
-                    (lang === 'ru' && focus === 'Баланс' && state.nutritionFocus === 'Balance'))
-                    ? 'bg-warmPink-500 text-white'
-                    : 'bg-warmGray-100 text-warmGraphite-700 hover:bg-warmGray-200'
-                )}
-              >
-                {focus}
-              </button>
-            ))}
+              : ['Баланс', 'Дефицит', 'Профицит']).map((focus) => {
+              const isActive = 
+                state.nutritionFocus === focus ||
+                (lang === 'en' && focus === 'Balance' && state.nutritionFocus === 'Баланс') ||
+                (lang === 'ru' && focus === 'Баланс' && (state.nutritionFocus === 'Balance' || state.nutritionFocus === 'Баланс'))
+              return (
+                <button
+                  key={focus}
+                  type="button"
+                  onClick={() => update({ nutritionFocus: focus })}
+                  className={cn(
+                    'px-3 py-1.5 rounded-full text-xs sm:text-sm transition-all',
+                    isActive
+                      ? 'bg-warmPink-500 text-white'
+                      : 'bg-warmGray-100 text-warmGraphite-700 hover:bg-warmGray-200'
+                  )}
+                >
+                  {focus}
+                </button>
+              )
+            })}
           </div>
         </div>
 

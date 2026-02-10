@@ -32,7 +32,7 @@ export default function StatsInfographic() {
       title: lang === 'en' ? 'User Growth' : 'Рост пользователей',
       value: '20%+',
       subtitle: lang === 'en' ? 'Monthly active user growth' : 'Ежемесячный рост активных пользователей',
-      color: 'orange' as const,
+      color: 'red' as const,
       progress: 75,
     },
     {
@@ -40,7 +40,7 @@ export default function StatsInfographic() {
       title: 'ARPU',
       value: '$15+',
       subtitle: lang === 'en' ? 'Average revenue per user per month' : 'Средний доход с пользователя в месяц',
-      color: 'purple' as const,
+      color: 'blue' as const,
       progress: 60,
     },
     {
