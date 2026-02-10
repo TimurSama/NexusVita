@@ -364,9 +364,7 @@ html {
 
 .animate-float {
   animation: float 3s ease-in-out infinite;
-}
-
-@keyframes glow {
+}@keyframes glow {
   0%, 100% {
     box-shadow: 
       0 0 20px rgba(168, 213, 226, 0.3),
