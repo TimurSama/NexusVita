@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import Link from 'next/link'
 import {
   Heart,
@@ -13,11 +13,15 @@ import {
   Video,
   BarChart3,
   Plus,
+  X,
 } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
 import NeumorphicCard from '@/components/ui/NeumorphicCard'
 import NeumorphicButton from '@/components/ui/NeumorphicButton'
 import NeumorphicInput from '@/components/ui/NeumorphicInput'
 import NeumorphicBadge from '@/components/ui/NeumorphicBadge'
+import NeumorphicSkeleton from '@/components/ui/NeumorphicSkeleton'
+import { generateMockPosts, generateMockUsers, type MockPost, type MockUser } from '@/lib/mocks/data-generators'
 import { cn } from '@/lib/utils/cn'
 
 const stories = [
@@ -28,38 +32,14 @@ const stories = [
   { name: 'Иван', role: 'Реабилитолог', status: 'Новая программа' },
 ]
 
-const posts = [
-  {
-    id: '1',
-    author: 'Анна К.',
-    role: 'Участник DAO',
-    time: '2 часа назад',
-    text: 'Наконец-то добрала норму сна 7.5 часов и заметила, как улучшилось восстановление после силовых.',
-    tags: ['сон', 'восстановление', 'силовые'],
-    stats: { likes: 42, comments: 8, saves: 12 },
-    liked: false,
-  },
-  {
-    id: '2',
-    author: 'Нутрициолог Мария',
-    role: 'Эксперт',
-    time: 'Сегодня',
-    text: 'Подготовила чек-лист по микронутриентам. Проверяем железо, D3, B12 и магний.',
-    tags: ['нутрициология', 'анализы', 'микронутриенты'],
-    stats: { likes: 118, comments: 24, saves: 56 },
-    liked: true,
-  },
-  {
-    id: '3',
-    author: 'Тренер Алексей',
-    role: 'Силовой тренинг',
-    time: 'Вчера',
-    text: 'Запустил новый курс по безопасной технике становой тяги. Старт через 5 дней.',
-    tags: ['тренировки', 'техника', 'курс'],
-    stats: { likes: 86, comments: 12, saves: 31 },
-    liked: false,
-  },
-]
+interface Post extends MockPost {
+  role: string
+  time: string
+  tags: string[]
+  stats: { likes: number; comments: number; saves: number }
+  liked: boolean
+  comments?: Array<{ id: string; author: MockUser; text: string; time: string }>
+}
 
 const friendSuggestions = [
   { name: 'Ксения', focus: 'Пилатес', mutual: 4 },
@@ -89,12 +69,124 @@ const groups = [
 
 export default function SocialPage() {
   const [postText, setPostText] = useState('')
-  const [likedPosts, setLikedPosts] = useState<Set<string>>(
-    new Set(posts.filter((p) => p.liked).map((p) => p.id))
-  )
+  const [posts, setPosts] = useState<Post[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [hasMore, setHasMore] = useState(true)
+  const [likedPosts, setLikedPosts] = useState<Set<string>>(new Set())
+  const [savedPosts, setSavedPosts] = useState<Set<string>>(new Set())
+  const [expandedComments, setExpandedComments] = useState<Set<string>>(new Set())
+  const [commentTexts, setCommentTexts] = useState<Record<string, string>>({})
+  const observerRef = useRef<IntersectionObserver | null>(null)
+  const lastPostElementRef = useCallback((node: HTMLDivElement | null) => {
+    if (isLoading) return
+    if (observerRef.current) observerRef.current.disconnect()
+    observerRef.current = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting && hasMore) {
+        loadMorePosts()
+      }
+    })
+    if (node) observerRef.current.observe(node)
+  }, [isLoading, hasMore])
+
+  const mockUsers = generateMockUsers(20)
+  const mockPosts = generateMockPosts(50, mockUsers)
+
+  useEffect(() => {
+    // Инициализация постов
+    const initialPosts: Post[] = mockPosts.slice(0, 10).map((mp, i) => ({
+      ...mp,
+      role: i % 3 === 0 ? 'Эксперт' : i % 3 === 1 ? 'Участник DAO' : 'Специалист',
+      time: i < 3 ? (i === 0 ? 'Сегодня' : i === 1 ? '2 часа назад' : 'Вчера') : `${i} дней назад`,
+      tags: ['здоровье', 'тренировки', 'питание'].slice(0, Math.floor(Math.random() * 3) + 1),
+      stats: {
+        likes: Math.floor(Math.random() * 100) + 20,
+        comments: Math.floor(Math.random() * 30) + 5,
+        saves: Math.floor(Math.random() * 20) + 5,
+      },
+      liked: Math.random() > 0.7,
+      comments: Array.from({ length: Math.floor(Math.random() * 5) }).map((_, ci) => ({
+        id: `comment-${i}-${ci}`,
+        author: mockUsers[Math.floor(Math.random() * mockUsers.length)],
+        text: `Отличный пост! ${ci === 0 ? 'Полностью согласен.' : 'Интересная информация.'}`,
+        time: `${ci} часов назад`,
+      })),
+    }))
+    setPosts(initialPosts)
+    setIsLoading(false)
+    setLikedPosts(new Set(initialPosts.filter((p) => p.liked).map((p) => p.id)))
+  }, [])
+
+  const loadMorePosts = () => {
+    if (isLoading || !hasMore) return
+    setIsLoading(true)
+    setTimeout(() => {
+      const newPosts: Post[] = mockPosts.slice(posts.length, posts.length + 10).map((mp, i) => ({
+        ...mp,
+        role: i % 3 === 0 ? 'Эксперт' : i % 3 === 1 ? 'Участник DAO' : 'Специалист',
+        time: `${posts.length + i} дней назад`,
+        tags: ['здоровье', 'тренировки', 'питание'].slice(0, Math.floor(Math.random() * 3) + 1),
+        stats: {
+          likes: Math.floor(Math.random() * 100) + 20,
+          comments: Math.floor(Math.random() * 30) + 5,
+          saves: Math.floor(Math.random() * 20) + 5,
+        },
+        liked: false,
+        comments: [],
+      }))
+      setPosts((prev) => [...prev, ...newPosts])
+      setIsLoading(false)
+      if (posts.length + newPosts.length >= mockPosts.length) {
+        setHasMore(false)
+      }
+    }, 500)
+  }
 
   const handleLike = (postId: string) => {
     setLikedPosts((prev) => {
+      const newSet = new Set(prev)
+      if (newSet.has(postId)) {
+        newSet.delete(postId)
+        setPosts((prevPosts) =>
+          prevPosts.map((p) =>
+            p.id === postId ? { ...p, stats: { ...p.stats, likes: p.stats.likes - 1 } } : p
+          )
+        )
+      } else {
+        newSet.add(postId)
+        setPosts((prevPosts) =>
+          prevPosts.map((p) =>
+            p.id === postId ? { ...p, stats: { ...p.stats, likes: p.stats.likes + 1 } } : p
+          )
+        )
+      }
+      return newSet
+    })
+  }
+
+  const handleSave = (postId: string) => {
+    setSavedPosts((prev) => {
+      const newSet = new Set(prev)
+      if (newSet.has(postId)) {
+        newSet.delete(postId)
+        setPosts((prevPosts) =>
+          prevPosts.map((p) =>
+            p.id === postId ? { ...p, stats: { ...p.stats, saves: p.stats.saves - 1 } } : p
+          )
+        )
+      } else {
+        newSet.add(postId)
+        setPosts((prevPosts) =>
+          prevPosts.map((p) =>
+            p.id === postId ? { ...p, stats: { ...p.stats, saves: p.stats.saves + 1 } } : p
+          )
+        )
+      }
+      return newSet
+    })
+  }
+
+  const toggleComments = (postId: string) => {
+    setExpandedComments((prev) => {
       const newSet = new Set(prev)
       if (newSet.has(postId)) {
         newSet.delete(postId)
@@ -103,6 +195,31 @@ export default function SocialPage() {
       }
       return newSet
     })
+  }
+
+  const handleAddComment = (postId: string) => {
+    const commentText = commentTexts[postId]?.trim()
+    if (!commentText) return
+
+    const newComment = {
+      id: `comment-${postId}-${Date.now()}`,
+      author: mockUsers[0],
+      text: commentText,
+      time: 'только что',
+    }
+
+    setPosts((prevPosts) =>
+      prevPosts.map((p) =>
+        p.id === postId
+          ? {
+              ...p,
+              comments: [...(p.comments || []), newComment],
+              stats: { ...p.stats, comments: p.stats.comments + 1 },
+            }
+          : p
+      )
+    )
+    setCommentTexts((prev) => ({ ...prev, [postId]: '' }))
   }
 
   return (
@@ -205,12 +322,19 @@ export default function SocialPage() {
             {/* Посты */}
             {posts.map((post, index) => {
               const isLiked = likedPosts.has(post.id)
+              const isSaved = savedPosts.has(post.id)
+              const showComments = expandedComments.has(post.id)
+              const isLastPost = index === posts.length - 1
+
               return (
-                <NeumorphicCard
+                <motion.div
                   key={post.id}
-                  className="p-4 sm:p-6 space-y-4 animate-fadeIn"
-                  style={{ animationDelay: `${index * 0.1}s` }}
+                  ref={isLastPost ? lastPostElementRef : null}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: index * 0.05 }}
                 >
+                  <NeumorphicCard className="p-4 sm:p-6 space-y-4">
                   <div className="flex items-center justify-between">
                     <div>
                       <div className="text-base sm:text-lg font-semibold text-warmGraphite-800">
@@ -265,7 +389,10 @@ export default function SocialPage() {
                       />
                       <span>{post.stats.likes + (isLiked ? 1 : 0)}</span>
                     </button>
-                    <button className="flex items-center gap-2 text-sm text-warmGraphite-600 hover:text-warmBlue-600 font-medium transition-colors">
+                    <button
+                      onClick={() => toggleComments(post.id)}
+                      className="flex items-center gap-2 text-sm text-warmGraphite-600 hover:text-warmBlue-600 font-medium transition-colors"
+                    >
                       <MessageCircle className="w-5 h-5" />
                       <span>{post.stats.comments}</span>
                     </button>
@@ -273,14 +400,99 @@ export default function SocialPage() {
                       <Share2 className="w-5 h-5" />
                       Поделиться
                     </button>
-                    <button className="flex items-center gap-2 text-sm text-warmGraphite-600 hover:text-warmBlue-600 font-medium transition-colors ml-auto">
-                      <Bookmark className="w-5 h-5" />
+                    <button
+                      onClick={() => handleSave(post.id)}
+                      className={cn(
+                        'flex items-center gap-2 text-sm font-medium transition-colors ml-auto',
+                        isSaved
+                          ? 'text-warmBlue-600'
+                          : 'text-warmGraphite-600 hover:text-warmBlue-600'
+                      )}
+                    >
+                      <Bookmark className={cn('w-5 h-5', isSaved && 'fill-warmBlue-600')} />
                       <span>{post.stats.saves}</span>
                     </button>
                   </div>
+
+                  {/* Комментарии */}
+                  <AnimatePresence>
+                    {showComments && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.3 }}
+                        className="overflow-hidden"
+                      >
+                        <div className="pt-4 border-t border-warmGray-300/50 space-y-3">
+                          {post.comments && post.comments.length > 0 && (
+                            <div className="space-y-3">
+                              {post.comments.map((comment) => (
+                                <NeumorphicCard key={comment.id} soft className="p-3">
+                                  <div className="flex items-start gap-3">
+                                    <div className="w-8 h-8 rounded-full neumorphic-card-soft flex items-center justify-center text-sm font-bold text-warmGraphite-700 flex-shrink-0">
+                                      {comment.author.name[0]}
+                                    </div>
+                                    <div className="flex-1">
+                                      <div className="flex items-center gap-2 mb-1">
+                                        <span className="text-sm font-semibold text-warmGraphite-800">
+                                          {comment.author.name}
+                                        </span>
+                                        <span className="text-xs text-warmGray-600">{comment.time}</span>
+                                      </div>
+                                      <p className="text-sm text-warmGraphite-700">{comment.text}</p>
+                                    </div>
+                                  </div>
+                                </NeumorphicCard>
+                              ))}
+                            </div>
+                          )}
+
+                          {/* Форма добавления комментария */}
+                          <div className="flex items-center gap-2">
+                            <div className="w-8 h-8 rounded-full neumorphic-card-soft flex items-center justify-center text-sm font-bold text-warmGraphite-700 flex-shrink-0">
+                              Я
+                            </div>
+                            <NeumorphicInput
+                              placeholder="Написать комментарий..."
+                              value={commentTexts[post.id] || ''}
+                              onChange={(e) =>
+                                setCommentTexts((prev) => ({ ...prev, [post.id]: e.target.value }))
+                              }
+                              onKeyPress={(e) => e.key === 'Enter' && handleAddComment(post.id)}
+                              className="flex-1"
+                            />
+                            <NeumorphicButton
+                              onClick={() => handleAddComment(post.id)}
+                              disabled={!commentTexts[post.id]?.trim()}
+                              className="p-2"
+                            >
+                              <Send className="w-4 h-4" />
+                            </NeumorphicButton>
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </NeumorphicCard>
+                </motion.div>
               )
             })}
+
+            {/* Индикатор загрузки */}
+            {isLoading && (
+              <div className="space-y-4">
+                {[1, 2, 3].map((i) => (
+                  <NeumorphicSkeleton key={i} variant="card" />
+                ))}
+              </div>
+            )}
+
+            {!hasMore && posts.length > 0 && (
+              <div className="text-center text-sm text-warmGraphite-600 py-4">
+                Все посты загружены
+              </div>
+            )}
           </div>
 
           {/* Сайдбар */}
