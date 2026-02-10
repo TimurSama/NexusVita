@@ -1,11 +1,15 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Calendar as CalendarIcon, Users, MapPin, Download, Upload, Clock, CheckCircle, XCircle } from 'lucide-react'
+import { Calendar as CalendarIcon, Users, MapPin, Download, Upload, Clock, CheckCircle, XCircle, Plus } from 'lucide-react'
+import { motion } from 'framer-motion'
 import NeumorphicCard from '@/components/ui/NeumorphicCard'
 import NeumorphicButton from '@/components/ui/NeumorphicButton'
 import NeumorphicInput from '@/components/ui/NeumorphicInput'
 import NeumorphicBadge from '@/components/ui/NeumorphicBadge'
+import NeumorphicCalendar from '@/components/ui/NeumorphicCalendar'
+import NeumorphicTabs from '@/components/ui/NeumorphicTabs'
+import { generateMockEvents } from '@/lib/mocks/data-generators'
 import { cn } from '@/lib/utils/cn'
 
 type EventItem = {
@@ -34,10 +38,13 @@ const eventTypeColors: Record<string, string> = {
 
 export default function CalendarPage() {
   const [events, setEvents] = useState<EventItem[]>([])
+  const [mockEvents, setMockEvents] = useState(generateMockEvents(20))
   const [userId, setUserId] = useState<string | null>(null)
   const [role, setRole] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [importFile, setImportFile] = useState<File | null>(null)
+  const [view, setView] = useState<'calendar' | 'list'>('calendar')
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null)
   const [requestForm, setRequestForm] = useState({
     specialistId: '',
     title: '',
@@ -47,19 +54,56 @@ export default function CalendarPage() {
 
   useEffect(() => {
     const load = async () => {
-      const me = await fetch('/api/auth/me').then((res) => res.json())
-      if (!me?.user?.id) {
-        setError('Войдите, чтобы видеть календарь.')
-        return
+      try {
+        const me = await fetch('/api/auth/me').then((res) => res.json())
+        if (!me?.user?.id) {
+          // Используем моки для демо
+          setEvents(
+            mockEvents.map((e) => ({
+              id: e.id,
+              title: e.title,
+              type: e.type.toUpperCase(),
+              startsAt: e.date.toISOString(),
+              endsAt: e.duration ? new Date(e.date.getTime() + e.duration * 60000).toISOString() : null,
+              location: null,
+              status: 'CONFIRMED',
+              specialist: null,
+            }))
+          )
+          return
+        }
+        setUserId(me.user.id)
+        setRole(me.user.role)
+        const query =
+          me.user.role === 'TRAINER' || me.user.role === 'DOCTOR'
+            ? `/api/calendar/events?specialistId=${me.user.id}`
+            : `/api/calendar/events?userId=${me.user.id}`
+        const data = await fetch(query).then((res) => res.json())
+        setEvents(Array.isArray(data) && data.length > 0 ? data : mockEvents.map((e) => ({
+          id: e.id,
+          title: e.title,
+          type: e.type.toUpperCase(),
+          startsAt: e.date.toISOString(),
+          endsAt: e.duration ? new Date(e.date.getTime() + e.duration * 60000).toISOString() : null,
+          location: null,
+          status: 'CONFIRMED',
+          specialist: null,
+        })))
+      } catch (err) {
+        // Используем моки при ошибке
+        setEvents(
+          mockEvents.map((e) => ({
+            id: e.id,
+            title: e.title,
+            type: e.type.toUpperCase(),
+            startsAt: e.date.toISOString(),
+            endsAt: e.duration ? new Date(e.date.getTime() + e.duration * 60000).toISOString() : null,
+            location: null,
+            status: 'CONFIRMED',
+            specialist: null,
+          }))
+        )
       }
-      setUserId(me.user.id)
-      setRole(me.user.role)
-      const query =
-        me.user.role === 'TRAINER' || me.user.role === 'DOCTOR'
-          ? `/api/calendar/events?specialistId=${me.user.id}`
-          : `/api/calendar/events?userId=${me.user.id}`
-      const data = await fetch(query).then((res) => res.json())
-      setEvents(Array.isArray(data) ? data : [])
     }
     load()
   }, [])
@@ -156,27 +200,87 @@ export default function CalendarPage() {
           </NeumorphicCard>
         </section>
 
-        {/* Ближайшие события */}
-        <NeumorphicCard className="p-4 sm:p-6 animate-fadeIn" style={{ animationDelay: '0.4s' }}>
-          <h2 className="text-xl sm:text-2xl font-semibold text-warmGraphite-800 mb-4">
-            Ближайшие события
-          </h2>
-          <div className="space-y-3">
+        {/* Календарь и события */}
+        <NeumorphicTabs
+          tabs={[
+            {
+              id: 'calendar',
+              label: 'Календарь',
+              icon: <CalendarIcon className="w-4 h-4" />,
+              content: (
+                <div className="mt-4">
+                  <NeumorphicCalendar
+                    events={events.map((e) => ({
+                      id: e.id,
+                      date: new Date(e.startsAt),
+                      title: e.title,
+                      type: e.type.toLowerCase() as any,
+                    }))}
+                    onDateClick={(date) => {
+                      setSelectedDate(date)
+                      setView('list')
+                    }}
+                    onEventClick={(event) => {
+                      const fullEvent = events.find((e) => e.id === event.id)
+                      if (fullEvent) {
+                        // Можно открыть модальное окно с деталями
+                      }
+                    }}
+                    view="month"
+                  />
+                </div>
+              ),
+            },
+            {
+              id: 'list',
+              label: 'Список',
+              icon: <Clock className="w-4 h-4" />,
+              content: (
+                <div className="mt-4">
+                  <NeumorphicCard className="p-4 sm:p-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <h2 className="text-xl sm:text-2xl font-semibold text-warmGraphite-800">
+                        {selectedDate
+                          ? `События на ${selectedDate.toLocaleDateString('ru-RU')}`
+                          : 'Ближайшие события'}
+                      </h2>
+                      {selectedDate && (
+                        <NeumorphicButton onClick={() => setSelectedDate(null)} className="text-xs">
+                          Показать все
+                        </NeumorphicButton>
+                      )}
+                    </div>
+                    <div className="space-y-3">
             {events.length === 0 && (
               <div className="text-sm text-warmGray-600 text-center py-8">
                 Событий пока нет. Добавьте занятия или синхронизируйте календарь со
                 специалистом.
               </div>
             )}
-            {events.map((event, index) => {
-              const typeColor = eventTypeColors[event.type] || 'warmGray'
-              return (
-                <NeumorphicCard
-                  key={event.id}
-                  soft
-                  className="p-4 hover:scale-[1.01] transition-all duration-300 animate-fadeIn"
-                  style={{ animationDelay: `${0.5 + index * 0.05}s` }}
-                >
+                      {events
+                        .filter((e) => {
+                          if (!selectedDate) return true
+                          const eventDate = new Date(e.startsAt)
+                          return (
+                            eventDate.getDate() === selectedDate.getDate() &&
+                            eventDate.getMonth() === selectedDate.getMonth() &&
+                            eventDate.getFullYear() === selectedDate.getFullYear()
+                          )
+                        })
+                        .sort((a, b) => new Date(a.startsAt).getTime() - new Date(b.startsAt).getTime())
+                        .map((event, index) => {
+                          const typeColor = eventTypeColors[event.type] || 'warmGray'
+                          return (
+                            <motion.div
+                              key={event.id}
+                              initial={{ opacity: 0, y: 10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              transition={{ delay: index * 0.05 }}
+                            >
+                              <NeumorphicCard
+                                soft
+                                className="p-4 hover:scale-[1.01] transition-all duration-300"
+                              >
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">
@@ -247,13 +351,21 @@ export default function CalendarPage() {
                         <XCircle className="w-3 h-3 mr-1" />
                         Отклонить
                       </NeumorphicButton>
+                              </div>
+                            )}
+                          </NeumorphicCard>
+                            </motion.div>
+                          )
+                        })}
                     </div>
-                  )}
-                </NeumorphicCard>
-              )
-            })}
-          </div>
-        </NeumorphicCard>
+                  </NeumorphicCard>
+                </div>
+              ),
+            },
+          ]}
+          defaultTab={view === 'calendar' ? 'calendar' : 'list'}
+          onTabChange={(tabId) => setView(tabId === 'calendar' ? 'calendar' : 'list')}
+        />
 
         {/* Запросы на занятия (для специалистов) */}
         {role && (role === 'TRAINER' || role === 'DOCTOR') && (
