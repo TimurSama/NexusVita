@@ -32,7 +32,9 @@ const stories = [
   { name: 'Иван', role: 'Реабилитолог', status: 'Новая программа' },
 ]
 
-interface Post extends MockPost {
+interface Post extends Omit<MockPost, 'comments' | 'author' | 'content'> {
+  author: string
+  text: string
   role: string
   time: string
   tags: string[]
@@ -94,7 +96,13 @@ export default function SocialPage() {
   useEffect(() => {
     // Инициализация постов
     const initialPosts: Post[] = mockPosts.slice(0, 10).map((mp, i) => ({
-      ...mp,
+      id: mp.id,
+      text: mp.content,
+      author: mp.author.name,
+      images: mp.images,
+      likes: mp.likes,
+      shares: mp.shares,
+      createdAt: mp.createdAt,
       role: i % 3 === 0 ? 'Эксперт' : i % 3 === 1 ? 'Участник DAO' : 'Специалист',
       time: i < 3 ? (i === 0 ? 'Сегодня' : i === 1 ? '2 часа назад' : 'Вчера') : `${i} дней назад`,
       tags: ['здоровье', 'тренировки', 'питание'].slice(0, Math.floor(Math.random() * 3) + 1),
@@ -121,7 +129,13 @@ export default function SocialPage() {
     setIsLoading(true)
     setTimeout(() => {
       const newPosts: Post[] = mockPosts.slice(posts.length, posts.length + 10).map((mp, i) => ({
-        ...mp,
+        id: mp.id,
+        text: mp.content,
+        author: mp.author.name,
+        images: mp.images,
+        likes: mp.likes,
+        shares: mp.shares,
+        createdAt: mp.createdAt,
         role: i % 3 === 0 ? 'Эксперт' : i % 3 === 1 ? 'Участник DAO' : 'Специалист',
         time: `${posts.length + i} дней назад`,
         tags: ['здоровье', 'тренировки', 'питание'].slice(0, Math.floor(Math.random() * 3) + 1),
