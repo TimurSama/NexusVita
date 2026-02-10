@@ -11,6 +11,9 @@ import NeumorphicCard from '@/components/ui/NeumorphicCard'
 import NeumorphicButton from '@/components/ui/NeumorphicButton'
 import NeumorphicInput from '@/components/ui/NeumorphicInput'
 import NeumorphicBadge from '@/components/ui/NeumorphicBadge'
+import TodayWidget from '@/components/dashboard/TodayWidget'
+import WeekWidget from '@/components/dashboard/WeekWidget'
+import ProgressWidget from '@/components/dashboard/ProgressWidget'
 import { cn } from '@/lib/utils/cn'
 
 // Моковые данные
@@ -299,35 +302,38 @@ export default function DashboardPage() {
           </div>
         </NeumorphicCard>
 
-        {/* Быстрые действия и планы */}
+        {/* Виджеты дашборда */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+          <TodayWidget />
+          <WeekWidget />
+          <ProgressWidget />
+        </div>
+
+        {/* Быстрые действия и достижения */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
           <NeumorphicCard className="p-4 sm:p-6 animate-fadeIn">
             <div className="flex items-center gap-2 mb-4">
               <Target className="w-5 h-5 text-warmGreen-600" />
               <h2 className="text-xl sm:text-2xl font-semibold text-warmGraphite-800">
-                Планы и задачи
+                Быстрые действия
               </h2>
             </div>
-            <div className="space-y-3">
+            <div className="grid grid-cols-2 gap-3">
               {[
-                { title: 'Тренировка', status: 'Запланировано', time: '18:00', link: '/training' },
-                { title: 'Прием пищи', status: 'Напоминание', time: '19:30', link: '/nutrition' },
-                { title: 'Дыхательная практика', status: 'Рекомендовано', time: '20:00', link: '/journal' },
-              ].map((task, index) => (
-                <Link key={index} href={task.link}>
+                { title: 'Запись в дневник', icon: '📔', link: '/journal', color: 'warmBlue' },
+                { title: 'Запись к специалисту', icon: '👨‍⚕️', link: '/specialists', color: 'warmGreen' },
+                { title: 'Добавить метрику', icon: '📊', link: '/metrics/weight', color: 'warmPink' },
+                { title: 'Создать цель', icon: '🎯', link: '/goals', color: 'warmOrange' },
+              ].map((action, index) => (
+                <Link key={index} href={action.link}>
                   <NeumorphicCard
                     soft
-                    className="p-3 flex items-center justify-between hover:scale-[1.01] transition-transform"
+                    className="p-4 text-center hover:scale-105 transition-transform cursor-pointer"
                   >
-                    <div>
-                      <div className="font-semibold text-warmGraphite-800 text-sm sm:text-base">
-                        {task.title}
-                      </div>
-                      <div className="text-xs text-warmGray-600 mt-1">
-                        {task.status} · {task.time}
-                      </div>
+                    <div className="text-2xl mb-2">{action.icon}</div>
+                    <div className="text-xs sm:text-sm font-medium text-warmGraphite-800">
+                      {action.title}
                     </div>
-                    <ArrowRight className="w-4 h-4 text-warmBlue-600" />
                   </NeumorphicCard>
                 </Link>
               ))}
