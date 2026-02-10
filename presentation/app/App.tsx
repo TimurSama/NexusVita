@@ -133,7 +133,7 @@ export default function App() {
       </div>
 
       {/* Chat Widget (Section 26) */}
-      <ChatWidget lang={lang} messages={chatMessages} onSendMessage={(text) => setChatMessages(p => [...p, { role: 'user', text }])} />
+      <ChatWidget lang={lang} messages={chatMessages} onSendMessage={(text: string) => setChatMessages(p => [...p, { role: 'user', text }])} />
 
       {/* 1. Hero Section */}
       <section className="min-h-screen flex flex-col items-center justify-center p-8 relative overflow-hidden">

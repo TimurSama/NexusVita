@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { AlertTriangle, Activity, Users, Target } from 'lucide-react'
+import { Activity, Users, Target } from 'lucide-react'
 import NeumorphicCard from '@/components/ui/NeumorphicCard'
 import { cn } from '@/lib/utils/cn'
 import { useI18n } from '@/lib/i18n/I18nProvider'
