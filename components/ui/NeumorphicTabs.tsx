@@ -31,7 +31,6 @@ export default function NeumorphicTabs({
     onTabChange?.(tabId)
   }
 
-  const activeTabIndex = tabs.findIndex((tab) => tab.id === activeTab)
   const activeTabContent = tabs.find((tab) => tab.id === activeTab)?.content
 
   return (
