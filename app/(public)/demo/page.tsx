@@ -1048,9 +1048,9 @@ function DashboardDemo({ lang }: { lang: string }) {
 // --- Enhanced Modals with Full Information ---
 
 function EnhancedSectorModal({ sector, isOpen, onClose, lang }: { sector: any; isOpen: boolean; onClose: () => void; lang: string }) {
-  if (!sector) return null
-
   const { t: tI18n } = useI18n()
+  
+  if (!sector) return null
   const t = (key: string, fallback?: string) => {
     const translation = tI18n(key)
     return translation !== key ? translation : (fallback || key)
@@ -1138,9 +1138,9 @@ function EnhancedSectorModal({ sector, isOpen, onClose, lang }: { sector: any; i
 }
 
 function EnhancedModuleModal({ module, isOpen, onClose, lang }: { module: any; isOpen: boolean; onClose: () => void; lang: string }) {
-  if (!module) return null
-
   const { t: tI18n } = useI18n()
+  
+  if (!module) return null
   const t = (key: string, fallback?: string) => {
     const translation = tI18n(key)
     return translation !== key ? translation : (fallback || key)

@@ -122,7 +122,9 @@ export function generatePersonalizedPlan(formData: {
   timeAvailable?: string
 }) {
   const level = formData.planLevel || 'medium'
-  const time = formData.timeAvailable || '1-2 часа'
+  // timeAvailable пока не используется в демо-логике, но может понадобиться позже
+  // Оставляем для будущего использования
+  void formData.timeAvailable
 
   const baseSchedule = [
     { day: 'Понедельник', time: '07:00', activity: 'Утренняя зарядка', type: 'training' },

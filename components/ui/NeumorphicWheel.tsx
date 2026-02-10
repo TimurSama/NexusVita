@@ -4,17 +4,19 @@ import { useState, useRef, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { cn } from '@/lib/utils/cn'
 
+type WheelValue = string | number
+
 interface WheelOption {
   id: string
   label: string
-  value: any
+  value: WheelValue
   color?: string
 }
 
 interface NeumorphicWheelProps {
   options: WheelOption[]
   value?: string
-  onChange?: (value: any) => void
+  onChange?: (value: WheelValue) => void
   size?: number
   className?: string
 }
