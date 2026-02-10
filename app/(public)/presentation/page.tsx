@@ -36,9 +36,12 @@ import ModuleModal from '@/components/presentation/ModuleModal'
 import PlanModal from '@/components/presentation/PlanModal'
 import PresentationPlannerPane from '@/components/presentation/PresentationPlannerPane'
 import TrainingNutritionInteractive from '@/components/presentation/TrainingNutritionInteractive'
+import { useI18n } from '@/lib/i18n/I18nProvider'
+import { cn } from '@/lib/utils/cn'
 
 export default function PresentationPage() {
   const router = useRouter()
+  const { lang, setLang } = useI18n()
   
   const [selectedSector, setSelectedSector] = useState<string | null>(null)
   const [selectedModule, setSelectedModule] = useState<string | null>(null)
@@ -234,6 +237,40 @@ export default function PresentationPage() {
                 onComplete={handleChatComplete}
                 context={chatContext}
       />
+
+      {/* Language Switcher - всегда виден */}
+      <motion.div
+        initial={{ opacity: 0, x: 20 }}
+        animate={{ opacity: 1, x: 0 }}
+        className="fixed top-20 right-4 z-50"
+      >
+        <div className="flex border border-warmGray-300 rounded-full overflow-hidden text-xs bg-warmBeige-50 shadow-lg">
+          <button
+            type="button"
+            onClick={() => setLang('ru')}
+            className={cn(
+              'px-3 py-1.5 transition-colors',
+              lang === 'ru'
+                ? 'bg-warmBlue-500 text-white'
+                : 'bg-warmBeige-50 text-warmGraphite-700 hover:bg-warmGray-100'
+            )}
+          >
+            RU
+          </button>
+          <button
+            type="button"
+            onClick={() => setLang('en')}
+            className={cn(
+              'px-3 py-1.5 transition-colors',
+              lang === 'en'
+                ? 'bg-warmBlue-500 text-white'
+                : 'bg-warmBeige-50 text-warmGraphite-700 hover:bg-warmGray-100'
+            )}
+          >
+            EN
+          </button>
+        </div>
+      </motion.div>
 
       {/* Chat Button */}
       {!chatOpen && (
