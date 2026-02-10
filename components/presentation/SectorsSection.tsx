@@ -60,7 +60,7 @@ export default function SectorsSection({ onSectorClick, onInteractiveClick }: Se
               >
                 <div className="flex items-start justify-between mb-2">
                   <div className={`text-${sector.color}-500 mb-3 sm:mb-4`}>
-                    {sector.icon}
+                    {sector.icon && <sector.icon className="w-8 h-8" />}
                   </div>
                   <button
                     onClick={(e) => {

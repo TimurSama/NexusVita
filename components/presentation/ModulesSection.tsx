@@ -42,7 +42,7 @@ export default function ModulesSection({ onModuleClick }: ModulesSectionProps) {
                 onClick={() => onModuleClick(module.id)}
               >
                 <div className="text-warmBlue-500 mb-3 sm:mb-4">
-                  {module.icon}
+                  {module.icon && <module.icon className="w-6 h-6" />}
                 </div>
                 <h3 className="text-lg sm:text-xl font-semibold text-warmGraphite-800 mb-2 sm:mb-3">
                   {module.title}

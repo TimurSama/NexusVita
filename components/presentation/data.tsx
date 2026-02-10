@@ -1,3 +1,5 @@
+'use client'
+
 import {
   Stethoscope,
   Dumbbell,
@@ -21,7 +23,7 @@ export const sectors: Sector[] = [
   {
     id: 'medicine',
     title: 'Медицина',
-    icon: <Stethoscope className="w-8 h-8" />,
+    icon: Stethoscope,
     color: 'red',
     description:
       'Централизованная история медицинских данных: лабораторные анализы, результаты обследований, назначения, реабилитационные планы и протоколы профилактики.',
@@ -52,7 +54,7 @@ export const sectors: Sector[] = [
   {
     id: 'sport',
     title: 'Спорт и физическая производительность',
-    icon: <Dumbbell className="w-8 h-8" />,
+    icon: Dumbbell,
     color: 'blue',
     description:
       'Планирование тренировок, контроль нагрузок, адаптивные планы прогресса и реабилитационные протоколы.',
@@ -83,7 +85,7 @@ export const sectors: Sector[] = [
   {
     id: 'psycho',
     title: 'Психо-эмоциональное здоровье',
-    icon: <Brain className="w-8 h-8" />,
+    icon: Brain,
     color: 'purple',
     description:
       'Инструменты для мониторинга настроения, доступа к терапевтам и программам ментального здоровья.',
@@ -114,7 +116,7 @@ export const sectors: Sector[] = [
   {
     id: 'nutrition',
     title: 'Питание и метаболизм',
-    icon: <Apple className="w-8 h-8" />,
+    icon: Apple,
     color: 'green',
     description:
       'Персонализированные планы питания на базе данных о пользователе, ограничениях, целях и анализах.',
@@ -145,7 +147,7 @@ export const sectors: Sector[] = [
   {
     id: 'social',
     title: 'Социальное',
-    icon: <Users className="w-8 h-8" />,
+    icon: Users,
     color: 'orange',
     description:
       'Лента и группы по интересам, социальные вызовы и командные планы.',
@@ -176,7 +178,7 @@ export const sectors: Sector[] = [
   {
     id: 'sleep',
     title: 'Сон и восстановление',
-    icon: <Clock className="w-8 h-8" />,
+    icon: Clock,
     color: 'indigo',
     description:
       'Аналитика сна, рекомендации по гигиене сна, интеграция с устройствами.',
@@ -207,7 +209,7 @@ export const sectors: Sector[] = [
   {
     id: 'prevention',
     title: 'Профилактика и окружающая среда',
-    icon: <Shield className="w-8 h-8" />,
+    icon: Shield,
     color: 'teal',
     description:
       'Мониторинг факторов среды, оценка рисков и рекомендации по адаптации образа жизни.',
@@ -241,7 +243,7 @@ export const modules: Module[] = [
   {
     id: 'journal',
     title: 'Личный журнал',
-    icon: <BookOpen className="w-6 h-6" />,
+    icon: BookOpen,
     description:
       'Ежедневные записи: самочувствие, тренировки, питание, сон, заметки врача.',
     features: [
@@ -260,7 +262,7 @@ export const modules: Module[] = [
   {
     id: 'ai-planner',
     title: 'ИИ-планировщик',
-    icon: <Sparkles className="w-6 h-6" />,
+    icon: Sparkles,
     description:
       'Формирует персональные планы тренировок, питания, восстановления и терапии.',
     features: [
@@ -279,7 +281,7 @@ export const modules: Module[] = [
   {
     id: 'specialists',
     title: 'Тренеры & Коучи',
-    icon: <Users className="w-6 h-6" />,
+    icon: Users,
     description:
       'Карточки специалистов, расписание, пакеты услуг, онлайн/оффлайн сессии.',
     features: [
@@ -298,7 +300,7 @@ export const modules: Module[] = [
   {
     id: 'marketplace',
     title: 'Магазин',
-    icon: <ShoppingBag className="w-6 h-6" />,
+    icon: ShoppingBag,
     description:
       'БАДы, медикаменты, питание, оборудование с интеграцией в планы.',
     features: [
@@ -317,7 +319,7 @@ export const modules: Module[] = [
   {
     id: 'centers',
     title: 'Центры и абонементы',
-    icon: <Building2 className="w-6 h-6" />,
+    icon: Building2,
     description:
       'Управление абонементами фитнес-центров, клиник, спа с синхронизацией.',
     features: [
@@ -336,7 +338,7 @@ export const modules: Module[] = [
   {
     id: 'dao',
     title: 'DAO и токены',
-    icon: <Coins className="w-6 h-6" />,
+    icon: Coins,
     description:
       'Управление сообществом, голосования, токены для бонусов и оплаты.',
     features: [
@@ -355,7 +357,7 @@ export const modules: Module[] = [
   {
     id: 'social-network',
     title: 'Социальная сеть',
-    icon: <Users className="w-6 h-6" />,
+    icon: Users,
     description:
       'Профиль, друзья, группы, обмен достижениями, реферальные кампании.',
     features: [
@@ -374,7 +376,7 @@ export const modules: Module[] = [
   {
     id: 'calendar',
     title: 'Календарь & Синхронизация',
-    icon: <Calendar className="w-6 h-6" />,
+    icon: Calendar,
     description:
       'Интеграция с Google/Apple Calendar, напоминания, планирование сессий, биллинг.',
     features: [
@@ -393,7 +395,7 @@ export const modules: Module[] = [
   {
     id: 'telemedicine',
     title: 'Чат и телемедицина',
-    icon: <MessageSquare className="w-6 h-6" />,
+    icon: MessageSquare,
     description:
       'Общение с тренерами, врачами, коучами, история переписки, запись сессий.',
     features: [
@@ -412,7 +414,7 @@ export const modules: Module[] = [
   {
     id: 'integrations',
     title: 'Интеграции устройств',
-    icon: <Settings className="w-6 h-6" />,
+    icon: Settings,
     description:
       'Wearables, умные весы, пульсометры, датчики среды, автоматический сбор данных.',
     features: [

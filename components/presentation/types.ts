@@ -1,7 +1,7 @@
 export type Sector = {
   id: string
   title: string
-  icon: React.ReactNode
+  icon: React.ComponentType<{ className?: string }>
   color: string
   description: string
   details: {
@@ -14,7 +14,7 @@ export type Sector = {
 export type Module = {
   id: string
   title: string
-  icon: React.ReactNode
+  icon: React.ComponentType<{ className?: string }>
   description: string
   features: string[]
   benefits: string[]
