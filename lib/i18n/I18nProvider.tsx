@@ -1,6 +1,7 @@
 'use client'
 
 import { createContext, useContext, useEffect, useState } from 'react'
+import { presentationDictionary } from './presentation-dictionary'
 
 type Language = 'ru' | 'en'
 
@@ -20,12 +21,14 @@ const dictionaries: Record<Language, Dictionary> = {
     'header.login': 'Войти',
     'header.register': 'Регистрация',
     'header.buyTokens': 'Купить токены',
+    ...presentationDictionary.ru,
   },
   en: {
     'header.search.placeholder': 'Search...',
     'header.login': 'Log in',
     'header.register': 'Sign up',
     'header.buyTokens': 'Buy tokens',
+    ...presentationDictionary.en,
   },
 }
 

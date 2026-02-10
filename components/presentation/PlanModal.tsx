@@ -8,6 +8,7 @@ import NeumorphicCard from '@/components/ui/NeumorphicCard'
 import NeumorphicButton from '@/components/ui/NeumorphicButton'
 import NeumorphicBadge from '@/components/ui/NeumorphicBadge'
 import { demoStorage, type DemoPlan } from '@/lib/demo/storage'
+import { useI18n } from '@/lib/i18n/I18nProvider'
 
 interface PlanModalProps {
   isOpen: boolean
@@ -16,6 +17,7 @@ interface PlanModalProps {
 
 export default function PlanModal({ isOpen, onClose }: PlanModalProps) {
   const router = useRouter()
+  const { t, lang } = useI18n()
   const [plan, setPlan] = useState<DemoPlan | null>(null)
 
   useEffect(() => {
@@ -39,15 +41,14 @@ export default function PlanModal({ isOpen, onClose }: PlanModalProps) {
     <NeumorphicModal
       isOpen={isOpen}
       onClose={onClose}
-      title="Ваш персональный план на месяц"
+      title={t('plan.title')}
       size="xl"
     >
       <div className="space-y-4 sm:space-y-6">
         <div className="text-center">
           <CheckCircle className="w-12 h-12 sm:w-16 sm:h-16 text-warmGreen-500 mx-auto mb-3 sm:mb-4" />
           <p className="text-base sm:text-lg text-warmGraphite-600">
-            План сформирован на основе ваших ответов в презентации. После регистрации он
-            будет доступен в личном кабинете.
+            {t('plan.description')}
           </p>
         </div>
 
@@ -58,20 +59,20 @@ export default function PlanModal({ isOpen, onClose }: PlanModalProps) {
                 <div className="flex items-center gap-2">
                   <User className="w-5 h-5 text-warmBlue-600" />
                   <span className="text-sm sm:text-base text-warmGraphite-700">
-                    Уровень плана:{' '}
+                    {t('plan.level')}{' '}
                     <strong className="text-warmGraphite-800">
                       {plan.level === 'hard'
-                        ? 'Интенсивный'
+                        ? t('plan.level.hard')
                         : plan.level === 'soft'
-                          ? 'Мягкий'
-                          : 'Умеренный'}
+                          ? t('plan.level.soft')
+                          : t('plan.level.medium')}
                     </strong>
                   </span>
                 </div>
                 <div className="flex items-center gap-2 text-xs sm:text-sm text-warmGraphite-600">
                   <Calendar className="w-4 h-4" />
                   <span>
-                    Старт: {new Date(plan.createdAt).toLocaleDateString('ru-RU')}
+                    {t('plan.startDate')} {new Date(plan.createdAt).toLocaleDateString(lang === 'en' ? 'en-US' : 'ru-RU')}
                   </span>
                 </div>
               </div>
@@ -80,38 +81,38 @@ export default function PlanModal({ isOpen, onClose }: PlanModalProps) {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
               <NeumorphicCard className="p-4 sm:p-5">
                 <h3 className="text-sm sm:text-base font-semibold text-warmGraphite-800 mb-2">
-                  Нагрузка
+                  {t('plan.load.title')}
                 </h3>
                 <p className="text-xs sm:text-sm text-warmGraphite-600 mb-3">
-                  Основные тренировки и активные дни.
+                  {t('plan.load.description')}
                 </p>
                 <div className="text-2xl sm:text-3xl font-bold text-warmGraphite-800 mb-1">
                   {trainingDays}
                 </div>
-                <p className="text-xs text-warmGray-600">дней с фокусом на тренировках</p>
+                <p className="text-xs text-warmGray-600">{t('plan.load.days')}</p>
               </NeumorphicCard>
 
               <NeumorphicCard className="p-4 sm:p-5">
                 <h3 className="text-sm sm:text-base font-semibold text-warmGraphite-800 mb-2">
-                  Восстановление и психика
+                  {t('plan.recovery.title')}
                 </h3>
                 <p className="text-xs sm:text-sm text-warmGraphite-600 mb-3">
-                  Дни с практиками восстановления и заботой о психике.
+                  {t('plan.recovery.description')}
                 </p>
                 <div className="text-2xl sm:text-3xl font-bold text-warmGraphite-800 mb-1">
                   {recoveryDays}
                 </div>
                 <p className="text-xs text-warmGray-600">
-                  дней с мягкими активностями и практиками
+                  {t('plan.recovery.days')}
                 </p>
               </NeumorphicCard>
 
               <NeumorphicCard className="p-4 sm:p-5">
                 <h3 className="text-sm sm:text-base font-semibold text-warmGraphite-800 mb-2">
-                  Специалисты
+                  {t('plan.specialists.title')}
                 </h3>
                 <p className="text-xs sm:text-sm text-warmGraphite-600 mb-3">
-                  Ключевые роли, с которыми вы можете работать.
+                  {t('plan.specialists.description')}
                 </p>
                 <div className="space-y-1.5">
                   {(plan.specialists || []).map((s) => (
@@ -125,7 +126,7 @@ export default function PlanModal({ isOpen, onClose }: PlanModalProps) {
                   ))}
                   {(!plan.specialists || plan.specialists.length === 0) && (
                     <p className="text-xs text-warmGray-500">
-                      В демо‑версии список специалистов сокращён.
+                      {t('plan.specialists.empty')}
                     </p>
                   )}
                 </div>
@@ -134,7 +135,7 @@ export default function PlanModal({ isOpen, onClose }: PlanModalProps) {
 
             <NeumorphicCard className="p-4 sm:p-6">
               <h3 className="text-sm sm:text-base font-semibold text-warmGraphite-800 mb-3">
-                Пример недели из плана
+                {t('plan.week.title')}
               </h3>
               <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
                 {plan.schedule.slice(0, 7).map((item, idx) => (
@@ -154,7 +155,7 @@ export default function PlanModal({ isOpen, onClose }: PlanModalProps) {
                         {item.activity}
                       </div>
                       <p className="text-xs text-warmGray-600 capitalize">
-                        Тип: {item.type}
+                        {t('plan.week.type')} {item.type}
                       </p>
                     </div>
                   </div>
@@ -165,8 +166,7 @@ export default function PlanModal({ isOpen, onClose }: PlanModalProps) {
         ) : (
           <NeumorphicCard className="p-4 sm:p-6 text-center">
             <p className="text-sm sm:text-base text-warmGraphite-600">
-              Демо‑план не найден. Попробуйте ещё раз пройти опрос в презентации — после
-              этого здесь появится ваш предварительный план.
+              {t('plan.notFound')}
             </p>
           </NeumorphicCard>
         )}
@@ -177,13 +177,13 @@ export default function PlanModal({ isOpen, onClose }: PlanModalProps) {
             onClick={() => router.push('/register')}
             className="flex-1"
           >
-            Зарегистрироваться и получить этот план + 7 дней AI Health+
+            {t('plan.cta.register')}
           </NeumorphicButton>
           <NeumorphicButton
             onClick={() => router.push('/subscriptions')}
             className="flex-1"
           >
-            Посмотреть подписки и премиум‑функции
+            {t('plan.cta.subscriptions')}
           </NeumorphicButton>
         </div>
       </div>

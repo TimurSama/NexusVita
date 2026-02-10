@@ -5,6 +5,7 @@ import { Activity, Apple, Flame } from 'lucide-react'
 import NeumorphicCard from '@/components/ui/NeumorphicCard'
 import NeumorphicProgress from '@/components/ui/NeumorphicProgress'
 import { cn } from '@/lib/utils/cn'
+import { useI18n } from '@/lib/i18n/I18nProvider'
 
 type LocalTrainingNutrition = {
   workoutsPerWeek: number
@@ -19,11 +20,12 @@ const CALORIES_MIN = 1400
 const CALORIES_MAX = 3200
 
 export default function TrainingNutritionInteractive() {
+  const { t, lang } = useI18n()
   const [state, setState] = useState<LocalTrainingNutrition>({
     workoutsPerWeek: 3,
-    workoutType: 'Смешанные',
+    workoutType: lang === 'en' ? 'Mixed' : 'Смешанные',
     caloriesTarget: 2000,
-    nutritionFocus: 'Баланс',
+    nutritionFocus: lang === 'en' ? 'Balance' : 'Баланс',
   })
 
   useEffect(() => {
@@ -68,16 +70,17 @@ export default function TrainingNutritionInteractive() {
           <div className="flex items-center gap-2">
             <Activity className="w-5 h-5 text-warmBlue-500" />
             <span className="text-sm font-semibold text-warmGraphite-800">
-              Тренировки в неделю
+              {t('training.weekly')}
             </span>
           </div>
           <span className="text-sm font-bold text-warmGraphite-800">
-            {state.workoutsPerWeek} раз
+            {state.workoutsPerWeek} {lang === 'en' ? 'times' : 'раз'}
           </span>
         </div>
         <p className="text-xs text-warmGraphite-600 mb-1">
-          Настройте желаемую частоту тренировок — это повлияет на интенсивность недельного
-          и месячного плана.
+          {lang === 'en'
+            ? 'Set your desired training frequency — this will affect the intensity of weekly and monthly plans.'
+            : 'Настройте желаемую частоту тренировок — это повлияет на интенсивность недельного и месячного плана.'}
         </p>
         <div className="px-1 py-2 rounded-2xl bg-warmBeige-50 border border-warmGray-200">
           <input
@@ -95,24 +98,28 @@ export default function TrainingNutritionInteractive() {
             className="mt-2"
           />
           <div className="flex justify-between text-[10px] sm:text-xs text-warmGray-500 mt-1">
-            <span>1 раз</span>
-            <span>7 раз</span>
+            <span>1 {lang === 'en' ? 'time' : 'раз'}</span>
+            <span>7 {lang === 'en' ? 'times' : 'раз'}</span>
           </div>
         </div>
 
         <div className="mt-3 space-y-1">
           <span className="text-xs sm:text-sm font-medium text-warmGraphite-700">
-            Формат тренировок
+            {lang === 'en' ? 'Workout format' : 'Формат тренировок'}
           </span>
           <div className="flex flex-wrap gap-2">
-            {(['Силовые', 'Кардио', 'Смешанные'] as const).map((type) => (
+            {(lang === 'en'
+              ? ['Strength', 'Cardio', 'Mixed']
+              : ['Силовые', 'Кардио', 'Смешанные']).map((type) => (
               <button
                 key={type}
                 type="button"
-                onClick={() => update({ workoutType: type })}
+                onClick={() => update({ workoutType: type as any })}
                 className={cn(
                   'px-3 py-1.5 rounded-full text-xs sm:text-sm transition-all',
-                  state.workoutType === type
+                  (state.workoutType === type ||
+                    (lang === 'en' && type === 'Mixed' && state.workoutType === 'Смешанные') ||
+                    (lang === 'ru' && type === 'Смешанные' && state.workoutType === 'Mixed'))
                     ? 'bg-warmBlue-500 text-white'
                     : 'bg-warmGray-100 text-warmGraphite-700 hover:bg-warmGray-200'
                 )}
@@ -129,16 +136,17 @@ export default function TrainingNutritionInteractive() {
           <div className="flex items-center gap-2">
             <Apple className="w-5 h-5 text-warmGreen-500" />
             <span className="text-sm font-semibold text-warmGraphite-800">
-              Цель по калориям
+              {t('nutrition.calories')}
             </span>
           </div>
           <span className="text-sm font-bold text-warmGraphite-800">
-            {state.caloriesTarget} ккал
+            {state.caloriesTarget} {lang === 'en' ? 'kcal' : 'ккал'}
           </span>
         </div>
         <p className="text-xs text-warmGraphite-600 mb-1">
-          Примерный дневной таргет калорий. В демо‑версии он влияет на рекомендации
-          презентации и план в ежедневнике.
+          {lang === 'en'
+            ? 'Approximate daily calorie target. In the demo version, it affects presentation recommendations and the journal plan.'
+            : 'Примерный дневной таргет калорий. В демо‑версии он влияет на рекомендации презентации и план в ежедневнике.'}
         </p>
         <div className="px-1 py-2 rounded-2xl bg-warmBeige-50 border border-warmGray-200">
           <input
@@ -158,24 +166,28 @@ export default function TrainingNutritionInteractive() {
             className="mt-2"
           />
           <div className="flex justify-between text-[10px] sm:text-xs text-warmGray-500 mt-1">
-            <span>{CALORIES_MIN} ккал</span>
-            <span>{CALORIES_MAX} ккал</span>
+            <span>{CALORIES_MIN} {lang === 'en' ? 'kcal' : 'ккал'}</span>
+            <span>{CALORIES_MAX} {lang === 'en' ? 'kcal' : 'ккал'}</span>
           </div>
         </div>
 
         <div className="mt-3 space-y-1">
           <span className="text-xs sm:text-sm font-medium text-warmGraphite-700">
-            Фокус питания
+            {lang === 'en' ? 'Nutrition focus' : 'Фокус питания'}
           </span>
           <div className="flex flex-wrap gap-2">
-            {(['Баланс', 'Дефицит', 'Профицит'] as const).map((focus) => (
+            {(lang === 'en'
+              ? ['Balance', 'Deficit', 'Surplus']
+              : ['Баланс', 'Дефицит', 'Профицит']).map((focus) => (
               <button
                 key={focus}
                 type="button"
-                onClick={() => update({ nutritionFocus: focus })}
+                onClick={() => update({ nutritionFocus: focus as any })}
                 className={cn(
                   'px-3 py-1.5 rounded-full text-xs sm:text-sm transition-all',
-                  state.nutritionFocus === focus
+                  (state.nutritionFocus === focus ||
+                    (lang === 'en' && focus === 'Balance' && state.nutritionFocus === 'Баланс') ||
+                    (lang === 'ru' && focus === 'Баланс' && state.nutritionFocus === 'Balance'))
                     ? 'bg-warmPink-500 text-white'
                     : 'bg-warmGray-100 text-warmGraphite-700 hover:bg-warmGray-200'
                 )}
@@ -189,8 +201,9 @@ export default function TrainingNutritionInteractive() {
         <div className="flex items-center gap-2 text-[11px] sm:text-xs text-warmGraphite-500 mt-2">
           <Flame className="w-3 h-3 text-warmOrange-500" />
           <span>
-            В полной версии эти параметры будут связаны с модулями тренировок, питания и
-            календарём. В демо‑режиме они используются для живой визуализации плана.
+            {lang === 'en'
+              ? 'In the full version, these parameters will be linked to training, nutrition and calendar modules. In demo mode, they are used for live plan visualization.'
+              : 'В полной версии эти параметры будут связаны с модулями тренировок, питания и календарём. В демо‑режиме они используются для живой визуализации плана.'}
           </span>
         </div>
       </NeumorphicCard>

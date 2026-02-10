@@ -36,12 +36,14 @@ import ModuleModal from '@/components/presentation/ModuleModal'
 import PlanModal from '@/components/presentation/PlanModal'
 import PresentationPlannerPane from '@/components/presentation/PresentationPlannerPane'
 import TrainingNutritionInteractive from '@/components/presentation/TrainingNutritionInteractive'
+import StatsInfographic from '@/components/presentation/StatsInfographic'
+import InteractiveTimeline from '@/components/presentation/InteractiveTimeline'
 import { useI18n } from '@/lib/i18n/I18nProvider'
 import { cn } from '@/lib/utils/cn'
 
 export default function PresentationPage() {
   const router = useRouter()
-  const { lang, setLang } = useI18n()
+  const { lang, setLang, t } = useI18n()
   
   const [selectedSector, setSelectedSector] = useState<string | null>(null)
   const [selectedModule, setSelectedModule] = useState<string | null>(null)
@@ -184,12 +186,10 @@ export default function PresentationPage() {
       <section className="py-8 sm:py-10 lg:py-12 px-4 sm:px-6 lg:px-8 bg-warmGray-50/40">
         <div className="max-w-5xl mx-auto">
           <h2 className="text-2xl sm:text-3xl font-bold text-warmGraphite-800 mb-3 sm:mb-4 text-center">
-            Настройте свой профиль по ходу презентации
+            {t('planner.title')}
           </h2>
           <p className="text-sm sm:text-base text-warmGraphite-600 mb-4 sm:mb-6 text-center max-w-2xl mx-auto">
-            Пока вы изучаете экосистему Nexus Vita, мы параллельно собираем ключевые данные о вас,
-            чтобы в конце показать предварительный персональный план и предложить пробный период
-            AI‑подписки.
+            {t('planner.description')}
           </p>
           <div className="max-w-xl mx-auto">
             <PresentationPlannerPane />
@@ -209,6 +209,10 @@ export default function PresentationPage() {
       <MarketplaceSection />
 
       <RoadmapSection />
+
+      <InteractiveTimeline />
+
+      <StatsInfographic />
 
       <EconomicsSection />
 

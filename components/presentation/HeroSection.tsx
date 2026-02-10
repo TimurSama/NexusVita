@@ -33,23 +33,7 @@ export default function HeroSection({
   const { scrollYProgress } = useScroll()
   const opacity = useTransform(scrollYProgress, [0, 0.2], [1, 0])
   const ringsRotation = useTransform(scrollYProgress, [0, 1], [0, 180])
-  const { lang } = useI18n()
-
-  const subtitle =
-    lang === 'en'
-      ? 'The first full-spectrum human health ecosystem'
-      : 'Первая экосистема полного здоровья человека'
-  const description =
-    lang === 'en'
-      ? 'From state assessment to personal plans: training, nutrition, mental health and social integration.'
-      : 'От анализа состояния до персональных планов: тренировки, питание, психо-эмоциональное здоровье и социальная интеграция'
-  const ctaPrimary = lang === 'en' ? 'Start for free' : 'Начать бесплатно'
-  const ctaSecondary = lang === 'en' ? 'Get a subscription' : 'Получить подписку'
-  const hotspotHintDesktop =
-    lang === 'en'
-      ? 'Hover or tap a sector to open a detailed card'
-      : 'Наведите/кликните на сектор — откроется детальная карточка'
-  const hotspotHintMobile = lang === 'en' ? 'Tap a sector' : 'Кликните на сектор'
+  const { lang, t } = useI18n()
 
   return (
     <section className="relative min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 overflow-hidden">
@@ -68,10 +52,10 @@ export default function HeroSection({
             NexusVita
           </h1>
           <p className="text-xl sm:text-2xl lg:text-3xl text-warmGraphite-600 mb-3 sm:mb-4">
-            {subtitle}
+            {t('hero.subtitle')}
           </p>
           <p className="text-base sm:text-lg lg:text-xl text-warmGraphite-500 mb-6 sm:mb-8 max-w-3xl mx-auto px-4">
-            {description}
+            {t('hero.description')}
           </p>
           
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center">
@@ -80,13 +64,13 @@ export default function HeroSection({
               onClick={onStartClick}
               className="text-base sm:text-lg px-6 sm:px-8 py-3 sm:py-4 w-full sm:w-auto"
             >
-              {ctaPrimary}
+              {t('hero.cta.primary')}
             </NeumorphicButton>
             <NeumorphicButton
               onClick={onSubscribeClick}
               className="text-base sm:text-lg px-6 sm:px-8 py-3 sm:py-4 w-full sm:w-auto"
             >
-              {ctaSecondary}
+              {t('hero.cta.secondary')}
             </NeumorphicButton>
           </div>
         </motion.div>
@@ -131,8 +115,8 @@ export default function HeroSection({
                 })}
 
                 <div className="absolute bottom-2 sm:bottom-3 left-1/2 -translate-x-1/2 text-xs text-warmGraphite-600 bg-warmBeige-50/80 backdrop-blur-sm px-2 sm:px-3 py-1 rounded-xl sm:rounded-2xl">
-                  <span className="hidden sm:inline">{hotspotHintDesktop}</span>
-                  <span className="sm:hidden">{hotspotHintMobile}</span>
+                  <span className="hidden sm:inline">{t('hero.hotspot.desktop')}</span>
+                  <span className="sm:hidden">{t('hero.hotspot.mobile')}</span>
                 </div>
               </div>
             </NeumorphicCard>
