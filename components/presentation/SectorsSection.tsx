@@ -4,10 +4,8 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { ArrowRight, CheckCircle, Sparkles } from 'lucide-react'
 import NeumorphicCard from '@/components/ui/NeumorphicCard'
-import NeumorphicButton from '@/components/ui/NeumorphicButton'
 import NeumorphicBadge from '@/components/ui/NeumorphicBadge'
 import { sectors } from './data'
-import { Sector } from './types'
 import { cn } from '@/lib/utils/cn'
 
 interface SectorsSectionProps {
