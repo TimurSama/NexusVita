@@ -6,7 +6,7 @@ import InfographicCard from './InfographicCard'
 import { useI18n } from '@/lib/i18n/I18nProvider'
 
 export default function StatsInfographic() {
-  const { t, lang } = useI18n()
+  const { lang } = useI18n()
 
   const stats = [
     {

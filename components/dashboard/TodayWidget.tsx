@@ -4,6 +4,7 @@ import { Calendar, Clock, CheckCircle } from 'lucide-react'
 import DashboardWidget from './DashboardWidget'
 import NeumorphicCard from '@/components/ui/NeumorphicCard'
 import NeumorphicBadge from '@/components/ui/NeumorphicBadge'
+import { cn } from '@/lib/utils/cn'
 import Link from 'next/link'
 
 interface TodayTask {
