@@ -50,7 +50,14 @@ import VitruvianMan from '@/components/vitruvian/VitruvianMan'
 import ChatWidget from '@/components/presentation/ChatWidget'
 import { questions } from '@/components/presentation/questions'
 import { generateMockEvents, generateMockGoals, generateMockMetrics } from '@/lib/mocks/data-generators'
-import confetti from 'canvas-confetti'
+// Dynamic import for canvas-confetti (client-side only)
+const loadConfetti = async () => {
+  if (typeof window !== 'undefined') {
+    const confetti = (await import('canvas-confetti')).default
+    return confetti
+  }
+  return null
+}
 
 // --- Types ---
 type Lang = 'ru' | 'en'
@@ -704,8 +711,11 @@ export default function DemoPresentationPage() {
             <NeumorphicButton 
               primary
               className="px-16 py-8 text-2xl" 
-              onClick={() => {
-                confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } })
+              onClick={async () => {
+                const confetti = await loadConfetti()
+                if (confetti) {
+                  confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } })
+                }
                 setChatOpen(true)
               }}
             >
@@ -1341,8 +1351,11 @@ function EnhancedPlanModal({ isOpen, onClose, survey, lang }: { isOpen: boolean;
           <NeumorphicButton 
             primary
             className="w-full text-lg py-6" 
-            onClick={() => {
-              confetti({ particleCount: 200, spread: 100 })
+            onClick={async () => {
+              const confetti = await loadConfetti()
+              if (confetti) {
+                confetti({ particleCount: 200, spread: 100 })
+              }
               window.location.href = '/subscriptions?plan=premium'
             }}
           >
