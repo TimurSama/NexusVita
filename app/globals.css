@@ -252,6 +252,7 @@ html {
   }
 }
 
+
 /* Legacy support для старых компонентов */
 .sketch-card {
   @apply neumorphic-card;

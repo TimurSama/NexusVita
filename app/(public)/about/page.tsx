@@ -102,18 +102,18 @@ export default function AboutPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="text-center mb-16"
+            className="text-center mb-12 sm:mb-16"
           >
-            <NeumorphicBadge variant="info" className="mb-6 text-lg px-6 py-3">
+            <NeumorphicBadge variant="info" className="mb-4 sm:mb-6 text-base sm:text-lg px-4 sm:px-6 py-2 sm:py-3">
               ✦ Экосистема здоровья нового поколения
             </NeumorphicBadge>
-            <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold text-warmGraphite-800 mb-6">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-warmGraphite-800 mb-4 sm:mb-6">
               Nexus Vita
             </h1>
-            <p className="text-2xl sm:text-3xl text-warmGraphite-600 mb-4 max-w-3xl mx-auto">
+            <p className="text-xl sm:text-2xl text-warmGraphite-600 mb-3 sm:mb-4 max-w-3xl mx-auto">
               Унифицированная платформа для управления здоровьем
             </p>
-            <p className="text-lg sm:text-xl text-warmGraphite-500 mb-12 max-w-2xl mx-auto">
+            <p className="text-base sm:text-lg text-warmGraphite-500 mb-8 sm:mb-12 max-w-2xl mx-auto">
               Объединяем медицинские данные, спорт, питание, психологию и AI-коучинг в единую экосистему
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">

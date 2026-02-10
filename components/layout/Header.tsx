@@ -5,11 +5,13 @@ import Link from 'next/link'
 import { Menu, X, Search } from 'lucide-react'
 import Sidebar from './Sidebar'
 import { cn } from '@/lib/utils/cn'
+import { useI18n } from '@/lib/i18n/I18nProvider'
 
 export default function Header() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
+  const { lang, setLang, t } = useI18n()
 
   return (
     <>
@@ -35,43 +37,72 @@ export default function Header() {
               </span>
             </Link>
 
-            {/* Right: Search */}
-            <div className="relative">
-              {isSearchOpen ? (
-                <div className="flex items-center gap-2">
-                  <input
-                    type="text"
-                    placeholder="Поиск..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="neumorphic-input w-64 text-sm text-warmGraphite-800 placeholder-warmGray-500"
-                    autoFocus
-                    onBlur={() => {
-                      if (!searchQuery) setIsSearchOpen(false)
-                    }}
-                  />
+            {/* Right: Search + Language */}
+            <div className="flex items-center gap-3">
+              <div className="relative">
+                {isSearchOpen ? (
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="text"
+                      placeholder={t('header.search.placeholder')}
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="neumorphic-input w-48 sm:w-64 text-sm text-warmGraphite-800 placeholder-warmGray-500"
+                      autoFocus
+                      onBlur={() => {
+                        if (!searchQuery) setIsSearchOpen(false)
+                      }}
+                    />
+                    <button
+                      onClick={() => {
+                        setSearchQuery('')
+                        setIsSearchOpen(false)
+                      }}
+                      className="neumorphic-button p-2 rounded-neumorphic-sm text-warmGraphite-600"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
+                ) : (
                   <button
-                    onClick={() => {
-                      setSearchQuery('')
-                      setIsSearchOpen(false)
-                    }}
-                    className="neumorphic-button p-2 rounded-neumorphic-sm text-warmGraphite-600"
+                    onClick={() => setIsSearchOpen(true)}
+                    className={cn(
+                      'neumorphic-button p-2 rounded-neumorphic-sm',
+                      'text-warmGraphite-700 hover:text-warmBlue-600'
+                    )}
+                    aria-label={t('header.search.placeholder')}
                   >
-                    <X className="w-5 h-5" />
+                    <Search className="w-6 h-6" />
                   </button>
-                </div>
-              ) : (
+                )}
+              </div>
+
+              <div className="flex border border-warmGray-300 rounded-full overflow-hidden text-xs">
                 <button
-                  onClick={() => setIsSearchOpen(true)}
+                  type="button"
+                  onClick={() => setLang('ru')}
                   className={cn(
-                    'neumorphic-button p-2 rounded-neumorphic-sm',
-                    'text-warmGraphite-700 hover:text-warmBlue-600'
+                    'px-2 py-1',
+                    lang === 'ru'
+                      ? 'bg-warmBlue-500 text-white'
+                      : 'bg-warmBeige-50 text-warmGraphite-700'
                   )}
-                  aria-label="Поиск"
                 >
-                  <Search className="w-6 h-6" />
+                  RU
                 </button>
-              )}
+                <button
+                  type="button"
+                  onClick={() => setLang('en')}
+                  className={cn(
+                    'px-2 py-1',
+                    lang === 'en'
+                      ? 'bg-warmBlue-500 text-white'
+                      : 'bg-warmBeige-50 text-warmGraphite-700'
+                  )}
+                >
+                  EN
+                </button>
+              </div>
             </div>
           </div>
         </div>
