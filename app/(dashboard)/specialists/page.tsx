@@ -211,7 +211,7 @@ export default function SpecialistsPage() {
               const spec = specialists.length > 0 ? expert : expert as any
               const name = spec.name || spec.firstName || spec.username || 'Специалист'
               const role = spec.role || spec.specialization || 'Специалист'
-              const rating = spec.rating || parseFloat(expert.rating) || 4.5
+              const rating = typeof spec.rating === 'number' ? spec.rating : (typeof expert.rating === 'number' ? expert.rating : parseFloat(String(expert.rating || '4.5')) || 4.5)
               const reviews = spec.reviews || expert.reviews || 0
               const price = spec.price || Math.floor(Math.random() * 5000) + 1000
 
@@ -238,7 +238,7 @@ export default function SpecialistsPage() {
                       <div className="flex items-center justify-center gap-1 mb-2">
                         <Star className="w-4 h-4 fill-warmPink-500 text-warmPink-500" />
                         <span className="text-sm font-semibold text-warmGraphite-800">
-                          {rating.toFixed(1)}
+                          {Number(rating).toFixed(1)}
                         </span>
                         <span className="text-xs text-warmGray-600">({reviews})</span>
                       </div>
@@ -316,7 +316,7 @@ export default function SpecialistsPage() {
               {specialists.map((spec, index) => {
                 const name = spec.name || spec.firstName || spec.username || 'Специалист'
                 const role = spec.role || spec.specialization || 'Специалист'
-                const rating = spec.rating || 4.5
+                const rating = typeof spec.rating === 'number' ? spec.rating : 4.5
                 const reviews = spec.reviews || 0
                 const price = spec.price || Math.floor(Math.random() * 5000) + 1000
 
@@ -344,7 +344,7 @@ export default function SpecialistsPage() {
                           <div className="flex items-center gap-1">
                             <Star className="w-3 h-3 fill-warmPink-500 text-warmPink-500" />
                             <span className="text-xs font-semibold text-warmGraphite-800">
-                              {rating.toFixed(1)}
+                              {Number(rating).toFixed(1)}
                             </span>
                             <span className="text-xs text-warmGray-600">({reviews})</span>
                           </div>
