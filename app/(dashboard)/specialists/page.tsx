@@ -1,12 +1,15 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Search, Star, Clock, MapPin, Filter } from 'lucide-react'
+import { Search, Star, Clock, MapPin, Filter, Calendar, MessageCircle, Award } from 'lucide-react'
+import { motion } from 'framer-motion'
 import NeumorphicCard from '@/components/ui/NeumorphicCard'
 import NeumorphicButton from '@/components/ui/NeumorphicButton'
 import NeumorphicInput from '@/components/ui/NeumorphicInput'
 import NeumorphicBadge from '@/components/ui/NeumorphicBadge'
 import NeumorphicModal from '@/components/ui/NeumorphicModal'
+import NeumorphicCarousel from '@/components/ui/NeumorphicCarousel'
+import { generateMockSpecialists } from '@/lib/mocks/data-generators'
 import { cn } from '@/lib/utils/cn'
 
 const categories = [
@@ -83,7 +86,9 @@ export default function SpecialistsPage() {
   const [recommendations, setRecommendations] = useState<any[]>([])
   const [offers, setOffers] = useState<any[]>([])
   const [specialists, setSpecialists] = useState<any[]>([])
+  const [mockSpecialists] = useState(generateMockSpecialists(20))
   const [query, setQuery] = useState('')
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const [selectedSpecialist, setSelectedSpecialist] = useState<any | null>(null)
   const [slots, setSlots] = useState<any[]>([])
   const [services, setServices] = useState<any[]>([])
@@ -94,12 +99,17 @@ export default function SpecialistsPage() {
 
   useEffect(() => {
     const load = async () => {
-      const recs = await fetch('/api/partners/recommendations').then((res) => res.json())
-      setRecommendations(Array.isArray(recs) ? recs : [])
-      const list = await fetch('/api/cashback/offers').then((res) => res.json())
-      setOffers(Array.isArray(list) ? list : [])
-      const people = await fetch('/api/specialists').then((res) => res.json())
-      setSpecialists(Array.isArray(people) ? people : [])
+      try {
+        const recs = await fetch('/api/partners/recommendations').then((res) => res.json())
+        setRecommendations(Array.isArray(recs) ? recs : [])
+        const list = await fetch('/api/cashback/offers').then((res) => res.json())
+        setOffers(Array.isArray(list) ? list : [])
+        const people = await fetch('/api/specialists').then((res) => res.json())
+        setSpecialists(Array.isArray(people) && people.length > 0 ? people : mockSpecialists)
+      } catch (err) {
+        // Используем моки при ошибке
+        setSpecialists(mockSpecialists)
+      }
     }
     load()
   }, [])
@@ -197,36 +207,61 @@ export default function SpecialistsPage() {
             </button>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {topExperts.map((expert, index) => (
-              <NeumorphicCard
-                key={expert.name}
-                soft
-                className="p-4 hover:scale-105 transition-all duration-300 cursor-pointer animate-fadeIn"
-                style={{ animationDelay: `${0.2 + index * 0.1}s` }}
-                onClick={() => handleSelect(expert as any)}
-              >
-                <div className="text-base sm:text-lg font-semibold text-warmGraphite-800 mb-1">
-                  {expert.name}
-                </div>
-                <div className="text-sm text-warmGraphite-600 mb-2">{expert.role}</div>
-                <div className="text-xs text-warmGray-600 mb-3 flex items-center gap-1">
-                  <Clock className="w-3 h-3" />
-                  {expert.format}
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-1">
-                    <Star className="w-4 h-4 fill-warmPink-500 text-warmPink-500" />
-                    <span className="text-sm font-semibold text-warmGraphite-800">
-                      {expert.rating}
-                    </span>
-                    <span className="text-xs text-warmGray-600">({expert.reviews})</span>
-                  </div>
-                  <NeumorphicButton className="text-xs px-3 py-1">
-                    Записаться
-                  </NeumorphicButton>
-                </div>
-              </NeumorphicCard>
-            ))}
+            {(specialists.length > 0 ? specialists.slice(0, 4) : topExperts).map((expert, index) => {
+              const spec = specialists.length > 0 ? expert : expert as any
+              const name = spec.name || spec.firstName || spec.username || 'Специалист'
+              const role = spec.role || spec.specialization || 'Специалист'
+              const rating = spec.rating || parseFloat(expert.rating) || 4.5
+              const reviews = spec.reviews || expert.reviews || 0
+              const price = spec.price || Math.floor(Math.random() * 5000) + 1000
+
+              return (
+                <motion.div
+                  key={spec.id || expert.name}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                >
+                  <NeumorphicCard
+                    soft
+                    className="p-4 hover:scale-105 transition-all duration-300 cursor-pointer"
+                    onClick={() => handleSelect(spec)}
+                  >
+                    <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full neumorphic-card-soft flex items-center justify-center text-lg sm:text-xl font-bold text-warmGraphite-700 mb-3 mx-auto">
+                      {name[0]}
+                    </div>
+                    <div className="text-center mb-2">
+                      <div className="text-base sm:text-lg font-semibold text-warmGraphite-800 mb-1">
+                        {name}
+                      </div>
+                      <div className="text-xs sm:text-sm text-warmGraphite-600 mb-2">{role}</div>
+                      <div className="flex items-center justify-center gap-1 mb-2">
+                        <Star className="w-4 h-4 fill-warmPink-500 text-warmPink-500" />
+                        <span className="text-sm font-semibold text-warmGraphite-800">
+                          {rating.toFixed(1)}
+                        </span>
+                        <span className="text-xs text-warmGray-600">({reviews})</span>
+                      </div>
+                      <div className="text-xs text-warmGray-600 mb-3 flex items-center justify-center gap-1">
+                        <Clock className="w-3 h-3" />
+                        от {price} ₽
+                      </div>
+                    </div>
+                    <NeumorphicButton
+                      primary
+                      className="w-full text-xs sm:text-sm"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleSelect(spec)
+                      }}
+                    >
+                      <Calendar className="w-3 h-3 mr-1" />
+                      Записаться
+                    </NeumorphicButton>
+                  </NeumorphicCard>
+                </motion.div>
+              )
+            })}
           </div>
         </NeumorphicCard>
 
@@ -278,27 +313,62 @@ export default function SpecialistsPage() {
                   Специалистов пока нет.
                 </div>
               )}
-              {specialists.map((spec, index) => (
-                <NeumorphicCard
-                  key={spec.id}
-                  soft
-                  className="p-4 flex items-center justify-between hover:scale-[1.01] transition-transform animate-fadeIn"
-                  style={{ animationDelay: `${0.6 + index * 0.05}s` }}
-                >
-                  <div>
-                    <div className="font-semibold text-warmGraphite-800">
-                      {spec.firstName || ''} {spec.lastName || ''} {spec.username}
-                    </div>
-                    <div className="text-xs text-warmGray-600 mt-1">{spec.role}</div>
-                  </div>
-                  <NeumorphicButton
-                    className="text-xs px-3 py-1.5"
-                    onClick={() => handleSelect(spec)}
+              {specialists.map((spec, index) => {
+                const name = spec.name || spec.firstName || spec.username || 'Специалист'
+                const role = spec.role || spec.specialization || 'Специалист'
+                const rating = spec.rating || 4.5
+                const reviews = spec.reviews || 0
+                const price = spec.price || Math.floor(Math.random() * 5000) + 1000
+
+                return (
+                  <motion.div
+                    key={spec.id}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.05 }}
                   >
-                    Слоты
-                  </NeumorphicButton>
-                </NeumorphicCard>
-              ))}
+                    <NeumorphicCard
+                      soft
+                      className="p-4 flex items-center gap-4 hover:scale-[1.01] transition-transform cursor-pointer"
+                      onClick={() => handleSelect(spec)}
+                    >
+                      <div className="w-12 h-12 rounded-full neumorphic-card-soft flex items-center justify-center text-lg font-bold text-warmGraphite-700 flex-shrink-0">
+                        {name[0]}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="font-semibold text-warmGraphite-800 text-sm sm:text-base mb-1">
+                          {name}
+                        </div>
+                        <div className="text-xs text-warmGraphite-600 mb-2">{role}</div>
+                        <div className="flex items-center gap-3 flex-wrap">
+                          <div className="flex items-center gap-1">
+                            <Star className="w-3 h-3 fill-warmPink-500 text-warmPink-500" />
+                            <span className="text-xs font-semibold text-warmGraphite-800">
+                              {rating.toFixed(1)}
+                            </span>
+                            <span className="text-xs text-warmGray-600">({reviews})</span>
+                          </div>
+                          <div className="text-xs text-warmGray-600 flex items-center gap-1">
+                            <Clock className="w-3 h-3" />
+                            от {price} ₽
+                          </div>
+                        </div>
+                      </div>
+                      <NeumorphicButton
+                        primary
+                        className="text-xs px-3 py-1.5 flex-shrink-0"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleSelect(spec)
+                        }}
+                      >
+                        <Calendar className="w-3 h-3 mr-1" />
+                        Запись
+                      </NeumorphicButton>
+                    </NeumorphicCard>
+                  </motion.div>
+                )
+              })}
             </div>
           </NeumorphicCard>
 
