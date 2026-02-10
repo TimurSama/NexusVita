@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Sparkles, MessageSquare, Users, BarChart3, BookOpen } from 'lucide-react'
 import NeumorphicCard from '@/components/ui/NeumorphicCard'
