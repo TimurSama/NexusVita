@@ -6,15 +6,8 @@ const nextConfig = {
   },
   transpilePackages: [],
   // Exclude presentation folder from build
-  webpack: (config) => {
-    config.watchOptions = {
-      ...config.watchOptions,
-      ignored: ['**/presentation/**'],
-    }
-    // Exclude presentation from compilation
-    config.resolve.alias = {
-      ...config.resolve.alias,
-    }
+  webpack: (config, { isServer }) => {
+    // Ignore presentation folder completely
     config.module.rules.push({
       test: /presentation\/.*\.(ts|tsx|js|jsx)$/,
       use: 'ignore-loader',
