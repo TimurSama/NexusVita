@@ -65,11 +65,30 @@ export default function ChatWidget({
   const [currentQuestion, setCurrentQuestion] = useState(0)
   const [formProgress, setFormProgress] = useState(0)
   const [selectedOptions, setSelectedOptions] = useState<string[]>([])
+  // Отслеживаем все пройденные вопросы и все контексты
+  const [answeredQuestionIds, setAnsweredQuestionIds] = useState<Set<string>>(new Set())
+  const [visitedContexts, setVisitedContexts] = useState<Set<string>>(new Set())
 
-  const activeContext = context || 'general'
-  const contextIds = contextQuestionMap[activeContext] || contextQuestionMap.general
-  const activeQuestions =
-    questions.filter((q) => contextIds.includes(q.id)) || questions
+  // Собираем ВСЕ вопросы из всех контекстов, которые пользователь проходил
+  const getAllQuestionsFromContexts = () => {
+    const allQuestionIds = new Set<string>()
+    
+    // Добавляем вопросы из всех посещённых контекстов
+    visitedContexts.forEach((ctx) => {
+      const ids = contextQuestionMap[ctx] || contextQuestionMap.general
+      ids.forEach((id) => allQuestionIds.add(id))
+    })
+    
+    // Добавляем вопросы из текущего контекста
+    const activeContext = context || 'general'
+    const currentContextIds = contextQuestionMap[activeContext] || contextQuestionMap.general
+    currentContextIds.forEach((id) => allQuestionIds.add(id))
+    
+    // Фильтруем вопросы, которые ещё не были заданы
+    return questions.filter((q) => allQuestionIds.has(q.id) && !answeredQuestionIds.has(q.id))
+  }
+
+  const activeQuestions = getAllQuestionsFromContexts()
 
   const applyAnswerToFormData = (question: Question, answer: string | string[]) => {
     const valueArray = Array.isArray(answer) ? answer : answer.split(',').map((v) => v.trim())
@@ -206,6 +225,8 @@ export default function ChatWidget({
 
   const handleAnswerSubmit = (answer: string, questionType?: string) => {
     const question = activeQuestions[currentQuestion]
+    if (!question) return
+    
     const finalAnswer =
       questionType === 'multiselect' && selectedOptions.length > 0
         ? selectedOptions.join(', ')
@@ -213,6 +234,9 @@ export default function ChatWidget({
 
     if (!finalAnswer.trim() && (!questionType || questionType !== 'multiselect')) return
     if (questionType === 'multiselect' && selectedOptions.length === 0) return
+
+    // Отмечаем вопрос как пройденный
+    setAnsweredQuestionIds((prev) => new Set([...prev, question.id]))
 
     // Обновляем демо-форму и профиль/состояние
     if (questionType === 'multiselect') {
@@ -230,12 +254,40 @@ export default function ChatWidget({
     setChatInput('')
     setSelectedOptions([])
 
-    const progress = ((currentQuestion + 1) / activeQuestions.length) * 100
+    // Пересчитываем активные вопросы (убираем уже отвеченные)
+    const remainingQuestions = getAllQuestionsFromContexts()
+    const totalQuestions = questions.length
+    const answeredCount = answeredQuestionIds.size + 1
+    const progress = (answeredCount / totalQuestions) * 100
     setFormProgress(progress)
 
     setTimeout(() => {
-      if (currentQuestion < activeQuestions.length - 1) {
-        const nextQuestion = activeQuestions[currentQuestion + 1]
+      // Обновляем список посещённых контекстов
+      const activeContext = context || 'general'
+      setVisitedContexts((prev) => {
+        const updated = new Set(prev)
+        if (updated.size === 0) updated.add('general')
+        updated.add(activeContext)
+        return updated
+      })
+      
+      // Собираем все ID вопросов из всех посещённых контекстов + текущего
+      const allIds = new Set<string>()
+      const activeCtx = context || 'general'
+      const currentIds = contextQuestionMap[activeCtx] || contextQuestionMap.general
+      currentIds.forEach((id) => allIds.add(id))
+      visitedContexts.forEach((ctx) => {
+        const ids = contextQuestionMap[ctx] || contextQuestionMap.general
+        ids.forEach((id) => allIds.add(id))
+      })
+      
+      // Фильтруем вопросы, которые ещё не были заданы
+      const nextRemaining = questions.filter(
+        (q) => allIds.has(q.id) && !answeredQuestionIds.has(q.id) && q.id !== question.id
+      )
+      
+      if (nextRemaining.length > 0) {
+        const nextQuestion = nextRemaining[0]
         setChatMessages((prev) => [
           ...prev,
           {
@@ -245,8 +297,9 @@ export default function ChatWidget({
             options: nextQuestion.options,
           },
         ])
-        setCurrentQuestion(currentQuestion + 1)
+        setCurrentQuestion(0)
       } else {
+        // Все вопросы из всех контекстов пройдены
         setChatMessages((prev) => [
           ...prev,
           {
@@ -299,25 +352,39 @@ export default function ChatWidget({
   }
 
   useEffect(() => {
-    if (!isOpen || activeQuestions.length === 0) return
+    if (!isOpen) return
 
-    // При смене контекста перезапускаем блок вопросов по новой теме
-    setCurrentQuestion(0)
-    setFormProgress(0)
-    setSelectedOptions([])
+    const activeContext = context || 'general'
+    
+    // Добавляем текущий контекст в посещённые (если его ещё нет)
+    setVisitedContexts((prev) => {
+      const updated = new Set(prev)
+      if (updated.size === 0) {
+        // При первом запуске добавляем 'general'
+        updated.add('general')
+      }
+      updated.add(activeContext)
+      return updated
+    })
 
-    const first = activeQuestions[0]
-    setChatMessages((prev) => [
-      ...prev,
-      {
-        sender: 'ai',
-        text: first.text,
-        type: first.type,
-        options: first.options,
-      },
-    ])
+    // Пересчитываем оставшиеся вопросы после обновления контекстов
+    const remaining = getAllQuestionsFromContexts()
+    
+    // Если это первый запуск или нет сообщений, задаём первый вопрос
+    if (chatMessages.length === 0 && remaining.length > 0) {
+      const first = remaining[0]
+      setChatMessages([
+        {
+          sender: 'ai',
+          text: first.text,
+          type: first.type,
+          options: first.options,
+        },
+      ])
+      setCurrentQuestion(0)
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOpen, activeContext])
+  }, [isOpen, context])
 
   if (!isOpen) return null
 

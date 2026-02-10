@@ -78,7 +78,7 @@ export default function NeumorphicModal({
         )}
 
         {/* Content */}
-        <div className="p-6">{children}</div>
+        <div className="p-6 max-h-[80vh] overflow-y-auto">{children}</div>
       </div>
     </div>
   )

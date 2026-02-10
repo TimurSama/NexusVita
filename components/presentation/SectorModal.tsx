@@ -20,7 +20,7 @@ export default function SectorModal({ sector, isOpen, onClose }: SectorModalProp
       title={sector.title}
       size="lg"
     >
-      <div className="space-y-4 sm:space-y-6">
+      <div className="space-y-4 sm:space-y-6 max-h-[70vh] overflow-y-auto pr-2">
         <div className={`text-${sector.color}-500 text-5xl sm:text-6xl mb-3 sm:mb-4 flex justify-center`}>
           {sector.icon}
         </div>
