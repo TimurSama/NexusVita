@@ -262,21 +262,19 @@ export default function ChatWidget({
     setFormProgress(progress)
 
     setTimeout(() => {
-      // Обновляем список посещённых контекстов
+      // Обновляем список посещённых контекстов и сразу используем обновлённое значение
       const activeContext = context || 'general'
-      setVisitedContexts((prev) => {
-        const updated = new Set(prev)
-        if (updated.size === 0) updated.add('general')
-        updated.add(activeContext)
-        return updated
-      })
+      const updatedContexts = new Set(visitedContexts)
+      if (updatedContexts.size === 0) updatedContexts.add('general')
+      updatedContexts.add(activeContext)
+      setVisitedContexts(updatedContexts)
       
       // Собираем все ID вопросов из всех посещённых контекстов + текущего
       const allIds = new Set<string>()
       const activeCtx = context || 'general'
       const currentIds = contextQuestionMap[activeCtx] || contextQuestionMap.general
       currentIds.forEach((id) => allIds.add(id))
-      visitedContexts.forEach((ctx) => {
+      updatedContexts.forEach((ctx) => {
         const ids = contextQuestionMap[ctx] || contextQuestionMap.general
         ids.forEach((id) => allIds.add(id))
       })
