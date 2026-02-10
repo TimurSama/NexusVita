@@ -28,7 +28,7 @@ export const SketchButton = ({
           : "bg-ink text-parchment border-2 border-ink",
         className
       )}
-      {...props}
+      {...(props as any)}
     >
       <div className="absolute inset-0 hatching opacity-0 hover:opacity-100 transition-opacity pointer-events-none rounded-inherit" />
       <span className="relative z-10 flex items-center justify-center gap-3">
