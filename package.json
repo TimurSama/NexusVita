@@ -15,7 +15,15 @@
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",
-    "db:seed": "tsx prisma/seed.ts"
+    "db:seed": "tsx prisma/seed.ts",
+    "vercel:login": "vercel login",
+    "vercel:link": "vercel link",
+    "vercel:deploy": "vercel --prod",
+    "vercel:logs": "vercel logs",
+    "vercel:logs:follow": "vercel logs --follow",
+    "vercel:env": "vercel env ls",
+    "vercel:domains": "vercel domains ls",
+    "vercel:inspect": "vercel inspect"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
