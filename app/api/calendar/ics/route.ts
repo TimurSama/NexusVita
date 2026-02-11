@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db/prisma'
 import { ensureSelfOrRole } from '@/lib/auth/requireRole'
 
+export const dynamic = 'force-dynamic'
+
 function formatDate(date: Date) {
   return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z'
 }

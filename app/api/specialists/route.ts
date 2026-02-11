@@ -3,6 +3,8 @@ import { prisma, isDatabaseAvailable } from '@/lib/db/prisma'
 import { UserRole } from '@prisma/client'
 import { mockSpecialists } from '@/lib/demo/mock-data'
 
+export const dynamic = 'force-dynamic'
+
 export async function GET(request: NextRequest) {
   try {
     const dbAvailable = await isDatabaseAvailable()
