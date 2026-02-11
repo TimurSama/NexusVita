@@ -1,5 +1,7 @@
 'use client'
 
+export const dynamic = 'force-dynamic'
+
 import { useState, useEffect, useMemo } from 'react'
 import { motion, AnimatePresence, useScroll, useSpring, useTransform } from 'framer-motion'
 import { 
@@ -1427,5 +1429,6 @@ function getValuePoints(perspective: string, lang: string) {
       ]
     }
   }
-  return data[perspective]?.[lang] || []
+  const result = data[perspective]?.[lang] || []
+  return Array.isArray(result) ? result : []
 }
