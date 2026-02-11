@@ -97,6 +97,10 @@ export default function DemoPresentationPage() {
   const [chatOpen, setChatOpen] = useState(true)
   const [chatContext, setChatContext] = useState<string | null>('general')
   
+  // Ensure modules and sectors are available
+  const safeModules = modules || []
+  const safeSectors = sectors || []
+  
   // Survey State
   const [survey, setSurvey] = useState({
     height: 175,
@@ -120,8 +124,8 @@ export default function DemoPresentationPage() {
     setShowPlanModal(true)
   }
 
-  const selectedSectorData = activeSector ? sectors.find(s => s.id === activeSector) ?? null : null
-  const selectedModuleData = activeModule ? modules.find(m => m.id === activeModule) ?? null : null
+  const selectedSectorData = activeSector ? safeSectors.find(s => s.id === activeSector) ?? null : null
+  const selectedModuleData = activeModule ? safeModules.find(m => m.id === activeModule) ?? null : null
 
   return (
     <div className="min-h-screen bg-warmBeige-50 font-serif text-warmGraphite-800 selection:bg-warmGraphite-800 selection:text-warmBeige-50">

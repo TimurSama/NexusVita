@@ -14,10 +14,6 @@ const nextConfig = {
     })
     return config
   },
-  // Disable static optimization for demo and presentation pages
-  experimental: {
-    isrMemoryCacheSize: 0,
-  },
 }
 
 module.exports = nextConfig
