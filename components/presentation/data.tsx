@@ -1,4 +1,5 @@
-// Icon mapping - no React components in data for serialization
+// Data file - no React components, only serializable data
+// This file should NOT have 'use client' directive
 import { Sector, Module } from './types'
 
 export const sectors: Sector[] = [
