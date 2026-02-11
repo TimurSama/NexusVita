@@ -1,8 +1,6 @@
-import { ReactNode } from 'react'
+'use client'
 
-// Disable static generation for all pages in this group
-export const dynamic = 'force-dynamic'
-export const revalidate = 0
+import { ReactNode } from 'react'
 
 export default function PublicLayout({
   children,

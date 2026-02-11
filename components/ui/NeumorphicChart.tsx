@@ -33,25 +33,41 @@ export default function NeumorphicChart({
 }: NeumorphicChartProps) {
   const [animatedValues, setAnimatedValues] = useState<number[]>([])
 
-  const maxValue = Math.max(...data.map((d) => d.value), 1)
+  // Ensure data is valid and not empty
+  const safeData = Array.isArray(data) && data.length > 0 ? data : []
+  const maxValue = safeData.length > 0 ? Math.max(...safeData.map((d) => (typeof d.value === 'number' && !isNaN(d.value) ? d.value : 0)), 1) : 1
 
   useEffect(() => {
+    if (safeData.length === 0) {
+      setAnimatedValues([])
+      return
+    }
     if (animate) {
-      setAnimatedValues(data.map(() => 0))
+      setAnimatedValues(safeData.map(() => 0))
       const timer = setTimeout(() => {
-        setAnimatedValues(data.map((d) => d.value))
+        setAnimatedValues(safeData.map((d) => typeof d.value === 'number' && !isNaN(d.value) ? d.value : 0))
       }, 100)
       return () => clearTimeout(timer)
     } else {
-      setAnimatedValues(data.map((d) => d.value))
+      setAnimatedValues(safeData.map((d) => typeof d.value === 'number' && !isNaN(d.value) ? d.value : 0))
     }
-  }, [data, animate])
+  }, [safeData, animate])
 
   const renderLineChart = () => {
-    const points = data.map((d, i) => {
-      const x = (i / (data.length - 1 || 1)) * 100
-      const y = 100 - (animatedValues[i] / maxValue) * 100
-      return `${x},${y}`
+    if (safeData.length === 0) {
+      return <div className="text-center text-warmGraphite-500 py-8">Нет данных для отображения</div>
+    }
+    
+    const points = safeData.map((d, i) => {
+      const divisor = safeData.length > 1 ? safeData.length - 1 : 1
+      const x = (i / divisor) * 100
+      const safeValue = typeof animatedValues[i] === 'number' && !isNaN(animatedValues[i]) ? animatedValues[i] : 0
+      const safeMax = typeof maxValue === 'number' && !isNaN(maxValue) && maxValue > 0 ? maxValue : 1
+      const y = 100 - (safeValue / safeMax) * 100
+      // Ensure x and y are valid numbers
+      const safeX = typeof x === 'number' && !isNaN(x) ? x : 0
+      const safeY = typeof y === 'number' && !isNaN(y) ? y : 100
+      return `${safeX},${safeY}`
     }).join(' ')
 
     return (
@@ -81,14 +97,20 @@ export default function NeumorphicChart({
           strokeLinecap="round"
           strokeLinejoin="round"
         />
-        {data.map((d, i) => {
-          const x = (i / (data.length - 1 || 1)) * 100
-          const y = 100 - (animatedValues[i] / maxValue) * 100
+        {safeData.map((d, i) => {
+          const divisor = safeData.length > 1 ? safeData.length - 1 : 1
+          const x = (i / divisor) * 100
+          const safeValue = typeof animatedValues[i] === 'number' && !isNaN(animatedValues[i]) ? animatedValues[i] : 0
+          const safeMax = typeof maxValue === 'number' && !isNaN(maxValue) && maxValue > 0 ? maxValue : 1
+          const y = 100 - (safeValue / safeMax) * 100
+          // Ensure x and y are valid numbers
+          const safeX = typeof x === 'number' && !isNaN(x) ? x : 0
+          const safeY = typeof y === 'number' && !isNaN(y) ? y : 100
           return (
             <circle
               key={i}
-              cx={x}
-              cy={y}
+              cx={safeX}
+              cy={safeY}
               r="2"
               fill="currentColor"
               className="text-warmBlue-500"
@@ -100,7 +122,11 @@ export default function NeumorphicChart({
   }
 
   const renderBarChart = () => {
-    const barWidth = 100 / data.length
+    if (safeData.length === 0) {
+      return <div className="text-center text-warmGraphite-500 py-8">Нет данных для отображения</div>
+    }
+    
+    const barWidth = 100 / safeData.length
 
     return (
       <svg viewBox="0 0 100 100" className="w-full h-full" preserveAspectRatio="none">
@@ -120,23 +146,31 @@ export default function NeumorphicChart({
             ))}
           </>
         )}
-        {data.map((d, i) => {
-          const barHeight = (animatedValues[i] / maxValue) * 100
+        {safeData.map((d, i) => {
+          const safeValue = typeof animatedValues[i] === 'number' && !isNaN(animatedValues[i]) ? animatedValues[i] : 0
+          const safeMax = typeof maxValue === 'number' && !isNaN(maxValue) && maxValue > 0 ? maxValue : 1
+          const barHeight = (safeValue / safeMax) * 100
           const x = (i * barWidth) + (barWidth * 0.1)
           const width = barWidth * 0.8
           const y = 100 - barHeight
+          
+          // Ensure all values are valid numbers
+          const safeX = typeof x === 'number' && !isNaN(x) ? x : 0
+          const safeY = typeof y === 'number' && !isNaN(y) ? y : 100
+          const safeWidth = typeof width === 'number' && !isNaN(width) ? width : 0
+          const safeBarHeight = typeof barHeight === 'number' && !isNaN(barHeight) && barHeight >= 0 ? barHeight : 0
 
           return (
             <motion.rect
               key={i}
-              x={x}
-              y={y}
-              width={width}
-              height={barHeight}
+              x={safeX}
+              y={safeY}
+              width={safeWidth}
+              height={safeBarHeight}
               fill="currentColor"
               className={d.color || 'text-warmBlue-500'}
               initial={{ height: 0, y: 100 }}
-              animate={{ height: barHeight, y }}
+              animate={{ height: safeBarHeight, y: safeY }}
               transition={{ duration: 0.6, delay: i * 0.1 }}
             />
           )
@@ -146,8 +180,19 @@ export default function NeumorphicChart({
   }
 
   const renderPieChart = () => {
+    if (safeData.length === 0) {
+      return <div className="text-center text-warmGraphite-500 py-8">Нет данных для отображения</div>
+    }
+    
     let currentAngle = -90
-    const total = data.reduce((sum, d) => sum + d.value, 0)
+    const total = safeData.reduce((sum, d) => {
+      const value = typeof d.value === 'number' && !isNaN(d.value) ? d.value : 0
+      return sum + value
+    }, 0)
+    
+    if (total === 0) {
+      return <div className="text-center text-warmGraphite-500 py-8">Нет данных для отображения</div>
+    }
 
     return (
       <svg viewBox="0 0 100 100" className="w-full h-full">
@@ -160,8 +205,9 @@ export default function NeumorphicChart({
           strokeWidth="2"
           className="text-warmGray-200"
         />
-        {data.map((d, i) => {
-          const percentage = (d.value / total) * 100
+        {safeData.map((d, i) => {
+          const safeValue = typeof d.value === 'number' && !isNaN(d.value) ? d.value : 0
+          const percentage = (safeValue / total) * 100
           const angle = (percentage / 100) * 360
           const startAngle = currentAngle
           const endAngle = currentAngle + angle
@@ -171,11 +217,17 @@ export default function NeumorphicChart({
           const x2 = 50 + 40 * Math.cos((endAngle * Math.PI) / 180)
           const y2 = 50 + 40 * Math.sin((endAngle * Math.PI) / 180)
           const largeArc = angle > 180 ? 1 : 0
+          
+          // Ensure all values are valid numbers
+          const safeX1 = typeof x1 === 'number' && !isNaN(x1) ? x1 : 50
+          const safeY1 = typeof y1 === 'number' && !isNaN(y1) ? y1 : 50
+          const safeX2 = typeof x2 === 'number' && !isNaN(x2) ? x2 : 50
+          const safeY2 = typeof y2 === 'number' && !isNaN(y2) ? y2 : 50
 
           const pathData = [
             `M 50 50`,
-            `L ${x1} ${y1}`,
-            `A 40 40 0 ${largeArc} 1 ${x2} ${y2}`,
+            `L ${safeX1} ${safeY1}`,
+            `A 40 40 0 ${largeArc} 1 ${safeX2} ${safeY2}`,
             `Z`,
           ].join(' ')
 
@@ -197,8 +249,16 @@ export default function NeumorphicChart({
   }
 
   const renderProgressChart = () => {
-    const total = data.reduce((sum, d) => sum + d.value, 0)
-    const percentage = (total / maxValue) * 100
+    if (safeData.length === 0) {
+      return <div className="text-center text-warmGraphite-500 py-8">Нет данных для отображения</div>
+    }
+    
+    const total = safeData.reduce((sum, d) => {
+      const value = typeof d.value === 'number' && !isNaN(d.value) ? d.value : 0
+      return sum + value
+    }, 0)
+    const safeMax = typeof maxValue === 'number' && !isNaN(maxValue) && maxValue > 0 ? maxValue : 1
+    const percentage = Math.min(Math.max((total / safeMax) * 100, 0), 100)
 
     return (
       <div className="w-full">
@@ -232,16 +292,16 @@ export default function NeumorphicChart({
         {type === 'pie' && renderPieChart()}
         {type === 'progress' && renderProgressChart()}
       </div>
-      {showLabels && type !== 'progress' && (
+      {showLabels && type !== 'progress' && safeData.length > 0 && (
         <div className="mt-4 flex flex-wrap gap-2 sm:gap-4">
-          {data.map((d, i) => (
+          {safeData.map((d, i) => (
             <div key={i} className="flex items-center gap-2">
               <div
                 className="w-3 h-3 rounded-full"
-                style={{ backgroundColor: d.color || `hsl(${(i * 360) / data.length}, 70%, 60%)` }}
+                style={{ backgroundColor: d.color || `hsl(${(i * 360) / safeData.length}, 70%, 60%)` }}
               />
               <span className="text-xs sm:text-sm text-warmGraphite-600">
-                {d.label}: {d.value}
+                {d.label}: {typeof d.value === 'number' && !isNaN(d.value) ? d.value : 0}
               </span>
             </div>
           ))}

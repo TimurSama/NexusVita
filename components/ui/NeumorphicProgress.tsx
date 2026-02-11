@@ -36,7 +36,10 @@ export default function NeumorphicProgress({
   className,
 }: NeumorphicProgressProps) {
   const [animatedValue, setAnimatedValue] = useState(0)
-  const percentage = Math.min(Math.max((value / max) * 100, 0), 100)
+  // Ensure value and max are valid numbers
+  const safeValue = typeof value === 'number' && !isNaN(value) ? value : 0
+  const safeMax = typeof max === 'number' && !isNaN(max) && max > 0 ? max : 100
+  const percentage = Math.min(Math.max((safeValue / safeMax) * 100, 0), 100)
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -50,7 +53,7 @@ export default function NeumorphicProgress({
       {(showLabel || label) && (
         <div className="flex items-center justify-between mb-2">
           <span className="text-sm font-medium text-warmGraphite-700">
-            {label || `${Math.round(value)}%`}
+            {label || `${Math.round(safeValue)}%`}
           </span>
           {showLabel && (
             <span className="text-sm text-warmGray-600">
