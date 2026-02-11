@@ -1,5 +1,9 @@
 'use client'
 
+// Disable static generation for this page
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 import { useState, useEffect, useMemo } from 'react'
 import { motion, AnimatePresence, useScroll, useSpring, useTransform } from 'framer-motion'
 import { 
@@ -360,7 +364,7 @@ export default function DemoPresentationPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {modules.map((module, index) => (
+            {safeModules.map((module, index) => (
               <motion.div
                 key={module.id}
                 initial={{ opacity: 0, y: 20 }}
@@ -402,7 +406,7 @@ export default function DemoPresentationPage() {
         <SectionHeader number="08" title="Секторы здоровья" subtitle={t('ecosystem.description', 'Все аспекты здоровья в одной экосистеме')} />
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {sectors.map((sector, index) => (
+          {safeSectors.map((sector, index) => (
             <motion.div
               key={sector.id}
               initial={{ opacity: 0, y: 20 }}

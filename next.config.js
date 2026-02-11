@@ -5,10 +5,6 @@ const nextConfig = {
     domains: [],
   },
   transpilePackages: [],
-  // Disable static generation for demo and presentation pages
-  generateBuildId: async () => {
-    return 'build-' + Date.now()
-  },
   // Exclude presentation folder from build
   webpack: (config, { isServer }) => {
     // Ignore presentation folder completely
@@ -17,6 +13,10 @@ const nextConfig = {
       use: 'ignore-loader',
     })
     return config
+  },
+  // Disable static optimization for demo and presentation pages
+  experimental: {
+    isrMemoryCacheSize: 0,
   },
 }
 
