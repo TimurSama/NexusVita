@@ -6,7 +6,7 @@ import { logAudit } from '@/lib/audit/log'
 
 const schema = z.object({
   userId: z.string().uuid(),
-  bundle: z.record(z.any()),
+  bundle: z.record(z.string(), z.any()),
 })
 
 export async function POST(request: NextRequest) {
