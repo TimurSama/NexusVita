@@ -1,29 +1,11 @@
-'use client'
-
-import {
-  Stethoscope,
-  Dumbbell,
-  Brain,
-  Apple,
-  Users,
-  Clock,
-  Shield,
-  BookOpen,
-  Sparkles,
-  ShoppingBag,
-  Building2,
-  Coins,
-  Calendar,
-  MessageSquare,
-  Settings,
-} from 'lucide-react'
+// Icon mapping - no React components in data for serialization
 import { Sector, Module } from './types'
 
 export const sectors: Sector[] = [
   {
     id: 'medicine',
     title: 'Медицина',
-    icon: Stethoscope,
+    icon: 'stethoscope',
     color: 'red',
     description:
       'Централизованная история медицинских данных: лабораторные анализы, результаты обследований, назначения, реабилитационные планы и протоколы профилактики.',
@@ -54,7 +36,7 @@ export const sectors: Sector[] = [
   {
     id: 'sport',
     title: 'Спорт и физическая производительность',
-    icon: Dumbbell,
+    icon: 'dumbbell',
     color: 'blue',
     description:
       'Планирование тренировок, контроль нагрузок, адаптивные планы прогресса и реабилитационные протоколы.',
@@ -85,7 +67,7 @@ export const sectors: Sector[] = [
   {
     id: 'psycho',
     title: 'Психо-эмоциональное здоровье',
-    icon: Brain,
+    icon: 'brain',
     color: 'purple',
     description:
       'Инструменты для мониторинга настроения, доступа к терапевтам и программам ментального здоровья.',
@@ -116,7 +98,7 @@ export const sectors: Sector[] = [
   {
     id: 'nutrition',
     title: 'Питание и метаболизм',
-    icon: Apple,
+    icon: 'apple',
     color: 'green',
     description:
       'Персонализированные планы питания на базе данных о пользователе, ограничениях, целях и анализах.',
@@ -147,7 +129,7 @@ export const sectors: Sector[] = [
   {
     id: 'social',
     title: 'Социальное',
-    icon: Users,
+    icon: 'users',
     color: 'orange',
     description:
       'Лента и группы по интересам, социальные вызовы и командные планы.',
@@ -178,7 +160,7 @@ export const sectors: Sector[] = [
   {
     id: 'sleep',
     title: 'Сон и восстановление',
-    icon: Clock,
+    icon: 'clock',
     color: 'indigo',
     description:
       'Аналитика сна, рекомендации по гигиене сна, интеграция с устройствами.',
@@ -209,7 +191,7 @@ export const sectors: Sector[] = [
   {
     id: 'prevention',
     title: 'Профилактика и окружающая среда',
-    icon: Shield,
+    icon: 'shield',
     color: 'teal',
     description:
       'Мониторинг факторов среды, оценка рисков и рекомендации по адаптации образа жизни.',
@@ -243,7 +225,7 @@ export const modules: Module[] = [
   {
     id: 'journal',
     title: 'Личный журнал',
-    icon: BookOpen,
+    icon: 'bookopen',
     description:
       'Ежедневные записи: самочувствие, тренировки, питание, сон, заметки врача.',
     features: [
@@ -262,7 +244,7 @@ export const modules: Module[] = [
   {
     id: 'ai-planner',
     title: 'ИИ-планировщик',
-    icon: Sparkles,
+    icon: 'sparkles',
     description:
       'Формирует персональные планы тренировок, питания, восстановления и терапии.',
     features: [
@@ -281,7 +263,7 @@ export const modules: Module[] = [
   {
     id: 'specialists',
     title: 'Тренеры & Коучи',
-    icon: Users,
+    icon: 'users',
     description:
       'Карточки специалистов, расписание, пакеты услуг, онлайн/оффлайн сессии.',
     features: [
@@ -300,7 +282,7 @@ export const modules: Module[] = [
   {
     id: 'marketplace',
     title: 'Магазин',
-    icon: ShoppingBag,
+    icon: 'shoppingbag',
     description:
       'БАДы, медикаменты, питание, оборудование с интеграцией в планы.',
     features: [
@@ -319,7 +301,7 @@ export const modules: Module[] = [
   {
     id: 'centers',
     title: 'Центры и абонементы',
-    icon: Building2,
+    icon: 'building2',
     description:
       'Управление абонементами фитнес-центров, клиник, спа с синхронизацией.',
     features: [
@@ -338,7 +320,7 @@ export const modules: Module[] = [
   {
     id: 'dao',
     title: 'DAO и токены',
-    icon: Coins,
+    icon: 'coins',
     description:
       'Управление сообществом, голосования, токены для бонусов и оплаты.',
     features: [
@@ -357,7 +339,7 @@ export const modules: Module[] = [
   {
     id: 'social-network',
     title: 'Социальная сеть',
-    icon: Users,
+    icon: 'users',
     description:
       'Профиль, друзья, группы, обмен достижениями, реферальные кампании.',
     features: [
@@ -376,7 +358,7 @@ export const modules: Module[] = [
   {
     id: 'calendar',
     title: 'Календарь & Синхронизация',
-    icon: Calendar,
+    icon: 'calendar',
     description:
       'Интеграция с Google/Apple Calendar, напоминания, планирование сессий, биллинг.',
     features: [
@@ -395,7 +377,7 @@ export const modules: Module[] = [
   {
     id: 'telemedicine',
     title: 'Чат и телемедицина',
-    icon: MessageSquare,
+    icon: 'messagesquare',
     description:
       'Общение с тренерами, врачами, коучами, история переписки, запись сессий.',
     features: [
@@ -414,7 +396,7 @@ export const modules: Module[] = [
   {
     id: 'integrations',
     title: 'Интеграции устройств',
-    icon: Settings,
+    icon: 'settings',
     description:
       'Wearables, умные весы, пульсометры, датчики среды, автоматический сбор данных.',
     features: [

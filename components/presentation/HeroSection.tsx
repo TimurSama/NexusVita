@@ -8,6 +8,7 @@ import VitruvianMan from '@/components/vitruvian/VitruvianMan'
 import { sectors } from './data'
 import { cn } from '@/lib/utils/cn'
 import { useI18n } from '@/lib/i18n/I18nProvider'
+import { getIcon } from './iconMap'
 
 interface HeroSectionProps {
   onStartClick: () => void
@@ -107,7 +108,12 @@ export default function HeroSection({
                       aria-label={label}
                     >
                       <span className={cn('inline-flex items-center gap-1 sm:gap-2', hs.colorClass)}>
-                        <span className="opacity-90">{sector.icon && <sector.icon className="w-4 h-4 sm:w-5 sm:h-5" />}</span>
+                        <span className="opacity-90">
+                          {(() => {
+                            const IconComponent = getIcon(sector.icon)
+                            return IconComponent ? <IconComponent className="w-4 h-4 sm:w-5 sm:h-5" /> : null
+                          })()}
+                        </span>
                         <span className="text-warmGraphite-800 hidden sm:inline">{label}</span>
                       </span>
                     </button>

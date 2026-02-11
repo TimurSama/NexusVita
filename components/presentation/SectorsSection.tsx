@@ -7,6 +7,7 @@ import NeumorphicCard from '@/components/ui/NeumorphicCard'
 import NeumorphicBadge from '@/components/ui/NeumorphicBadge'
 import { sectors } from './data'
 import { cn } from '@/lib/utils/cn'
+import { getIcon } from './iconMap'
 
 interface SectorsSectionProps {
   onSectorClick: (sectorId: string) => void
@@ -60,7 +61,10 @@ export default function SectorsSection({ onSectorClick, onInteractiveClick }: Se
               >
                 <div className="flex items-start justify-between mb-2">
                   <div className={`text-${sector.color}-500 mb-3 sm:mb-4`}>
-                    {sector.icon && <sector.icon className="w-8 h-8" />}
+                    {(() => {
+                      const IconComponent = getIcon(sector.icon)
+                      return IconComponent ? <IconComponent className="w-8 h-8" /> : null
+                    })()}
                   </div>
                   <button
                     onClick={(e) => {

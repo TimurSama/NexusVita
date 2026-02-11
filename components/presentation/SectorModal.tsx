@@ -3,6 +3,7 @@
 import NeumorphicModal from '@/components/ui/NeumorphicModal'
 import { CheckCircle, Star, Zap } from 'lucide-react'
 import { Sector } from './types'
+import { getIcon } from './iconMap'
 
 interface SectorModalProps {
   sector: Sector | null
@@ -22,7 +23,10 @@ export default function SectorModal({ sector, isOpen, onClose }: SectorModalProp
     >
       <div className="space-y-4 sm:space-y-6 max-h-[70vh] overflow-y-auto pr-2">
         <div className={`text-${sector.color}-500 text-5xl sm:text-6xl mb-3 sm:mb-4 flex justify-center`}>
-          {sector.icon && <sector.icon className="w-12 h-12 sm:w-16 sm:h-16" />}
+          {(() => {
+            const IconComponent = getIcon(sector.icon)
+            return IconComponent ? <IconComponent className="w-12 h-12 sm:w-16 sm:h-16" /> : null
+          })()}
         </div>
         <p className="text-base sm:text-lg text-warmGraphite-600 text-center">
           {sector.description}

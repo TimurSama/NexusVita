@@ -4,6 +4,7 @@ import { motion } from 'framer-motion'
 import { ArrowRight } from 'lucide-react'
 import NeumorphicCard from '@/components/ui/NeumorphicCard'
 import { modules } from './data'
+import { getIcon } from './iconMap'
 
 interface ModulesSectionProps {
   onModuleClick: (moduleId: string) => void
@@ -42,7 +43,10 @@ export default function ModulesSection({ onModuleClick }: ModulesSectionProps) {
                 onClick={() => onModuleClick(module.id)}
               >
                 <div className="text-warmBlue-500 mb-3 sm:mb-4">
-                  {module.icon && <module.icon className="w-6 h-6" />}
+                  {(() => {
+                    const IconComponent = getIcon(module.icon)
+                    return IconComponent ? <IconComponent className="w-6 h-6" /> : null
+                  })()}
                 </div>
                 <h3 className="text-lg sm:text-xl font-semibold text-warmGraphite-800 mb-2 sm:mb-3">
                   {module.title}

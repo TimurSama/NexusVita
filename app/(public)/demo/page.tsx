@@ -1,9 +1,5 @@
 'use client'
 
-// Disable static generation for this page
-export const dynamic = 'force-dynamic'
-export const revalidate = 0
-
 import { useState, useEffect, useMemo } from 'react'
 import { motion, AnimatePresence, useScroll, useSpring, useTransform } from 'framer-motion'
 import { 
@@ -40,6 +36,7 @@ import {
   X,
 } from 'lucide-react'
 import { sectors, modules } from '@/components/presentation/data'
+import { getIcon } from '@/components/presentation/iconMap'
 import { useI18n } from '@/lib/i18n/I18nProvider'
 import { cn } from '@/lib/utils/cn'
 import NeumorphicCard from '@/components/ui/NeumorphicCard'
@@ -382,7 +379,10 @@ export default function DemoPresentationPage() {
                   onClick={() => setActiveModule(module.id)}
                 >
                   <div className="mb-6 p-4 bg-warmBeige-50 text-warmGraphite-800 rounded-lg w-fit">
-                    {module.icon && <module.icon className="w-6 h-6" />}
+                    {(() => {
+                      const IconComponent = getIcon(module.icon)
+                      return IconComponent ? <IconComponent className="w-6 h-6" /> : null
+                    })()}
                   </div>
                   <h4 className="text-2xl font-semibold mb-3 text-warmBeige-50 font-serif tracking-tight">
                     {module.title}
@@ -423,7 +423,10 @@ export default function DemoPresentationPage() {
                 onClick={() => setActiveSector(sector.id)}
               >
                 <div className={`text-${sector.color}-500 text-4xl mb-4`}>
-                  {sector.icon && <sector.icon className="w-10 h-10" />}
+                  {(() => {
+                    const IconComponent = getIcon(sector.icon)
+                    return IconComponent ? <IconComponent className="w-10 h-10" /> : null
+                  })()}
                 </div>
                 <h3 className="text-xl font-semibold text-warmGraphite-800 mb-2">
                   {sector.title}
@@ -1073,7 +1076,10 @@ function EnhancedSectorModal({ sector, isOpen, onClose, lang }: { sector: any; i
     >
       <div className="space-y-6 max-h-[80vh] overflow-y-auto pr-2">
         <div className={`text-${sector.color}-500 text-6xl mb-4 flex justify-center`}>
-          {sector.icon && <sector.icon className="w-16 h-16" />}
+          {(() => {
+            const IconComponent = getIcon(sector.icon)
+            return IconComponent ? <IconComponent className="w-16 h-16" /> : null
+          })()}
         </div>
         <p className="text-lg text-warmGraphite-600 text-center">
           {sector.description}
@@ -1163,7 +1169,10 @@ function EnhancedModuleModal({ module, isOpen, onClose, lang }: { module: any; i
     >
       <div className="space-y-6 max-h-[80vh] overflow-y-auto pr-2">
         <div className="text-warmBlue-500 text-6xl mb-4 flex justify-center">
-          {module.icon && <module.icon className="w-16 h-16" />}
+          {(() => {
+            const IconComponent = getIcon(module.icon)
+            return IconComponent ? <IconComponent className="w-16 h-16" /> : null
+          })()}
         </div>
         <p className="text-lg text-warmGraphite-600 text-center">
           {module.description}
