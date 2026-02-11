@@ -1,9 +1,5 @@
 'use client'
 
-// Disable static generation for this page
-export const dynamic = 'force-dynamic'
-export const generateStaticParams = () => []
-
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { MessageSquare } from 'lucide-react'
