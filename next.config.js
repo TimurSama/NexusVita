@@ -5,10 +5,6 @@ const nextConfig = {
     domains: [],
   },
   transpilePackages: [],
-  // Disable static optimization for specific routes
-  experimental: {
-    missingSuspenseWithCSRBailout: false,
-  },
   // Exclude presentation folder from build
   webpack: (config, { isServer }) => {
     // Ignore presentation folder completely

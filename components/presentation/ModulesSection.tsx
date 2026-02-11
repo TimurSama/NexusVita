@@ -44,8 +44,10 @@ export default function ModulesSection({ onModuleClick }: ModulesSectionProps) {
               >
                 <div className="text-warmBlue-500 mb-3 sm:mb-4">
                   {(() => {
+                    if (!module.icon || typeof module.icon !== 'string') return null
                     const IconComponent = getIcon(module.icon)
-                    return IconComponent ? <IconComponent className="w-6 h-6" /> : null
+                    if (!IconComponent || typeof IconComponent !== 'function') return null
+                    return <IconComponent className="w-6 h-6" />
                   })()}
                 </div>
                 <h3 className="text-lg sm:text-xl font-semibold text-warmGraphite-800 mb-2 sm:mb-3">

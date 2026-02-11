@@ -62,8 +62,10 @@ export default function SectorsSection({ onSectorClick, onInteractiveClick }: Se
                 <div className="flex items-start justify-between mb-2">
                   <div className={`text-${sector.color}-500 mb-3 sm:mb-4`}>
                     {(() => {
+                      if (!sector.icon || typeof sector.icon !== 'string') return null
                       const IconComponent = getIcon(sector.icon)
-                      return IconComponent ? <IconComponent className="w-8 h-8" /> : null
+                      if (!IconComponent || typeof IconComponent !== 'function') return null
+                      return <IconComponent className="w-8 h-8" />
                     })()}
                   </div>
                   <button

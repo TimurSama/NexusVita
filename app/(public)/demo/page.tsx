@@ -380,8 +380,10 @@ export default function DemoPresentationPage() {
                 >
                   <div className="mb-6 p-4 bg-warmBeige-50 text-warmGraphite-800 rounded-lg w-fit">
                     {(() => {
+                      if (!module.icon || typeof module.icon !== 'string') return null
                       const IconComponent = getIcon(module.icon)
-                      return IconComponent ? <IconComponent className="w-6 h-6" /> : null
+                      if (!IconComponent || typeof IconComponent !== 'function') return null
+                      return <IconComponent className="w-6 h-6" />
                     })()}
                   </div>
                   <h4 className="text-2xl font-semibold mb-3 text-warmBeige-50 font-serif tracking-tight">
@@ -424,8 +426,10 @@ export default function DemoPresentationPage() {
               >
                 <div className={`text-${sector.color}-500 text-4xl mb-4`}>
                   {(() => {
+                    if (!sector.icon || typeof sector.icon !== 'string') return null
                     const IconComponent = getIcon(sector.icon)
-                    return IconComponent ? <IconComponent className="w-10 h-10" /> : null
+                    if (!IconComponent || typeof IconComponent !== 'function') return null
+                    return <IconComponent className="w-10 h-10" />
                   })()}
                 </div>
                 <h3 className="text-xl font-semibold text-warmGraphite-800 mb-2">
@@ -1077,8 +1081,10 @@ function EnhancedSectorModal({ sector, isOpen, onClose, lang }: { sector: any; i
       <div className="space-y-6 max-h-[80vh] overflow-y-auto pr-2">
         <div className={`text-${sector.color}-500 text-6xl mb-4 flex justify-center`}>
           {(() => {
+            if (!sector.icon || typeof sector.icon !== 'string') return null
             const IconComponent = getIcon(sector.icon)
-            return IconComponent ? <IconComponent className="w-16 h-16" /> : null
+            if (!IconComponent || typeof IconComponent !== 'function') return null
+            return <IconComponent className="w-16 h-16" />
           })()}
         </div>
         <p className="text-lg text-warmGraphite-600 text-center">
@@ -1170,8 +1176,10 @@ function EnhancedModuleModal({ module, isOpen, onClose, lang }: { module: any; i
       <div className="space-y-6 max-h-[80vh] overflow-y-auto pr-2">
         <div className="text-warmBlue-500 text-6xl mb-4 flex justify-center">
           {(() => {
+            if (!module.icon || typeof module.icon !== 'string') return null
             const IconComponent = getIcon(module.icon)
-            return IconComponent ? <IconComponent className="w-16 h-16" /> : null
+            if (!IconComponent || typeof IconComponent !== 'function') return null
+            return <IconComponent className="w-16 h-16" />
           })()}
         </div>
         <p className="text-lg text-warmGraphite-600 text-center">

@@ -38,5 +38,11 @@ export const iconMap: Record<string, LucideIcon> = {
 }
 
 export const getIcon = (iconName: string): LucideIcon | null => {
-  return iconMap[iconName.toLowerCase()] || null
+  if (!iconName || typeof iconName !== 'string') return null
+  const icon = iconMap[iconName.toLowerCase()]
+  // Ensure we return a valid component function, not an object
+  if (typeof icon === 'function') {
+    return icon
+  }
+  return null
 }

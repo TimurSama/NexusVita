@@ -110,8 +110,10 @@ export default function HeroSection({
                       <span className={cn('inline-flex items-center gap-1 sm:gap-2', hs.colorClass)}>
                         <span className="opacity-90">
                           {(() => {
+                            if (!sector.icon || typeof sector.icon !== 'string') return null
                             const IconComponent = getIcon(sector.icon)
-                            return IconComponent ? <IconComponent className="w-4 h-4 sm:w-5 sm:h-5" /> : null
+                            if (!IconComponent || typeof IconComponent !== 'function') return null
+                            return <IconComponent className="w-4 h-4 sm:w-5 sm:h-5" />
                           })()}
                         </span>
                         <span className="text-warmGraphite-800 hidden sm:inline">{label}</span>

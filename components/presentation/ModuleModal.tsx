@@ -24,8 +24,10 @@ export default function ModuleModal({ module, isOpen, onClose }: ModuleModalProp
       <div className="space-y-4 sm:space-y-6 max-h-[70vh] overflow-y-auto pr-2">
         <div className="text-warmBlue-500 text-5xl sm:text-6xl mb-3 sm:mb-4 flex justify-center">
           {(() => {
+            if (!module.icon || typeof module.icon !== 'string') return null
             const IconComponent = getIcon(module.icon)
-            return IconComponent ? <IconComponent className="w-12 h-12 sm:w-16 sm:h-16" /> : null
+            if (!IconComponent || typeof IconComponent !== 'function') return null
+            return <IconComponent className="w-12 h-12 sm:w-16 sm:h-16" />
           })()}
         </div>
         <p className="text-base sm:text-lg text-warmGraphite-600 text-center">
